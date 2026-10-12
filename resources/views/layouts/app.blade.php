@@ -685,10 +685,166 @@
                 transition-duration: 0.01ms !important;
             }
         }
+
+        :root {
+            --UNI-primary: #155e4b;
+            --UNI-primary-dark: #10483a;
+            --UNI-secondary: #21765e;
+            --UNI-accent: #2f9875;
+            --UNI-gold: #d8b45a;
+            --UNI-bg: #f4f7f6;
+            --UNI-card-border: #e3eae7;
+            --UNI-text: #172b25;
+            --UNI-muted: #718078;
+        }
+        body {
+            background:
+                radial-gradient(ellipse at 0 0, rgba(220, 237, 228, 0.42), transparent 36rem),
+                #f5f7f6;
+            color: var(--UNI-text);
+        }
+        .navbar-UNI {
+            background: rgba(16, 54, 45, 0.97);
+            border-bottom: 1px solid rgba(216, 180, 90, 0.55);
+            box-shadow: 0 8px 24px rgba(18, 45, 38, 0.14);
+            backdrop-filter: blur(14px);
+        }
+        .navbar-UNI > .container {
+            max-width: 1560px;
+        }
+        .navbar-UNI .navbar-nav {
+            flex-wrap: nowrap;
+        }
+        .navbar-UNI .nav-link {
+            font-size: 0.8rem;
+            padding: 0.48rem 0.58rem !important;
+            border-radius: 0.65rem;
+        }
+        .navbar-UNI .nav-link.active-link {
+            color: #fff !important;
+            background: rgba(255, 255, 255, 0.14);
+            box-shadow: inset 0 -2px 0 var(--UNI-gold);
+        }
+        .brand-text {
+            letter-spacing: 0.06em;
+        }
+        main.container {
+            max-width: 1500px;
+            padding-bottom: 2rem;
+        }
+        .card-custom {
+            border-color: #e4ebe8;
+            border-radius: 1rem;
+            box-shadow: 0 5px 20px rgba(25, 54, 45, 0.045), 0 1px 3px rgba(25, 54, 45, 0.035);
+        }
+        .card-custom:hover {
+            border-color: #d6e4dd;
+            box-shadow: 0 12px 30px rgba(25, 54, 45, 0.08);
+        }
+        .card-custom-header {
+            padding: 1.1rem 1.35rem;
+        }
+        .page-heading {
+            margin-bottom: 1.75rem;
+        }
+        .page-heading h1,
+        .page-heading h2,
+        .page-heading h3 {
+            color: #16372d;
+            letter-spacing: -0.035em;
+        }
+        .btn {
+            border-radius: 0.7rem;
+            padding-top: 0.58rem;
+            padding-bottom: 0.58rem;
+        }
+        .btn-sm {
+            padding-top: 0.38rem;
+            padding-bottom: 0.38rem;
+        }
+        .form-control,
+        .form-select,
+        .input-group-text {
+            border-color: #d9e2de;
+            border-radius: 0.7rem;
+        }
+        .form-control,
+        .form-select {
+            min-height: 44px;
+        }
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--UNI-accent);
+            box-shadow: 0 0 0 0.22rem rgba(47, 152, 117, 0.14);
+        }
+        .table {
+            --bs-table-hover-bg: #f5f9f7;
+        }
+        .table > thead th {
+            color: #61736b;
+            background: #f5f8f6;
+            border-bottom-color: #e4ebe7;
+            letter-spacing: 0.075em;
+        }
+        .table > tbody td {
+            border-bottom-color: #edf1ef;
+        }
+        .stat-bubble {
+            width: 48px;
+            height: 48px;
+            border: 0;
+            border-radius: 14px;
+            background: #edf5f1;
+            color: var(--UNI-primary);
+        }
+        .alert {
+            border: 1px solid rgba(25, 54, 45, 0.08);
+            box-shadow: 0 3px 12px rgba(25, 54, 45, 0.035);
+        }
+        .dropdown-menu {
+            border-color: #e3eae7;
+            border-radius: 0.9rem;
+            box-shadow: 0 16px 38px rgba(19, 43, 36, 0.15);
+        }
+        .auth-screen {
+            background: #f3f6f4;
+        }
+        .auth-screen .navbar-UNI,
+        .auth-screen footer {
+            display: none !important;
+        }
+        main.auth-main {
+            max-width: none;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        .dashboard-heading {
+            padding: 1.6rem 1.8rem;
+            border: 1px solid #e1ebe5;
+            border-radius: 1.2rem;
+            background: linear-gradient(115deg, #fff 0%, #f1f7f3 100%);
+            box-shadow: 0 8px 26px rgba(25, 54, 45, 0.045);
+        }
+        @media (max-width: 991.98px) {
+            .navbar-UNI .navbar-nav {
+                flex-wrap: wrap;
+            }
+            .dashboard-heading {
+                padding: 1.25rem;
+            }
+        }
+        @media (max-width: 575.98px) {
+            .page-heading {
+                margin-bottom: 1.2rem;
+            }
+            .dashboard-heading {
+                border-radius: 1rem;
+            }
+        }
     </style>
     @yield('styles')
 </head>
-<body class="d-flex flex-column min-vh-100">
+<body class="d-flex flex-column min-vh-100 @guest auth-screen @endguest">
 
     <a class="skip-link" href="#main-content">Skip to main content</a>
 
@@ -1278,7 +1434,7 @@
     @endauth
 
     <!-- Main Content Container -->
-    <main class="container my-4 flex-grow-1" id="main-content">
+    <main class="container my-4 flex-grow-1 @guest auth-main @endguest" id="main-content">
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
                 <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
