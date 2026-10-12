@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<style>.upload-zone{transition:all .2s ease;}.upload-zone:hover{border-color:#212529!important;background:#f8f9fa;}</style>
+<style>.upload-zone{transition:all .2s ease;}.upload-zone:hover,.upload-zone:focus-visible{border-color:var(--UNI-accent)!important;background:#f2f8f4;}</style>
 
 <div class="row justify-content-center">
     <div class="col-md-8">
@@ -17,10 +17,10 @@
             </div>
         </div>
 
-        <div class="card shadow-sm border-0">
+        <div class="card card-custom">
             <div class="card-body p-4">
                 <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-1 gap-2">
-                    <h5 class="fw-bold mb-0"><i class="bi bi-journal-plus me-2 text-success"></i>New Research Proposal</h5>
+                    <h1 class="h4 fw-bold mb-0"><i class="bi bi-journal-plus me-2 text-success"></i>New Research Proposal</h1>
                     <a href="{{ route('projects.index') }}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i> Back to Projects</a>
                 </div>
                 <p class="text-muted small mb-3">Proposals >= 500,000 ETB route to RCSC & VP approval.</p>
@@ -30,13 +30,13 @@
 
                     <div id="step1">
                         <div class="mb-3">
-                            <label class="form-label fw-bold small">Research Project Title <span class="text-danger">*</span></label>
+                            <label for="inputTitle" class="form-label fw-bold small">Research Project Title <span class="text-danger">*</span></label>
                             <input type="text" name="title" class="form-control form-control-sm @error('title') is-invalid @enderror" required placeholder="Full academic title" value="{{ old('title') }}" id="inputTitle">
                             @error('title')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-bold small">Thematic Priority Area <span class="text-danger">*</span></label>
+                            <label for="inputThematic" class="form-label fw-bold small">Thematic Priority Area <span class="text-danger">*</span></label>
                             <select name="thematic_id" class="form-select form-select-sm @error('thematic_id') is-invalid @enderror" required id="inputThematic">
                                 <option value="">-- Select --</option>
                                 @foreach($thematicAreas as $t)
@@ -47,14 +47,14 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-bold small">Requested Budget (ETB) <span class="text-danger">*</span></label>
+                            <label for="budgetInput" class="form-label fw-bold small">Requested Budget (ETB) <span class="text-danger">*</span></label>
                             <input type="number" step="0.01" min="0" name="requested_budget" class="form-control form-control-sm @error('requested_budget') is-invalid @enderror" required placeholder="e.g. 450000" value="{{ old('requested_budget') }}" id="budgetInput">
                             @error('requested_budget')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             <div id="budgetAlert" class="alert alert-warning small py-1 mb-0 mt-1 d-none"><i class="bi bi-exclamation-triangle me-1"></i>RCSC & VP approval required (>= 500k ETB)</div>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-bold small">Technical Abstract <span class="text-danger">*</span></label>
+                            <label for="abstractInput" class="form-label fw-bold small">Technical Abstract <span class="text-danger">*</span></label>
                             <textarea name="abstract_text" rows="4" maxlength="5000" class="form-control form-control-sm @error('abstract_text') is-invalid @enderror" required placeholder="Executive summary, objectives, methodology, expected outcomes..." id="abstractInput">{{ old('abstract_text') }}</textarea>
                             <small class="text-muted"><span id="charCount">0</span>/5000</small>
                             @error('abstract_text')<div class="invalid-feedback">{{ $message }}</div>@enderror
@@ -62,7 +62,7 @@
 
                         <div class="mb-3">
                             <label class="form-label fw-bold small">Proposal Document (PDF) <span class="text-danger">*</span></label>
-                            <div class="upload-zone border border-2 border-dashed rounded-3 p-3 text-center" id="uploadZone" style="cursor:pointer;border-color:#dee2e6;">
+                            <div class="upload-zone border border-2 border-dashed rounded-3 p-3 text-center" id="uploadZone" role="button" tabindex="0" aria-label="Choose a proposal document or drag and drop it here" style="cursor:pointer;border-color:#dee2e6;">
                                 <i class="bi bi-cloud-arrow-up fs-3 text-muted d-block mb-1"></i>
                                 <p class="mb-0 small fw-bold text-dark">Drag & drop or click to browse</p>
                                 <input type="file" name="proposal_document" accept=".pdf,.doc,.docx" class="d-none" id="fileInput">
@@ -153,8 +153,9 @@ var uz = document.getElementById('uploadZone');
 var fi = document.getElementById('fileInput');
 var fn = document.getElementById('fileName');
 if(uz&&fi){
-    uz.addEventListener('click',function(){fi.click();});
-    uz.addEventListener('dragover',function(e){e.preventDefault();this.style.borderColor='#212529';});
+    uz.addEventListener('click',function(e){if(e.target!==fi){fi.click();}});
+    uz.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();fi.click();}});
+    uz.addEventListener('dragover',function(e){e.preventDefault();this.style.borderColor='#2e8b57';});
     uz.addEventListener('dragleave',function(e){e.preventDefault();this.style.borderColor='#dee2e6';});
     uz.addEventListener('drop',function(e){e.preventDefault();this.style.borderColor='#dee2e6';if(e.dataTransfer.files.length){fi.files=e.dataTransfer.files;showFN(e.dataTransfer.files[0]);}});
     fi.addEventListener('change',function(){if(this.files.length)showFN(this.files[0]);});
