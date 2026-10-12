@@ -16,9 +16,8 @@
 </div>
 
 {{-- Active calls banner for PIs / TMs --}}
-@inject('openCalls', 'App\Models\ResearchCall')
 @if(in_array(auth()->user()->role, ['pi', 'tm']))
-@php $nowOpen = $openCalls::active()->count(); @endphp
+@php $nowOpen = \App\Models\ResearchCall::active()->count(); @endphp
 @if($nowOpen > 0)
 <div class="alert alert-success d-flex align-items-center shadow-sm mb-4">
     <i class="bi bi-bullhorn fs-4 me-3"></i>
@@ -61,7 +60,7 @@
 
 {{-- Open calls highlight --}}
 <div id="openCallsSection" class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3 mb-4">
-    @forelse($calls->where('status', 'Open') as $call)
+    @forelse($calls->getCollection()->where('status', 'Open') as $call)
     <div class="col">
         <div class="card card-custom h-100 p-3">
             <div class="d-flex justify-content-between align-items-start mb-2">
