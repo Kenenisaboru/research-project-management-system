@@ -71,7 +71,7 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse($papers->where('status', '!=', 'Recorded')->where('status', '!=', 'Rejected') as $paper)
+                @forelse($papers->getCollection()->where('status', '!=', 'Recorded')->where('status', '!=', 'Rejected') as $paper)
                 <tr>
                     <td class="fw-bold">{{ \Illuminate\Support\Str::limit($paper->title, 60) }}</td>
                     <td>{{ $paper->submitter->name ?? '—' }}</td>
