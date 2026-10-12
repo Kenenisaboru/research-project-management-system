@@ -25,6 +25,12 @@ class PermissionMiddleware
         }
 
         if (!RbacService::userHasAnyPermission($user, $resolvedPermissions)) {
+            \App\Services\AuditService::log(
+                'PRIVILEGE_ESCALATION_ATTEMPT',
+                'User',
+                $user->id,
+                "User attempted to access resource [{$request->method()} {$request->path()}] without permission(s): " . implode(',', $resolvedPermissions)
+            );
             abort(403, 'Unauthorized. You do not have the required permission to access this resource.');
         }
 

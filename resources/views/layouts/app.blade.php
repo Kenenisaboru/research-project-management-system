@@ -709,6 +709,35 @@
                     </li>
                     @endif
 
+                    {{-- 10. Calls for Proposals --}}
+                    @if(Auth::user()->hasPermission('view_calls'))
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('calls.*') ? 'active-link' : '' }}" href="{{ route('calls.index') }}">
+                            <i class="bi bi-megaphone me-1"></i> Calls
+                        </a>
+                    </li>
+                    @endif
+
+                    {{-- 11. Publication & Award --}}
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('papers.*') ? 'active-link' : '' }}" href="{{ route('papers.index') }}">
+                            <i class="bi bi-journal-richtext me-1"></i> Publications
+                        </a>
+                    </li>
+
+                    {{-- 12. Admin: Backups & Migration --}}
+                    @if(Auth::user()->role === 'admin')
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {{ request()->routeIs('admin.backups', 'admin.data-migration') ? 'active-link' : '' }}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-hdd-stack me-1"></i> System
+                        </a>
+                        <ul class="dropdown-menu shadow-sm">
+                            <li><a class="dropdown-item small" href="{{ route('admin.backups') }}"><i class="bi bi-hdd-stack me-2 text-dark"></i>Backup &amp; Recovery</a></li>
+                            <li><a class="dropdown-item small" href="{{ route('admin.data-migration') }}"><i class="bi bi-box-arrow-in-down me-2 text-dark"></i>Data Migration</a></li>
+                        </ul>
+                    </li>
+                    @endif
+
                 </ul>
 
                 <!-- User Profile & Action Controls -->
@@ -728,7 +757,15 @@
                         <ul class="dropdown-menu dropdown-menu-end p-2 shadow-lg" style="width: 320px; max-height: 380px; overflow-y: auto;">
                             <li class="dropdown-header fw-bold d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
                                 <span><i class="bi bi-bell me-1 text-warning"></i> Notifications Center</span>
-                                <span class="badge bg-dark rounded-pill">{{ $notifCount }}</span>
+                                <span class="d-flex align-items-center gap-1">
+                                    <span class="badge bg-dark rounded-pill">{{ $notifCount }}</span>
+                                    @if($notifCount > 0)
+                                    <form action="{{ route('notifications.read-all') }}" method="POST" class="d-inline m-0">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-link p-0 text-decoration-none" style="font-size:0.7rem;" title="Mark all as read">Mark all read</button>
+                                    </form>
+                                    @endif
+                                </span>
                             </li>
                             @forelse($notifItems as $item)
                                 <li class="mb-2">
@@ -785,9 +822,17 @@
                                 </div>
                             </li>
 
+                            <li>
+                                <a class="dropdown-item small py-1" href="{{ route('research.catalog') }}" target="_blank">
+                                    <i class="bi bi-globe2 me-2 text-info"></i> Public Research Repository
+                                </a>
+                            </li>
+
                             <li class="dropdown-header fw-bold text-dark px-1 py-1 d-flex justify-content-between align-items-center">
                                 <span><i class="bi bi-arrow-repeat me-1 text-primary"></i> Switch Demo Role</span>
+                                @if(app()->environment('local', 'staging'))
                                 <span class="badge bg-warning-subtle text-warning border border-warning-subtle" style="font-size: 0.6rem;">DEMO</span>
+                                @endif
                             </li>
 
                             @php
@@ -965,6 +1010,23 @@
                     </a>
                 </li>
                 @endif
+                @if(Auth::user()->hasPermission('view_calls'))
+                <li class="nav-item">
+                    <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('calls.*') ? 'active-link' : '' }}" href="{{ route('calls.index') }}" style="font-size: 0.85rem;">
+                        <i class="bi bi-megaphone me-2 text-white-50"></i> Calls
+                    </a>
+                </li>
+                @endif
+                <li class="nav-item">
+                    <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('papers.*') ? 'active-link' : '' }}" href="{{ route('papers.index') }}" style="font-size: 0.85rem;">
+                        <i class="bi bi-journal-richtext me-2 text-white-50"></i> Publications
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white py-2 px-2" href="{{ route('research.catalog') }}" target="_blank" style="font-size: 0.85rem;">
+                        <i class="bi bi-globe2 me-2 text-white-50"></i> Research Repository
+                    </a>
+                </li>
                 @if(Auth::user()->hasAnyPermission(['approve_extensions', 'approve_amendments']))
                 <li class="nav-item">
                     <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('extensions.*') ? 'active-link' : '' }}" href="{{ route('extensions.index') }}" style="font-size: 0.85rem;">
@@ -993,6 +1055,16 @@
                 <li class="nav-item">
                     <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('admin.departments') ? 'active-link' : '' }}" href="{{ route('admin.departments') }}" style="font-size: 0.85rem;">
                         <i class="bi bi-building me-2 text-white-50"></i> Departments
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('admin.backups') ? 'active-link' : '' }}" href="{{ route('admin.backups') }}" style="font-size: 0.85rem;">
+                        <i class="bi bi-hdd-stack me-2 text-white-50"></i> Backup &amp; Recovery
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('admin.data-migration') ? 'active-link' : '' }}" href="{{ route('admin.data-migration') }}" style="font-size: 0.85rem;">
+                        <i class="bi bi-box-arrow-in-down me-2 text-white-50"></i> Data Migration
                     </a>
                 </li>
                 @endif

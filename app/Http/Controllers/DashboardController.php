@@ -61,7 +61,9 @@ class DashboardController extends Controller
             $pendingApprovals = Project::where('status', '!=', 'Draft')->where('status', '!=', 'Withdrawn')->with(['pi', 'thematicArea'])->latest()->limit(10)->get();
         }
 
-        return view('dashboard', compact('user', 'role', 'stats', 'myProjects', 'assignedReviews', 'pendingApprovals', 'teamProjects', 'pendingDisbursements', 'disbursedHistory'));
+        $alerts = \App\Services\AlertsService::all();
+
+        return view('dashboard', compact('user', 'role', 'stats', 'myProjects', 'assignedReviews', 'pendingApprovals', 'teamProjects', 'pendingDisbursements', 'disbursedHistory', 'alerts'));
     }
 
     private function getRoleSpecificStats($user, $role)
