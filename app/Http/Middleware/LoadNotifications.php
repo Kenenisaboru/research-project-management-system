@@ -17,20 +17,62 @@ class LoadNotifications
             $notifItems = [];
             $role = $user->role;
 
+            // Generated notifications (single source of truth for in-app alerts)
+            \App\Models\Notification::forUser($user->id)->unread()->latest()->limit(10)->get()
+                ->each(function (\App\Models\Notification $n) use (&$notifCount, &$notifItems) {
+                    $notifCount++;
+                    $notifItems[] = [
+                        'title' => $n->type ? ucwords(strtolower(str_replace('_', ' ', $n->type))) : 'Notice',
+                        'desc'  => $n->message,
+                        'time'  => $n->created_at ? $n->created_at->diffForHumans() : 'Now',
+                        'icon'  => 'bi-bell text-primary',
+                    ];
+                });
+
+            // Legacy role-scoped roll-up counts (kept for backwards compatibility)
             if ($role === 'reviewer') {
-                $notifCount = \App\Models\Evaluation::where('examiner_id', $user->id)
+                $n = \App\Models\Evaluation::where('examiner_id', $user->id)
                     ->where('decision', 'Pending')->count();
+                if ($n > 0) {
+                    $notifCount += $n;
+                    $notifItems[] = ['title' => 'Pending Evaluations', 'desc' => "$n project evaluation(s) awaiting your scoring.", 'time' => 'Now', 'icon' => 'bi-clipboard-check text-warning'];
+                }
             } elseif (in_array($role, ['coordinator', 'dh'])) {
-                $notifCount = \App\Models\Project::where('status', 'Submitted')->count();
+                $n = \App\Models\Project::where('status', 'Submitted')->count();
+                if ($n > 0) {
+                    $notifCount += $n;
+                    $notifItems[] = ['title' => 'Submitted Proposals', 'desc' => "$n new proposal(s) awaiting screening.", 'time' => 'Now', 'icon' => 'bi-inbox text-primary'];
+                }
             } elseif (in_array($role, ['dean', 'rcsc', 'vparttcs'])) {
-                $notifCount = \App\Models\BudgetRequest::where('status', 'Pending')->count();
+                $n = \App\Models\BudgetRequest::where('status', 'Pending')->count();
+                if ($n > 0) {
+                    $notifCount += $n;
+                    $notifItems[] = ['title' => 'Budget Approvals', 'desc' => "$n budget request(s) pending your decision.", 'time' => 'Now', 'icon' => 'bi-cash-stack text-success'];
+                }
             } elseif ($role === 'pi') {
-                $notifCount = \App\Models\Project::where('pi_id', $user->id)
+                $n = \App\Models\Project::where('pi_id', $user->id)
                     ->whereNotIn('status', ['Completed', 'Terminated'])->count();
+                if ($n > 0) {
+                    $notifItems[] = ['title' => 'Active Projects', 'desc' => "You have $n project(s) in progress.", 'time' => 'Now', 'icon' => 'bi-folder2-open text-info'];
+                }
             } elseif ($role === 'irerc') {
-                $notifCount = \App\Models\IRERCClearance::where('status', 'Pending')->count();
+                $n = \App\Models\IRERCClearance::where('status', 'Pending')->count();
+                if ($n > 0) {
+                    $notifCount += $n;
+                    $notifItems[] = ['title' => 'Ethics Clearances', 'desc' => "$n proposal(s) awaiting ethical review.", 'time' => 'Now', 'icon' => 'bi-shield-exclamation text-danger'];
+                }
+            } elseif ($role === 'finance') {
+                $n = \App\Models\BudgetRequest::where('status', 'Approved')->where('released_at', null)->count();
+                if ($n > 0) {
+                    $notifCount += $n;
+                    $notifItems[] = ['title' => 'Disbursements', 'desc' => "$n approved tranche(s) ready for release.", 'time' => 'Now', 'icon' => 'bi-cash-coin text-success'];
+                }
             } elseif ($role === 'admin') {
-                $notifCount = 1;
+                $b = \App\Services\AlertsService::backupRiskCount();
+                if ($b > 0) {
+                    $notifCount += $b;
+                    $notifItems[] = ['title' => 'Risk Alerts', 'desc' => "$b overdue or over-budget project(s) need attention.", 'time' => 'Now', 'icon' => 'bi-exclamation-triangle text-danger'];
+                }
                 $notifItems[] = [
                     'title' => 'System Overview',
                     'desc'  => \App\Models\User::where('status', 'active')->count() . ' active users',
@@ -38,7 +80,10 @@ class LoadNotifications
                     'icon'  => 'bi-gear text-primary',
                 ];
             } elseif ($role === 'tm') {
-                $notifCount = \App\Models\ProjectMember::where('user_id', $user->id)->count();
+                $n = \App\Models\ProjectMember::where('user_id', $user->id)->count();
+                if ($n > 0) {
+                    $notifItems[] = ['title' => 'Memberships', 'desc' => "You belong to $n project team(s).", 'time' => 'Now', 'icon' => 'bi-people text-info'];
+                }
             }
 
             View::share('notifCount', $notifCount);
