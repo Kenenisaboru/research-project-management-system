@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+<div class="page-heading d-flex justify-content-between align-items-center flex-wrap gap-2">
     <div>
-        <h3 class="fw-bold mb-0">Dashboard Overview</h3>
-        <span class="text-muted">Welcome back, {{ preg_replace('/\s*\([^)]*\)/', '', $user->name) }}</span>
+        <h1 class="h3 fw-bold mb-0">Dashboard Overview</h1>
+        <p class="text-muted">Welcome back, {{ preg_replace('/\s*\([^)]*\)/', '', $user->name) }}</p>
     </div>
     @if($role === 'pi')
         <a href="{{ route('projects.create') }}" class="btn btn-success fw-bold shadow-sm">
