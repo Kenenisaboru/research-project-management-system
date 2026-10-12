@@ -32,8 +32,8 @@ class AlertsService
     {
         return Project::with('pi')->whereIn('status', ['Active', 'Ongoing'])->get()->filter(function (Project $project) {
             $released = (float) BudgetRequest::where('project_id', $project->project_id)
-                ->whereNotNull('released_at')
-                ->sum('amount');
+                ->where('status', 'Released')
+                ->sum('approved_amount');
 
             $cap = (float) ($project->approved_budget ?: $project->requested_budget);
 
