@@ -1,7 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
-<h3 class="fw-bold mb-4"><i class="bi bi-clipboard-check me-2 text-dark"></i>My Review Assignments</h3>
+<div class="page-heading">
+    <h1 class="h3 fw-bold"><i class="bi bi-clipboard-check me-2 text-dark"></i>My Review Assignments</h1>
+    <p class="text-muted">Review assigned proposals and revisit completed evaluations.</p>
+</div>
 
 <h5 class="fw-bold mb-3"><i class="bi bi-hourglass-split me-2 text-warning"></i>Pending Reviews ({{ $pending->count() }})</h5>
 <div class="card card-custom p-4 mb-4">
