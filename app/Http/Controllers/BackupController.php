@@ -3,27 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Services\AuditService;
+use App\Services\BackupService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class BackupController extends Controller
 {
-    private const DIR = 'backups';
-
-    private const TABLES = [
-        'users', 'roles', 'permissions', 'role_permission', 'colleges', 'departments',
-        'thematic_areas', 'projects', 'project_members', 'evaluations', 'irerc_clearances',
-        'budget_requests', 'budget_amendments', 'milestone_reports', 'project_extensions',
-        'pi_transfers', 'project_terminations', 'certificates', 'procurement_requests',
-        'research_calls', 'papers', 'paper_evaluations', 'awards', 'notifications', 'audit_logs',
-    ];
-
     public function index()
     {
-        Storage::disk('local')->makeDirectory(self::DIR);
+        Storage::disk('local')->makeDirectory(BackupService::DIR);
 
-        $files = collect(Storage::disk('local')->files(self::DIR))
+        $files = collect(Storage::disk('local')->files(BackupService::DIR))
             ->map(function ($path) {
                 return [
                     'name'     => basename($path),
@@ -34,8 +25,8 @@ class BackupController extends Controller
             ->sortByDesc('modified')
             ->values();
 
-        $driver   = DB::connection()->getDriverName();
-        $dbSize   = null;
+        $driver = DB::connection()->getDriverName();
+        $dbSize = null;
         if ($driver === 'sqlite') {
             $dbPath = DB::connection()->getDatabaseName();
             $dbSize = file_exists($dbPath) ? filesize($dbPath) : null;
@@ -46,39 +37,21 @@ class BackupController extends Controller
 
     public function create()
     {
-        Storage::disk('local')->makeDirectory(self::DIR);
-        $driver = DB::connection()->getDriverName();
-        $stamp  = now()->format('Y-m-d_His');
-
-        if ($driver === 'sqlite') {
-            $dbPath = DB::connection()->getDatabaseName();
-            if (! file_exists($dbPath)) {
-                return back()->with('error', 'SQLite database file not found.');
-            }
-            $name = "rpms-backup-{$stamp}.sqlite";
-            Storage::disk('local')->put(self::DIR . '/' . $name, file_get_contents($dbPath));
-        } elseif ($driver === 'mysql') {
-            $name = "rpms-backup-{$stamp}.sql";
-            $sql  = $this->dumpMysql();
-            if ($sql === null) {
-                $name = "rpms-backup-{$stamp}.json";
-                Storage::disk('local')->put(self::DIR . '/' . $name, $this->dumpJson());
-            } else {
-                Storage::disk('local')->put(self::DIR . '/' . $name, $sql);
-            }
-        } else {
-            $name = "rpms-backup-{$stamp}.json";
-            Storage::disk('local')->put(self::DIR . '/' . $name, $this->dumpJson());
+        try {
+            $name = BackupService::create();
+        } catch (\Throwable $e) {
+            report($e);
+            return back()->with('error', 'Backup failed: ' . $e->getMessage());
         }
 
-        AuditService::log('BACKUP_CREATED', 'Backup', null, "Database backup created: {$name} ({$driver})");
+        AuditService::log('BACKUP_CREATED', 'Backup', null, "Database backup created: {$name}");
 
         return back()->with('success', "Backup created successfully: {$name}");
     }
 
     public function download($file)
     {
-        $path = self::DIR . '/' . basename($file);
+        $path = BackupService::DIR . '/' . basename($file);
         if (! Storage::disk('local')->exists($path)) {
             abort(404, 'Backup file not found.');
         }
@@ -123,31 +96,13 @@ class BackupController extends Controller
 
     public function destroy($file)
     {
-        $path = self::DIR . '/' . basename($file);
+        $path = BackupService::DIR . '/' . basename($file);
         if (Storage::disk('local')->exists($path)) {
             Storage::disk('local')->delete($path);
             AuditService::log('BACKUP_DELETED', 'Backup', null, "Backup deleted: {$file}");
         }
 
         return back()->with('success', 'Backup file removed.');
-    }
-
-    private function dumpJson(): string
-    {
-        $payload = [
-            'generated_at' => now()->toIso8601String(),
-            'driver'       => DB::connection()->getDriverName(),
-            'tables'       => [],
-        ];
-
-        foreach (self::TABLES as $table) {
-            if (! DB::getSchemaBuilder()->hasTable($table)) {
-                continue;
-            }
-            $payload['tables'][$table] = DB::table($table)->get()->map(fn ($row) => (array) $row)->all();
-        }
-
-        return json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
     private function restoreJson(string $json): void
@@ -158,7 +113,7 @@ class BackupController extends Controller
         }
 
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
-        foreach (self::TABLES as $table) {
+        foreach (BackupService::TABLES as $table) {
             if (! isset($data['tables'][$table]) || ! DB::getSchemaBuilder()->hasTable($table)) {
                 continue;
             }
@@ -172,28 +127,5 @@ class BackupController extends Controller
         } catch (\Throwable $e) {
             // SQLite / non-MySQL engines ignore this.
         }
-    }
-
-    private function dumpMysql(): ?string
-    {
-        $db   = DB::connection()->getConfig();
-        $host = $db['host'] ?? '127.0.0.1';
-        $port = $db['port'] ?? '3306';
-        $user = $db['username'] ?? '';
-        $pass = $db['password'] ?? '';
-        $name = $db['database'] ?? '';
-
-        $cmd = sprintf(
-            'mysqldump --host=%s --port=%s --user=%s %s %s 2>NUL',
-            escapeshellarg($host),
-            escapeshellarg($port),
-            escapeshellarg($user),
-            $pass !== '' ? '--password=' . escapeshellarg($pass) : '',
-            escapeshellarg($name)
-        );
-
-        $output = @shell_exec($cmd);
-
-        return is_string($output) && strlen($output) > 100 ? $output : null;
     }
 }
