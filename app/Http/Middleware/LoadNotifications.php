@@ -62,7 +62,7 @@ class LoadNotifications
                     $notifItems[] = ['title' => 'Ethics Clearances', 'desc' => "$n proposal(s) awaiting ethical review.", 'time' => 'Now', 'icon' => 'bi-shield-exclamation text-danger'];
                 }
             } elseif ($role === 'finance') {
-                $n = \App\Models\BudgetRequest::where('status', 'Approved')->where('released_at', null)->count();
+                $n = \App\Models\BudgetRequest::where('status', 'Approved')->whereNull('disbursed_at')->count();
                 if ($n > 0) {
                     $notifCount += $n;
                     $notifItems[] = ['title' => 'Disbursements', 'desc' => "$n approved tranche(s) ready for release.", 'time' => 'Now', 'icon' => 'bi-cash-coin text-success'];
