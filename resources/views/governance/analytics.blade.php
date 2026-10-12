@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+<div class="page-heading d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
     <div>
-        <h3 class="fw-bold mb-0"><i class="bi bi-bar-chart-line me-2 text-dark"></i>Executive Analytics &amp; Reporting</h3>
-        <span class="text-muted small">Real-time research portfolio intelligence dashboard</span>
+        <h1 class="h3 fw-bold mb-0"><i class="bi bi-bar-chart-line me-2 text-dark"></i>Executive Analytics &amp; Reporting</h1>
+        <p class="text-muted small">Research portfolio intelligence and financial overview.</p>
     </div>
     <div class="d-flex align-items-center gap-2 flex-wrap">
         <a href="{{ route('analytics.export.csv') }}" class="btn btn-outline-dark fw-bold shadow-sm flex-grow-1 flex-md-grow-0">
