@@ -12,6 +12,11 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgressReportController;
 use App\Http\Controllers\TeamMemberController;
+use App\Http\Controllers\CallController;
+use App\Http\Controllers\PaperController;
+use App\Http\Controllers\BackupController;
+use App\Http\Controllers\DataMigrationController;
+use App\Http\Controllers\ResearchController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,6 +32,9 @@ Route::get('/', function () {
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Public research repository (no authentication required)
+Route::get('/research', [ResearchController::class, 'catalog'])->name('research.catalog');
 
 // Authenticated System Routes
 Route::middleware(['auth'])->group(function () {
@@ -619,5 +627,62 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/admin/colleges', [AdminController::class, 'storeCollege'])->name('admin.colleges.store');
         Route::put('/admin/colleges/{id}', [AdminController::class, 'updateCollege'])->name('admin.colleges.update');
         Route::delete('/admin/colleges/{id}', [AdminController::class, 'destroyCollege'])->name('admin.colleges.destroy');
+    });
+
+    // ---------------------------------------------------------------------
+    // Module: Calls for Proposals / Abstracts
+    // ---------------------------------------------------------------------
+    Route::get('/calls', [CallController::class, 'index'])->name('calls.index');
+    Route::middleware(['role:coordinator,dh,admin'])->group(function () {
+        Route::post('/calls', [CallController::class, 'store'])->name('calls.store');
+        Route::put('/calls/{id}', [CallController::class, 'update'])->name('calls.update');
+        Route::post('/calls/{id}/status', [CallController::class, 'setStatus'])->name('calls.status');
+        Route::delete('/calls/{id}', [CallController::class, 'destroy'])->name('calls.destroy');
+    });
+
+    // ---------------------------------------------------------------------
+    // Module: Publication & Award
+    // ---------------------------------------------------------------------
+    Route::get('/papers', [PaperController::class, 'index'])->name('papers.index');
+    Route::get('/papers/create', [PaperController::class, 'create'])->name('papers.create');
+    Route::post('/papers', [PaperController::class, 'store'])->name('papers.store');
+    Route::get('/papers/{id}', [PaperController::class, 'show'])->whereNumber('id')->name('papers.show');
+    Route::post('/papers/{id}/evaluate', [PaperController::class, 'evaluate'])->whereNumber('id')->name('papers.evaluate');
+    Route::middleware(['role:vparttcs,rcsc,admin'])->group(function () {
+        Route::post('/papers/{id}/approve', [PaperController::class, 'approve'])->whereNumber('id')->name('papers.approve');
+        Route::post('/papers/{id}/reject', [PaperController::class, 'reject'])->whereNumber('id')->name('papers.reject');
+        Route::post('/papers/{id}/award', [PaperController::class, 'award'])->whereNumber('id')->name('papers.award');
+    });
+    Route::middleware(['role:coordinator,admin'])->group(function () {
+        Route::post('/papers/{id}/record', [PaperController::class, 'record'])->whereNumber('id')->name('papers.record');
+    });
+    Route::delete('/papers/{id}', [PaperController::class, 'destroy'])->whereNumber('id')->name('papers.destroy');
+
+    // ---------------------------------------------------------------------
+    // Module: Notifications
+    // ---------------------------------------------------------------------
+    Route::post('/notifications/read-all', function () {
+        \App\Services\NotificationService::markAllRead(\Auth::id());
+        return back()->with('success', 'All notifications marked as read.');
+    })->name('notifications.read-all');
+
+    // ---------------------------------------------------------------------
+    // Module: Backup / Recovery (Admin)
+    // ---------------------------------------------------------------------
+    Route::middleware(['role:admin'])->group(function () {
+        Route::get('/admin/backups', [BackupController::class, 'index'])->name('admin.backups');
+        Route::post('/admin/backups/create', [BackupController::class, 'create'])->name('admin.backups.create');
+        Route::get('/admin/backups/download/{file}', [BackupController::class, 'download'])->name('admin.backups.download');
+        Route::post('/admin/backups/restore', [BackupController::class, 'restore'])->name('admin.backups.restore');
+        Route::delete('/admin/backups/{file}', [BackupController::class, 'destroy'])->name('admin.backups.destroy');
+    });
+
+    // ---------------------------------------------------------------------
+    // Module: Legacy Data Migration (Admin)
+    // ---------------------------------------------------------------------
+    Route::middleware(['role:admin'])->group(function () {
+        Route::get('/admin/data-migration', [DataMigrationController::class, 'index'])->name('admin.data-migration');
+        Route::post('/admin/data-migration/import', [DataMigrationController::class, 'import'])->name('admin.data-migration.import');
+        Route::get('/admin/data-migration/template', [DataMigrationController::class, 'template'])->name('admin.data-migration.template');
     });
 });
