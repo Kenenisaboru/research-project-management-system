@@ -111,7 +111,7 @@ class SampleDataSeeder extends Seeder
 
             if ($reviewer) {
                 PaperEvaluation::create([
-                    'paper_id'     => $paper1->paper_id,
+                    'paper_id'     => $paper1->id,
                     'evaluator_id' => $reviewer->id,
                     'decision'     => 'RecommendAccept',
                     'score'        => 88.50,
@@ -119,7 +119,7 @@ class SampleDataSeeder extends Seeder
                 ]);
 
                 PaperEvaluation::create([
-                    'paper_id'     => $paper2->paper_id,
+                    'paper_id'     => $paper2->id,
                     'evaluator_id' => $reviewer->id,
                     'decision'     => 'RecommendAcceptWithRevisions',
                     'score'        => 76.00,
@@ -128,7 +128,7 @@ class SampleDataSeeder extends Seeder
             }
 
             Award::create([
-                'paper_id'     => $paper1->paper_id,
+                'paper_id'     => $paper1->id,
                 'recipient_id' => $pi->id,
                 'awarded_by'   => $admin->id,
                 'award_name'   => 'GMU Best Applied Research Publication Award 2026',
