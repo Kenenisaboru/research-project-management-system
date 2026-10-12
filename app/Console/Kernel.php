@@ -15,7 +15,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        if (config('rpms.scheduled_backup_enabled', true)) {
+            $schedule->command('backups:create --prune')
+                ->dailyAt('02:00')
+                ->withoutOverlapping();
+        }
     }
 
     /**
