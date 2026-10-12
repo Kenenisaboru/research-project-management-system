@@ -39,7 +39,7 @@ class PaperController extends Controller
 
         $pendingEvaluationCount = PaperEvaluation::where('evaluator_id', $user->id)->count();
         $awards = in_array($user->role, ['vparttcs', 'rcsc', 'admin', 'coordinator'])
-            ? Award::with(['paper', 'recipient'])->latest()->get()
+            ? Award::with(['paper', 'recipient', 'awardedBy'])->latest()->get()
             : collect();
 
         return view('papers.index', compact('papers', 'pendingEvaluationCount', 'awards'));
@@ -49,7 +49,6 @@ class PaperController extends Controller
     {
         $projects = Project::where('pi_id', \Auth::id())
             ->whereIn('status', ['Completed', 'Active', 'Ongoing'])
-            ->orWhere('status', 'Completed')
             ->get()
             ->unique('project_id');
 
@@ -134,7 +133,7 @@ class PaperController extends Controller
 
         AuditService::log('PAPER_APPROVED', 'Paper', $paper->id, "Paper approved for recording: {$paper->title}");
 
-        \App\Services\NotificationService::notifyManagers('PAPER_APPROVED', "Paper approved: {$paper->title}", ['pi', 'tm']);
+        \App\Services\NotificationService::notifyUser((int) $paper->submitter_id, 'PAPER_APPROVED', "Your paper was approved: {$paper->title}");
 
         return back()->with('success', 'Paper approved. It is now eligible for award and recording.');
     }
