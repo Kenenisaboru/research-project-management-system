@@ -28,8 +28,14 @@ class DashboardController extends Controller
 
         $pendingDisbursements = collect();
         $disbursedHistory = collect();
+        $recentActivity = collect();
 
-        if ($role === 'pi') {
+        if ($role === 'admin') {
+            $recentActivity = \App\Models\AuditLog::with('user')
+                ->latest()
+                ->limit(6)
+                ->get();
+        } elseif ($role === 'pi') {
             $myProjects = Project::where('pi_id', $user->id)->with(['thematicArea', 'irercClearance'])->get();
         } elseif ($role === 'reviewer') {
             $assignedReviews = Evaluation::where('examiner_id', $user->id)
@@ -63,7 +69,7 @@ class DashboardController extends Controller
 
         $alerts = \App\Services\AlertsService::all();
 
-        return view('dashboard', compact('user', 'role', 'stats', 'myProjects', 'assignedReviews', 'pendingApprovals', 'teamProjects', 'pendingDisbursements', 'disbursedHistory', 'alerts'));
+        return view('dashboard', compact('user', 'role', 'stats', 'myProjects', 'assignedReviews', 'pendingApprovals', 'teamProjects', 'pendingDisbursements', 'disbursedHistory', 'recentActivity', 'alerts'));
     }
 
     private function getRoleSpecificStats($user, $role)

@@ -1,97 +1,448 @@
 @extends('layouts.app')
 
-@section('navbar-class', 'justify-content-center')
-@section('navbar-container-class', ' justify-content-center')
-
 @section('content')
-<div class="row justify-content-center my-4">
-    <div class="col-md-5">
-        <div class="card card-custom p-4">
-            <div class="text-center mb-4">
-                <i class="bi bi-shield-lock-fill fs-1 text-success"></i>
-                <h4 class="fw-bold mt-2">Sign In to RPMS</h4>
-                <p class="text-muted small">Research Management Portal</p>
-            </div>
+<section class="login-frame" aria-labelledby="login-title">
+    <div class="login-intro">
+        <div class="login-brand">
+            <span class="login-brand-mark"><i class="bi bi-journal-bookmark-fill"></i></span>
+            <span>
+                <strong>RPMS</strong>
+                <small>Research Project Management System</small>
+            </span>
+        </div>
 
-            <form method="POST" action="{{ route('login') }}" autocomplete="off">
+        <div class="login-intro-copy">
+            <span class="login-eyebrow"><i class="bi bi-stars me-2"></i>Research, made manageable</span>
+            <h1>Ideas into impact.<br><span>Every step, connected.</span></h1>
+            <p>One secure workspace for research proposals, reviews, funding, and project progress.</p>
+
+            <div class="login-benefits">
+                <div><i class="bi bi-check2-circle"></i><span>Follow projects from proposal to completion</span></div>
+                <div><i class="bi bi-shield-check"></i><span>Keep reviews and approvals in one place</span></div>
+                <div><i class="bi bi-graph-up-arrow"></i><span>See progress and funding at a glance</span></div>
+            </div>
+        </div>
+
+        <div class="login-intro-footer">
+            <i class="bi bi-lock-fill me-2"></i>Secure access for the research community
+        </div>
+    </div>
+
+    <div class="login-panel">
+        <div class="login-panel-inner">
+            <span class="login-form-kicker">Welcome back</span>
+            <h2 id="login-title">Sign in to your account</h2>
+            <p class="login-form-description">Enter your university account details to continue.</p>
+
+            @if($errors->any())
+            <div class="alert alert-danger login-error" role="alert">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span>{{ $errors->first('email') ?: $errors->first() }}</span>
+            </div>
+            @endif
+
+            @if(session('success'))
+            <div class="alert alert-success" role="status">{{ session('success') }}</div>
+            @endif
+
+            <form method="POST" action="{{ route('login') }}" autocomplete="on" id="loginForm">
                 @csrf
 
-                @if($errors->any())
-                <div class="alert alert-danger py-2 mb-3">
-                    <i class="bi bi-exclamation-triangle-fill me-1"></i>
-                    {{ $errors->first('email') }}
-                </div>
-                @endif
-
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Email Address</label>
-                    <input type="email" id="email" name="email" class="form-control @error('email') is-invalid @enderror"
-                           required autofocus placeholder="user@rpms.local"
-                           value="{{ old('email') }}"
-                           autocomplete="username">
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label fw-bold mb-0">Password</label>
-                    <div class="text-muted small mt-1">
-                        <i class="bi bi-person-lock me-1"></i>Forgot password? Contact the <strong>System Administrator</strong>.
+                    <label class="form-label" for="email">Email address</label>
+                    <div class="login-input-wrap">
+                        <i class="bi bi-envelope"></i>
+                        <input type="email" id="email" name="email"
+                               class="form-control @error('email') is-invalid @enderror"
+                               required autofocus placeholder="name@university.edu"
+                               value="{{ old('email') }}" autocomplete="username">
                     </div>
-                    <div class="input-group mt-1">
+                </div>
+
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <label class="form-label mb-0" for="password">Password</label>
+                        <span class="login-help">Need help? Contact your system administrator.</span>
+                    </div>
+                    <div class="login-input-wrap login-password-wrap mt-2">
+                        <i class="bi bi-lock"></i>
                         <input type="password" id="password" name="password" class="form-control"
-                               required placeholder="••••••••"
-                               autocomplete="current-password">
-                        <button class="btn btn-outline-secondary border" type="button" id="togglePassword" title="Show/Hide password">
+                               required placeholder="Enter your password" autocomplete="current-password">
+                        <button class="password-toggle" type="button" id="togglePassword"
+                                title="Show or hide password" aria-label="Show password">
                             <i class="bi bi-eye" id="passwordIcon"></i>
                         </button>
                     </div>
                 </div>
 
-                <div class="mb-3 form-check">
-                    <input type="checkbox" class="form-check-input" id="remember" name="remember" {{ old('remember') ? 'checked' : '' }}>
-                    <label class="form-check-label" for="remember">Remember Me</label>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <label class="form-check login-remember mb-0" for="remember">
+                        <input type="checkbox" class="form-check-input" id="remember" name="remember" {{ old('remember') ? 'checked' : '' }}>
+                        <span class="form-check-label">Remember me</span>
+                    </label>
+                    <span class="login-secure"><i class="bi bi-shield-lock me-1"></i>Secure sign in</span>
                 </div>
 
-                <button type="submit" id="loginBtn" class="btn btn-success w-100 py-2 fw-bold">
-                    <span id="loginText">Sign In</span>
+                <button type="submit" id="loginBtn" class="btn btn-success w-100 login-submit">
+                    <span id="loginText">Sign in</span>
                     <span id="loginSpinner" class="d-none">
-                        <span class="spinner-border spinner-border-sm me-1" role="status"></span>Signing in...
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Signing in...
                     </span>
+                    <i class="bi bi-arrow-right ms-auto" id="loginArrow"></i>
                 </button>
             </form>
 
             @if(app()->environment('local', 'staging'))
-            <div class="text-center mt-3">
-                <form action="{{ route('login') }}" method="POST" autocomplete="off">
+            <div class="login-demo">
+                <div class="login-divider"><span>Development access</span></div>
+                <form action="{{ route('login') }}" method="POST" autocomplete="off" id="demoLoginForm">
                     @csrf
                     <input type="hidden" name="email" value="admin@rpms.local">
                     <input type="hidden" name="password" value="UNI@Demo1">
-                    <button type="submit" class="btn btn-outline-dark btn-sm fw-bold" title="Demo convenience only - disabled outside non-production environments">
-                        <i class="bi bi-gear me-1"></i> Login as Admin (Demo)
+                    <button type="submit" class="btn btn-outline-dark w-100 login-demo-button">
+                        <i class="bi bi-person-gear me-2"></i>Sign in as demo administrator
                     </button>
                 </form>
             </div>
             @endif
+
+            <p class="login-legal">By signing in, you agree to use this system in accordance with university policies.</p>
         </div>
     </div>
-</div>
+</section>
 
 <script>
-    document.getElementById('togglePassword').addEventListener('click', function () {
-        const pwd = document.getElementById('password');
+    const passwordToggle = document.getElementById('togglePassword');
+    passwordToggle.addEventListener('click', function () {
+        const password = document.getElementById('password');
         const icon = document.getElementById('passwordIcon');
-        if (pwd.type === 'password') {
-            pwd.type = 'text';
-            icon.classList.replace('bi-eye', 'bi-eye-slash');
-        } else {
-            pwd.type = 'password';
-            icon.classList.replace('bi-eye-slash', 'bi-eye');
-        }
+        const showing = password.type === 'password';
+
+        password.type = showing ? 'text' : 'password';
+        icon.classList.toggle('bi-eye', !showing);
+        icon.classList.toggle('bi-eye-slash', showing);
+        passwordToggle.setAttribute('aria-label', showing ? 'Hide password' : 'Show password');
     });
 
-    document.querySelector('form').addEventListener('submit', function () {
+    document.getElementById('loginForm').addEventListener('submit', function () {
         document.getElementById('loginText').classList.add('d-none');
+        document.getElementById('loginArrow').classList.add('d-none');
         document.getElementById('loginSpinner').classList.remove('d-none');
         document.getElementById('loginBtn').disabled = true;
     });
 </script>
+@endsection
+
+@section('styles')
+<style>
+    .login-frame {
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) minmax(420px, 0.95fr);
+        width: min(1120px, calc(100% - 3rem));
+        min-height: min(680px, calc(100vh - 3rem));
+        margin: 1.5rem auto;
+        overflow: hidden;
+        border: 1px solid #e2e9e5;
+        border-radius: 1.6rem;
+        background: #fff;
+        box-shadow: 0 28px 80px rgba(20, 52, 42, 0.13);
+    }
+    .login-intro {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 100%;
+        overflow: hidden;
+        padding: clamp(2rem, 5vw, 4rem);
+        color: #fff;
+        background:
+            radial-gradient(circle at 84% 14%, rgba(113, 201, 156, 0.22), transparent 15rem),
+            linear-gradient(145deg, #174e3d 0%, #103b32 58%, #0c302b 100%);
+    }
+    .login-intro::after {
+        position: absolute;
+        right: -8rem;
+        bottom: -11rem;
+        width: 27rem;
+        height: 27rem;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 50%;
+        box-shadow: 0 0 0 34px rgba(255, 255, 255, 0.025), 0 0 0 72px rgba(255, 255, 255, 0.02);
+        content: "";
+        pointer-events: none;
+    }
+    .login-brand {
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+    }
+    .login-brand-mark {
+        display: grid;
+        width: 3rem;
+        height: 3rem;
+        place-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        border-radius: 1rem;
+        color: #f2d58e;
+        background: rgba(255, 255, 255, 0.1);
+        font-size: 1.35rem;
+    }
+    .login-brand strong,
+    .login-brand small {
+        display: block;
+    }
+    .login-brand strong {
+        font-size: 1.1rem;
+        letter-spacing: 0.09em;
+    }
+    .login-brand small {
+        margin-top: 0.1rem;
+        color: rgba(255, 255, 255, 0.68);
+        font-size: 0.72rem;
+    }
+    .login-intro-copy {
+        z-index: 1;
+        max-width: 34rem;
+        padding: 3rem 0;
+    }
+    .login-eyebrow,
+    .login-form-kicker {
+        display: inline-flex;
+        align-items: center;
+        color: #c8e5d4;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+    .login-intro h1 {
+        margin: 1.3rem 0 1rem;
+        color: #fff;
+        font-size: clamp(2.35rem, 4vw, 3.6rem);
+        font-weight: 750;
+        letter-spacing: -0.055em;
+        line-height: 1.08;
+    }
+    .login-intro h1 span {
+        color: #c8e5d4;
+    }
+    .login-intro-copy > p {
+        max-width: 28rem;
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 1rem;
+        line-height: 1.7;
+    }
+    .login-benefits {
+        display: grid;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    .login-benefits > div {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        color: rgba(255, 255, 255, 0.88);
+        font-size: 0.9rem;
+    }
+    .login-benefits i {
+        color: #c8e5d4;
+        font-size: 1.15rem;
+    }
+    .login-intro-footer {
+        z-index: 1;
+        color: rgba(255, 255, 255, 0.63);
+        font-size: 0.78rem;
+    }
+    .login-panel {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: clamp(2rem, 5vw, 4.5rem);
+        background: #fff;
+    }
+    .login-panel-inner {
+        width: 100%;
+        max-width: 390px;
+    }
+    .login-form-kicker {
+        color: #398365;
+        letter-spacing: 0.11em;
+    }
+    .login-panel h2 {
+        margin: 0.7rem 0 0.45rem;
+        color: #19372e;
+        font-size: 1.85rem;
+        font-weight: 750;
+        letter-spacing: -0.04em;
+    }
+    .login-form-description {
+        margin-bottom: 2rem;
+        color: #76837d;
+        font-size: 0.91rem;
+    }
+    .login-panel .form-label {
+        margin-bottom: 0.5rem;
+        color: #344c42;
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+    .login-input-wrap {
+        position: relative;
+    }
+    .login-input-wrap > i {
+        position: absolute;
+        z-index: 2;
+        top: 50%;
+        left: 0.95rem;
+        color: #8a9b92;
+        transform: translateY(-50%);
+    }
+    .login-input-wrap .form-control {
+        min-height: 50px;
+        padding-left: 2.7rem;
+        border-color: #dfe7e3;
+        border-radius: 0.75rem;
+        background: #fbfcfb;
+        font-size: 0.88rem;
+    }
+    .login-input-wrap .form-control:focus {
+        background: #fff;
+    }
+    .login-help {
+        max-width: 12rem;
+        color: #829088;
+        font-size: 0.68rem;
+        text-align: right;
+    }
+    .login-password-wrap .form-control {
+        padding-right: 3rem;
+    }
+    .password-toggle {
+        position: absolute;
+        z-index: 3;
+        top: 50%;
+        right: 0.8rem;
+        padding: 0.35rem;
+        border: 0;
+        color: #74847c;
+        background: transparent;
+        transform: translateY(-50%);
+    }
+    .login-remember {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        color: #52635a;
+        font-size: 0.82rem;
+    }
+    .login-remember .form-check-input {
+        float: none;
+        margin: 0;
+    }
+    .login-secure {
+        color: #75857c;
+        font-size: 0.75rem;
+    }
+    .login-submit {
+        display: flex;
+        min-height: 52px;
+        align-items: center;
+        padding: 0.75rem 1.05rem;
+        border: 0 !important;
+        border-radius: 0.78rem;
+        background: #17624b !important;
+        font-size: 0.92rem;
+        box-shadow: 0 8px 18px rgba(23, 98, 75, 0.2);
+    }
+    .login-submit:hover {
+        background: #104b3a !important;
+        box-shadow: 0 10px 22px rgba(23, 98, 75, 0.27);
+    }
+    .login-submit:disabled {
+        opacity: 0.75;
+    }
+    .login-error {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.6rem;
+        font-size: 0.83rem;
+    }
+    .login-demo {
+        margin-top: 1.55rem;
+    }
+    .login-divider {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        color: #92a098;
+        font-size: 0.7rem;
+    }
+    .login-divider::before,
+    .login-divider::after {
+        height: 1px;
+        flex: 1;
+        background: #e8eeeb;
+        content: "";
+    }
+    .login-demo-button {
+        min-height: 44px;
+        border-color: #dfe7e3 !important;
+        border-radius: 0.75rem;
+        color: #435a4f !important;
+        font-size: 0.8rem;
+    }
+    .login-legal {
+        margin: 1.6rem 0 0;
+        color: #98a49e;
+        font-size: 0.68rem;
+        line-height: 1.6;
+        text-align: center;
+    }
+    @media (max-width: 767.98px) {
+        .login-frame {
+            grid-template-columns: 1fr;
+            width: min(520px, calc(100% - 1.5rem));
+            min-height: 0;
+            margin: 0.75rem auto;
+            border-radius: 1.2rem;
+        }
+        .login-intro {
+            min-height: 0;
+            padding: 1.5rem;
+        }
+        .login-intro-copy {
+            padding: 2rem 0 0.5rem;
+        }
+        .login-intro h1 {
+            margin: 0.9rem 0 0.6rem;
+            font-size: 2rem;
+        }
+        .login-intro-copy > p {
+            margin-bottom: 0;
+            font-size: 0.87rem;
+        }
+        .login-benefits,
+        .login-intro-footer {
+            display: none;
+        }
+        .login-panel {
+            padding: 1.8rem 1.5rem 2rem;
+        }
+        .login-panel h2 {
+            font-size: 1.55rem;
+        }
+        .login-form-description {
+            margin-bottom: 1.5rem;
+        }
+    }
+    @media (max-width: 390px) {
+        .login-help {
+            max-width: 9rem;
+            font-size: 0.63rem;
+        }
+    }
+</style>
 @endsection

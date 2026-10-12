@@ -9,6 +9,23 @@ use App\Services\RbacService;
 
 class PermissionMiddleware
 {
+    protected function normalizePermissions(array $permissions): array
+    {
+        $normalized = [];
+
+        foreach ($permissions as $permissionGroup) {
+            foreach (preg_split('/[|,]/', (string) $permissionGroup) as $permission) {
+                $permission = trim($permission);
+
+                if ($permission !== '') {
+                    $normalized[] = $permission;
+                }
+            }
+        }
+
+        return $normalized;
+    }
+
     public function handle(Request $request, Closure $next, ...$permissions)
     {
         if (!Auth::check()) {
@@ -16,13 +33,7 @@ class PermissionMiddleware
         }
 
         $user = Auth::user();
-
-        $resolvedPermissions = [];
-        foreach ($permissions as $perm) {
-            foreach (explode('|', $perm) as $p) {
-                $resolvedPermissions[] = trim($p);
-            }
-        }
+        $resolvedPermissions = $this->normalizePermissions($permissions);
 
         if (!RbacService::userHasAnyPermission($user, $resolvedPermissions)) {
             \App\Services\AuditService::log(
