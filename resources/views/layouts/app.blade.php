@@ -1057,6 +1057,16 @@
                         <i class="bi bi-building me-2 text-white-50"></i> Departments
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('admin.backups') ? 'active-link' : '' }}" href="{{ route('admin.backups') }}" style="font-size: 0.85rem;">
+                        <i class="bi bi-hdd-stack me-2 text-white-50"></i> Backup &amp; Recovery
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('admin.data-migration') ? 'active-link' : '' }}" href="{{ route('admin.data-migration') }}" style="font-size: 0.85rem;">
+                        <i class="bi bi-box-arrow-in-down me-2 text-white-50"></i> Data Migration
+                    </a>
+                </li>
                 @endif
             </ul>
 
