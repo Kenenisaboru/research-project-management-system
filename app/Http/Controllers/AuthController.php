@@ -39,18 +39,8 @@ class AuthController extends Controller
         // Pass 'status' => 'active' to ensure deactivated accounts cannot log in
         $authCredentials = array_merge($credentials, ['status' => 'active']);
 
-        // If locked out, check if user is entering correct credentials for an admin account
+        // If locked out, reject the attempt uniformly -- no privileged bypass.
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
-            $user = \App\Models\User::where('email', $credentials['email'])->first();
-            if ($user && $user->role === 'admin' && \Illuminate\Support\Facades\Hash::check($credentials['password'], $user->password) && $user->status === 'active') {
-                // Admin override: authenticate and clear rate limit
-                Auth::login($user, $request->boolean('remember'));
-                RateLimiter::clear($throttleKey);
-                $request->session()->regenerate();
-                $user->update(['last_login_at' => now()]);
-                return redirect()->intended('/dashboard');
-            }
-
             $seconds = RateLimiter::availableIn($throttleKey);
             $minutes = ceil($seconds / 60);
             return back()->withErrors([
