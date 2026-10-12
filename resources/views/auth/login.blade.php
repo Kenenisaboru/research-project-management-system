@@ -59,16 +59,18 @@
                 </button>
             </form>
 
+            @if(app()->environment('local', 'staging'))
             <div class="text-center mt-3">
-                <form action="{{ route('login') }}" method="POST">
+                <form action="{{ route('login') }}" method="POST" autocomplete="off">
                     @csrf
                     <input type="hidden" name="email" value="admin@rpms.local">
                     <input type="hidden" name="password" value="UNI@Demo1">
-                    <button type="submit" class="btn btn-outline-dark btn-sm fw-bold">
-                        <i class="bi bi-gear me-1"></i> Login as Admin
+                    <button type="submit" class="btn btn-outline-dark btn-sm fw-bold" title="Demo convenience only - disabled outside non-production environments">
+                        <i class="bi bi-gear me-1"></i> Login as Admin (Demo)
                     </button>
                 </form>
             </div>
+            @endif
         </div>
     </div>
 </div>

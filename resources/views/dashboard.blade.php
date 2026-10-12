@@ -33,7 +33,38 @@
     @endif
 </div>
 
-{{-- Pending Cancellation Requests Alert --}}
+{{-- System Risk Alerts (overdue projects / over-budget disbursements) --}}
+@isset($alerts)
+@if(count($alerts) > 0)
+<div class="card card-custom mb-4 border-start border-4 border-danger">
+    <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-exclamation-octagon-fill text-danger me-2"></i>
+            Active Risk Alerts <span class="badge bg-danger rounded-pill ms-1">{{ count($alerts) }}</span></span>
+        <a class="btn btn-sm btn-outline-danger fw-bold" data-bs-toggle="collapse" href="#riskAlerts" role="button" aria-expanded="true">
+            <i class="bi bi-chevron-expand"></i> Toggle
+        </a>
+    </div>
+    <div class="collapse show" id="riskAlerts">
+        <ul class="list-group list-group-flush">
+            @foreach($alerts as $alert)
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="badge {{ $alert['type'] === 'overdue' ? 'bg-warning text-dark' : 'bg-danger' }} me-2">
+                        {{ $alert['type'] === 'overdue' ? 'OVERDUE' : 'OVER-BUDGET' }}
+                    </span>
+                    <a href="{{ route('projects.show', $alert['project']->project_id) }}" class="fw-semibold text-decoration-none text-dark">
+                        {{ \Illuminate\Support\Str::limit($alert['project']->title, 80) }}
+                    </a>
+                    <div class="small text-muted">{{ $alert['reason'] }}</div>
+                </div>
+                <small class="text-muted text-nowrap ms-2">{{ $alert['project']->pi->name ?? '' }}</small>
+            </li>
+            @endforeach
+        </ul>
+    </div>
+</div>
+@endif
+@endisset
 @php
     $pendingCancellations = App\Models\Project::where('status', 'PendingCancellation')->get();
 @endphp

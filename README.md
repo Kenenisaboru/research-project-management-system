@@ -15,6 +15,12 @@ A full-featured web application for managing the complete lifecycle of academic 
 - **Project Lifecycle:** Extensions, amendments, PI transfers, and termination with refund calculations
 - **Procurement Requests:** Equipment and supplies procurement tied to projects
 - **Analytics Dashboard:** Real-time project statistics, budget charts, and departmental metrics
+- **Calls for Proposals:** Post and manage calls (projects, abstracts, community service) with deadlines and budget ceilings
+- **Publication & Award:** Journal-index paper submission, evaluation, approval, recording, and award tracking
+- **Notifications Centre:** In-app + email alerts with alerter roll-ups (overdue projects, over-budget disbursements)
+- **Public Research Repository:** Unauthenticated catalogue of ongoing/completed/terminated/rejected research
+- **Backup & Recovery:** On-demand and scheduled database backups with download/restore
+- **Legacy Data Migration:** Import existing paper-based project records from CSV/Excel
 - **Audit Trail:** Complete action logging for compliance
 - **Mobile Responsive:** Dark-themed, professional UI with collapsible sidebar on mobile
 
@@ -110,6 +116,10 @@ Key variables in `.env`:
 | `DB_DATABASE`    | Database path   | `/data/database.sqlite` |
 | `CACHE_DRIVER`   | Cache backend   | `file`                  |
 | `SESSION_DRIVER` | Session storage | `file`                  |
+| `RPMS_OVERDUE_MONTHS` | Months before an active project is flagged overdue | `12` |
+| `RPMS_BUDGET_ALERT_PERCENT` | Released-vs-approved budget alert threshold | `90` |
+| `RPMS_BACKUP_RETENTION_DAYS` | Backup retention window (auto-prune) | `30` |
+| `RPMS_SCHEDULED_BACKUP` | Enable the daily scheduled backup | `true` |
 
 ## Docker Deployment
 
@@ -144,6 +154,23 @@ The system enforces 60+ granular permissions across 12 roles:
 | RCSC Chair             | Financial governance (≥500k ETB), budget approval                    |
 | Finance Office         | Process disbursements, financial tracking                             |
 | System Administrator   | Full access: users, colleges, departments, thematic areas, audit logs |
+
+## Assumptions & Design Decisions
+
+The following assumptions were made while implementing the specification. They are documented here so reviewers can validate the interpretation of the requirements.
+
+1. **Role model:** The specification references an *Auditor* role, but access control is implemented with the 11 operational roles actually required by the workflow (PI, TM, DH, Coordinator, Reviewer, Dean, IRERC, VP ARTTCS, RCSC, Finance, Admin). The Admin role subsumes read-only audit duties via the Audit Log module. An Auditor role can be added without schema changes (it is a name in the `roles` table).
+2. **Approval thresholds:** Financial approvals follow the dual-threshold rule: Dean approves requests **below 500,000 ETB**, RCSC/VP approves requests **at or above 500,000 ETB**. Thresholds are currently constants in the workflow engine and can be moved to configuration if policy changes.
+3. **Single active call vs. many:** Multiple calls may be open simultaneously; PIs are not hard-blocked from submitting outside an open call (the call is advisory metadata). Enforcing a hard gate would be a policy decision, so it is intentionally not enforced.
+4. **Overdue definition:** A project is *overdue* when it remains `Active`/`Ongoing` past `rpms.overdue_months` (default **12**) from `activated_at` without a `completed_at`. This is configurable via `RPMS_OVERDUE_MONTHS`.
+5. **Over-budget definition:** A project is *over-budget* when the sum of `Released` budget requests (`approved_amount`) exceeds `approved_budget` (falling back to `requested_budget` when no approved budget exists).
+6. **Paper evaluation:** Paper evaluation is single-round and score-based; any evaluator with `evaluate_paper` may score a paper. Approval (`approve_paper`) is restricted to VP ARTTCS / RCSC / Admin, matching the publication governance chain.
+7. **Journal index:** Journal indexing accepts the descriptive labels (`SCIE`, `SSCI`, `Scopus`, `ESCI`, `National`, `None`) as free text rather than a fixed enum, because indexing databases change.
+8. **Notifications:** Email delivery uses Laravel's mailer and is **guarded** — on an offline/LAN-only deployment without SMTP, in-app notifications still work and mail failures are swallowed so they never break a user action.
+9. **Backups:** For SQLite the backup is a byte-for-byte copy of the database file; for MySQL `mysqldump` is used when available, otherwise a portable JSON table dump is produced. Scheduled backups run `backups:create --prune` daily at 02:00 (enable via cron / `schedule:run`).
+10. **Legacy import:** The CSV importer is intentionally forgiving — unknown departments/thematic areas fall back to the first available record and an unmatched `pi_email` falls back to the first PI account, so a bulk import never hard-fails mid-file. Skipped rows are reported back to the administrator.
+11. **Public repository fields:** Only title, abstract, status, department and thematic area are exposed publicly. Budget figures, PI contact details, and files are never shown.
+12. **File storage:** Paper PDFs (when supplied) are stored on the `public` disk under `storage/app/public/papers`; run `php artisan storage:link` in any real deployment.
 
 ## License
 
