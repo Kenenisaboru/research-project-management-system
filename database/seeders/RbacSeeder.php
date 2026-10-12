@@ -62,6 +62,15 @@ class RbacSeeder extends Seeder
             ['name' => 'manage_procurement', 'display_name' => 'Manage Procurement', 'description' => 'Approve or reject procurement requests'],
             ['name' => 'submit_progress_report', 'display_name' => 'Submit Progress Report', 'description' => 'Submit milestone progress reports for projects'],
             ['name' => 'review_progress_report', 'display_name' => 'Review Progress Report', 'description' => 'Review and provide feedback on progress reports'],
+            ['name' => 'view_calls', 'display_name' => 'View Calls', 'description' => 'View calls for proposals and abstracts'],
+            ['name' => 'manage_calls', 'display_name' => 'Manage Calls', 'description' => 'Post, edit and close calls for proposals'],
+            ['name' => 'submit_paper', 'display_name' => 'Submit Paper', 'description' => 'Submit publication papers for journal-index evaluation'],
+            ['name' => 'evaluate_paper', 'display_name' => 'Evaluate Paper', 'description' => 'Evaluate journal index and quality of submitted papers'],
+            ['name' => 'approve_paper', 'display_name' => 'Approve Paper', 'description' => 'Approve papers for recording and awards'],
+            ['name' => 'award_papers', 'display_name' => 'Award Papers', 'description' => 'Record awards for published papers'],
+            ['name' => 'record_paper', 'display_name' => 'Record Paper', 'description' => 'Record approved papers in the publication registry'],
+            ['name' => 'manage_backups', 'display_name' => 'Manage Backups', 'description' => 'Create, download and restore system backups'],
+            ['name' => 'data_migration', 'display_name' => 'Data Migration', 'description' => 'Import legacy project data from CSV/Excel files'],
         ];
 
         foreach ($permissions as $permission) {
@@ -73,47 +82,57 @@ class RbacSeeder extends Seeder
                 'view_dashboard', 'manage_profile', 'create_project', 'view_projects',
                 'manage_team', 'request_extension', 'request_amendment', 'request_termination',
                 'request_pi_transfer', 'submit_procurement', 'sign_contract',
-                'submit_progress_report',
+                'submit_progress_report', 'view_calls', 'submit_paper',
             ],
             'tm' => [
                 'view_dashboard', 'manage_profile', 'view_projects', 'submit_progress_report',
+                'view_calls', 'submit_paper',
             ],
             'reviewer' => [
                 'view_dashboard', 'manage_profile', 'view_projects', 'submit_evaluation',
+                'view_calls', 'evaluate_paper',
             ],
             'dh' => [
                 'view_dashboard', 'manage_profile', 'view_projects', 'screen_proposals',
-                'review_progress_report',
+                'review_progress_report', 'view_calls', 'manage_calls',
             ],
             'coordinator' => [
                 'view_dashboard', 'manage_profile', 'view_projects', 'assign_reviewer',
                 'manage_certificates', 'manage_procurement', 'approve_extensions',
                 'approve_amendments', 'approve_pi_transfer', 'review_progress_report',
+                'view_calls', 'manage_calls', 'evaluate_paper', 'record_paper',
             ],
             'dean' => [
                 'view_dashboard', 'manage_profile', 'view_projects', 'approve_budget',
+                'view_calls',
             ],
             'irerc' => [
                 'view_dashboard', 'manage_profile', 'view_projects', 'ethics_review',
+                'view_calls',
             ],
             'vparttcs' => [
                 'view_dashboard', 'manage_profile', 'view_projects', 'sign_contract',
                 'approve_budget', 'approve_extensions', 'approve_amendments',
                 'approve_pi_transfer', 'view_rcsc_portal', 'view_analytics',
-                'manage_certificates', 'manage_procurement',
+                'manage_certificates', 'manage_procurement', 'view_calls',
+                'evaluate_paper', 'approve_paper', 'award_papers',
             ],
             'rcsc' => [
                 'view_dashboard', 'manage_profile', 'view_projects', 'approve_budget',
                 'approve_extensions', 'approve_amendments', 'view_rcsc_portal',
                 'view_analytics', 'manage_certificates', 'manage_procurement',
+                'view_calls', 'evaluate_paper', 'approve_paper', 'award_papers',
             ],
             'finance' => [
                 'view_dashboard', 'manage_profile', 'view_projects', 'process_disbursement',
+                'view_calls',
             ],
             'admin' => [
                 'view_dashboard', 'manage_profile', 'view_projects', 'manage_users',
                 'manage_thematic_areas', 'view_audit_logs', 'hrms_sync',
-                'approve_termination', 'view_analytics',
+                'approve_termination', 'view_analytics', 'view_calls', 'manage_calls',
+                'submit_paper', 'evaluate_paper', 'approve_paper', 'award_papers',
+                'record_paper', 'manage_backups', 'data_migration',
             ],
         ];
 
@@ -132,5 +151,8 @@ class RbacSeeder extends Seeder
                 $user->update(['role_id' => $role->id]);
             }
         }
+
+        // Drop cached RBAC matrices so freshly-minted permissions take effect immediately.
+        \App\Services\RbacService::clearCache();
     }
 }
