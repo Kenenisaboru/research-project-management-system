@@ -38,8 +38,14 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile/avatar', [ProfileController::class, 'deleteAvatar'])->name('profile.delete-avatar');
     Route::put('/profile/password', [ProfileController::class, 'changePassword'])->name('profile.change-password');
 
-    // Demo Role Switcher (accessible to all authenticated users for prototype demo)
+    // Demo Role Switcher (PRODUCTION SAFE: only enabled in non-production environments and requires admin)
     Route::get('/switch-role/{role}', function ($role) {
+        if (app()->environment('production')) {
+            abort(404);
+        }
+        if (\Auth::user()->role !== 'admin') {
+            abort(403, 'Only the System Administrator can switch demo roles.');
+        }
         $user = \App\Models\User::where('role', $role)->first();
         if ($user) {
             \Illuminate\Support\Facades\Auth::login($user);
