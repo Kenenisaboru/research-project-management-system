@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-4">
-    <h3 class="fw-bold mb-0">All Research Projects &amp; Proposals</h3>
+<div class="page-heading d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
+    <h1 class="h3 fw-bold mb-0">All Research Projects &amp; Proposals</h1>
     @if(Auth::user()->role === 'pi')
     <a href="{{ route('projects.create') }}" class="btn btn-success fw-bold">
         <i class="bi bi-plus-lg me-1"></i> New Proposal
@@ -16,7 +16,7 @@
             <div class="col-12 col-md-4">
                 <div class="input-group">
                     <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
-                    <input type="text" name="search" class="form-control border-start-0 ps-0" placeholder="Search project title..." value="{{ request('search') }}" onchange="this.form.submit()">
+                    <input type="text" name="search" class="form-control border-start-0 ps-0" placeholder="Search project title..." aria-label="Search project title" value="{{ request('search') }}" onchange="this.form.submit()">
                 </div>
             </div>
             <div class="col-12 col-md-8">
@@ -52,7 +52,7 @@
     </div>
 </form>
 
-<div class="card card-custom p-4">
+<div class="card card-custom p-3 p-md-4">
     <div class="table-responsive">
         <table class="table table-hover align-middle">
             <thead class="table-light">
@@ -167,4 +167,3 @@
 </div>
 
 @endsection
-
