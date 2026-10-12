@@ -122,5 +122,10 @@ class DatabaseSeeder extends Seeder
             \App\Services\AuditService::log('USER_SEED', 'User', $pi->id, 'Academic PI account provisioned (UNI-STAFF-101)', $admin->id);
             \App\Services\AuditService::log('THEMATIC_SETUP', 'ThematicArea', $t1->id, 'Thematic Area: Climate Resilience & Agriculture established', $admin->id);
         }
+
+        // 6. Seed Calls, Publications & Awards (idempotent)
+        $this->call([
+            SampleDataSeeder::class,
+        ]);
     }
 }
