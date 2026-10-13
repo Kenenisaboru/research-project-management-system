@@ -16,7 +16,7 @@
             <div class="col-12 col-md-4">
                 <div class="input-group">
                     <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
-                    <input type="text" name="search" class="form-control border-start-0 ps-0" placeholder="Search project title..." aria-label="Search project title" value="{{ request('search') }}" onchange="this.form.submit()">
+                    <input type="search" name="search" class="form-control border-start-0 ps-0" placeholder="Search project title..." aria-label="Search project title" value="{{ request('search') }}">
                 </div>
             </div>
             <div class="col-12 col-md-8">
@@ -30,25 +30,41 @@
                             'Returned' => ['label' => 'Returned', 'color' => 'warning', 'icon' => 'bi-arrow-return-left'],
                             'DH_Screened' => ['label' => 'Screened', 'color' => 'primary', 'icon' => 'bi-eye'],
                             'UnderReview' => ['label' => 'Under Review', 'color' => 'warning', 'icon' => 'bi-hourglass-split'],
+                            'Dean_Review' => ['label' => 'Dean Review', 'color' => 'info', 'icon' => 'bi-bank'],
+                            'RCSC_Review' => ['label' => 'RCSC Review', 'color' => 'danger', 'icon' => 'bi-bank'],
                             'Approved' => ['label' => 'Approved', 'color' => 'success', 'icon' => 'bi-check-circle'],
                             'Rejected' => ['label' => 'Rejected', 'color' => 'danger', 'icon' => 'bi-x-circle'],
                             'Active' => ['label' => 'Active', 'color' => 'primary', 'icon' => 'bi-play-circle'],
                             'Completed' => ['label' => 'Completed', 'color' => 'success', 'icon' => 'bi-trophy'],
+                            'PendingCancellation' => ['label' => 'Withdrawal Review', 'color' => 'warning', 'icon' => 'bi-hourglass-split'],
                             'Withdrawn' => ['label' => 'Withdrawn', 'color' => 'dark', 'icon' => 'bi-x-circle'],
                             'Terminated' => ['label' => 'Terminated', 'color' => 'danger', 'icon' => 'bi-x-octagon'],
                         ];
                         $current = request('status');
                     @endphp
                     @foreach($statuses as $val => $info)
-                        <button type="submit" name="status" value="{{ $val }}"
+                        <a href="{{ route('projects.index', array_merge(request()->except('page'), ['status' => $val])) }}"
                             class="btn btn-sm {{ $current === $val ? 'btn-dark' : 'btn-outline-secondary' }} fw-semibold rounded-pill px-2 px-md-3 py-1" style="font-size: 0.78rem;">
                             <i class="bi {{ $info['icon'] }} me-1"></i>{{ $info['label'] }}
-                        </button>
+                        </a>
                     @endforeach
                 </div>
             </div>
+            <div class="col-12 col-md-4">
+                <label for="thematic-area" class="form-label fw-semibold small text-muted mb-1">Thematic area</label>
+                <select id="thematic-area" name="thematic_area" class="form-select">
+                    <option value="">All thematic areas</option>
+                    @foreach($thematicAreas as $area)
+                        <option value="{{ $area->id }}" {{ (string) request('thematic_area') === (string) $area->id ? 'selected' : '' }}>{{ $area->title }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-12 col-md-auto d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-dark"><i class="bi bi-funnel me-1"></i>Apply filters</button>
+                <a href="{{ route('projects.index') }}" class="btn btn-outline-secondary">Clear</a>
+            </div>
         </div>
-        <input type="hidden" name="thematic_area" value="{{ request('thematic_area') }}">
+        <input type="hidden" name="status" value="{{ request('status') }}">
     </div>
 </form>
 
