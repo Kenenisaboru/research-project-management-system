@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\ProjectMember;
 use App\Models\IRERCClearance;
 use App\Models\ProjectExtension;
+use App\Models\Department;
 
 class DashboardController extends Controller
 {
@@ -29,6 +30,20 @@ class DashboardController extends Controller
         $pendingDisbursements = collect();
         $disbursedHistory = collect();
         $recentActivity = collect();
+        $pendingCancellations = collect();
+
+        if (in_array($role, ['admin', 'coordinator', 'dean', 'rcsc', 'vparttcs'])) {
+            $cancellations = Project::where('status', 'PendingCancellation')
+                ->with('pi');
+
+            if (in_array($role, ['coordinator', 'dean'])) {
+                $collegeId = Department::where('id', $user->dept_id)->value('college_id');
+                $collegeDepartmentIds = Department::where('college_id', $collegeId)->pluck('id');
+                $cancellations->whereIn('dept_id', $collegeDepartmentIds);
+            }
+
+            $pendingCancellations = $cancellations->latest()->get();
+        }
 
         if ($role === 'admin') {
             $recentActivity = \App\Models\AuditLog::with('user')
@@ -69,7 +84,7 @@ class DashboardController extends Controller
 
         $alerts = \App\Services\AlertsService::all();
 
-        return view('dashboard', compact('user', 'role', 'stats', 'myProjects', 'assignedReviews', 'pendingApprovals', 'teamProjects', 'pendingDisbursements', 'disbursedHistory', 'recentActivity', 'alerts'));
+        return view('dashboard', compact('user', 'role', 'stats', 'myProjects', 'assignedReviews', 'pendingApprovals', 'teamProjects', 'pendingDisbursements', 'disbursedHistory', 'recentActivity', 'pendingCancellations', 'alerts'));
     }
 
     private function getRoleSpecificStats($user, $role)
@@ -95,7 +110,7 @@ class DashboardController extends Controller
         } elseif ($role === 'dh') {
             return [
                 'pending_screening' => Project::where('status', 'Submitted')->where('dept_id', $user->dept_id)->count(),
-                'screened_today' => Project::where('status', 'DH_Screened')->whereDate('updated_at', today())->count(),
+                'screened_today' => Project::where('status', 'DH_Screened')->where('dept_id', $user->dept_id)->whereDate('updated_at', today())->count(),
                 'dept_projects' => Project::where('dept_id', $user->dept_id)->count(),
             ];
         } elseif ($role === 'coordinator') {
@@ -106,7 +121,7 @@ class DashboardController extends Controller
             ];
         } elseif ($role === 'dean') {
             return [
-                'pending_approval' => Project::where('requested_budget', '<', 500000)->whereIn('status', ['Dean_Review', 'UnderReview', 'DH_Screened'])->count(),
+                'pending_approval' => BudgetRequest::where('approval_tier', 'Dean')->where('status', 'Pending')->count(),
                 'approved' => Project::where('requested_budget', '<', 500000)->whereIn('status', ['Approved', 'Active', 'Completed'])->count(),
                 'total_value' => Project::where('requested_budget', '<', 500000)->where('status', '!=', 'Draft')->sum('requested_budget'),
             ];
@@ -118,14 +133,21 @@ class DashboardController extends Controller
             ];
         } elseif (in_array($role, ['rcsc', 'vparttcs'])) {
             return [
-                'rcsc_pending' => Project::where('requested_budget', '>=', 500000)->whereIn('status', ['RCSC_Review', 'UnderReview', 'DH_Screened'])->count(),
+                'rcsc_pending' => BudgetRequest::where('approval_tier', 'RCSC_VP')->where('status', 'Pending')->count(),
                 'pending_contracts' => Project::where('status', 'Approved')->whereNull('vp_signature_date')->count(),
                 'approved' => Project::whereIn('status', ['Approved', 'Active', 'Completed'])->count(),
                 'high_budget' => Project::where('requested_budget', '>=', 500000)->where('status', '!=', 'Draft')->count(),
             ];
         } elseif ($role === 'finance') {
+            $pendingRelease = BudgetRequest::where('status', 'Approved')
+                ->where(function ($query) {
+                    $query->where('milestone_phase', 'like', 'Tranche%')
+                        ->orWhere('milestone_phase', 'Budget Amendment');
+                })
+                ->whereHas('project', fn ($query) => $query->whereIn('status', ['Active', 'Approved', 'Completed']));
+
             return [
-                'pending_release' => BudgetRequest::where('status', 'Approved')->where('milestone_phase', 'like', 'Tranche%')->whereHas('project', fn($q) => $q->where('status', 'Active'))->count(),
+                'pending_release' => (clone $pendingRelease)->count(),
                 'disbursed' => BudgetRequest::where('status', 'Released')->sum('approved_amount'),
                 'transactions' => BudgetRequest::where('status', 'Released')->count(),
             ];
