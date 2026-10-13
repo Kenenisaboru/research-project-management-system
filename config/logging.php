@@ -117,6 +117,28 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | RPMS Application Log Channel
+        |--------------------------------------------------------------------------
+        |
+        | Dedicated daily rotating log channel for the RPMS application.
+        | Files are retained for 90 days and written to storage/logs/rpms-YYYY-MM-DD.log
+        |
+        */
+        'rpms' => [
+            'driver'           => 'daily',
+            'path'             => storage_path('logs/rpms.log'),
+            'level'            => env('LOG_LEVEL', 'debug'),
+            'days'             => 90,
+            'formatter'        => Monolog\Formatter\LineFormatter::class,
+            'formatter_with'   => [
+                'format'                => "[%datetime%] %channel%.%level_name%: %message% %context% %extra%\n",
+                'dateFormat'            => 'Y-m-d H:i:s',
+                'allowInlineLineBreaks' => true,
+            ],
+        ],
     ],
 
 ];

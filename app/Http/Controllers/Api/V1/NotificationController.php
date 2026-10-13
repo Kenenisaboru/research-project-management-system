@@ -56,6 +56,24 @@ class NotificationController extends ApiController
     }
 
     /**
+     * Poll latest notifications and unread counter.
+     *
+     * @param  Request  $request
+     * @return JsonResponse
+     */
+    public function poll(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $count = Notification::forUser($user->id)->unread()->count();
+        $recent = Notification::forUser($user->id)->latest()->limit(5)->get();
+
+        return $this->success([
+            'unread_count' => $count,
+            'recent'       => NotificationResource::collection($recent),
+        ], 'Notifications polled successfully.');
+    }
+
+    /**
      * Mark a specific notification as read.
      *
      * @param  Request  $request

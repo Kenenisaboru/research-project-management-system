@@ -1,28 +1,47 @@
-# Research Project Management System
+# Research Project Management System — **Pro Edition**
 
-A full-featured web application for managing the complete lifecycle of academic research projects, from proposal submission to completion and certificate issuance. Built for Research Project Management System.
+> **Gambella University, Ethiopia**
+> Full-featured, production-grade research project lifecycle management.
+
+[![CI](https://github.com/kenenisaboru/research-project-management-system/actions/workflows/laravel-tests.yml/badge.svg)](https://github.com/kenenisaboru/research-project-management-system/actions)
 
 ## Features
 
-- **12 Role-Based Access Control (RBAC):** Principal Investigator, Team Member, Department Head, Coordinator, Reviewer, College Dean, IRERC Ethics Committee, VP Academic (ARTTCS), RCSC Chair, Finance Office, System Administrator
-- **Workflow Engine:** Draft → Submitted → DH Screened → Under Review → Approved → Active → Completed
+### Core Workflow
+- **11-Role RBAC:** PI, Team Member, DH, Coordinator, Reviewer, Dean, IRERC, VP ARTTCS, RCSC, Finance, Admin
+- **Project Lifecycle:** Draft → Submitted → DH Screened → Under Review → Approved → Active → Completed
 - **Blind Peer Review:** Anonymous double-blind evaluation with scoring rubrics
-- **Dual-Threshold Financial Governance:** Dean (<500k ETB) and RCSC (≥500k ETB) approval tiers
-- **Budget Management:** Tranche-based disbursement tracking with approval workflows
-- **Progress Reports:** Quarterly/semi-annual/annual reporting with team member contributions
-- **Contract Signing:** Digital contract generation and tracking
-- **PDF Certificates:** Research Project Management System-branded completion certificates with PDF download
-- **Project Lifecycle:** Extensions, amendments, PI transfers, and termination with refund calculations
-- **Procurement Requests:** Equipment and supplies procurement tied to projects
-- **Analytics Dashboard:** Real-time project statistics, budget charts, and departmental metrics
-- **Calls for Proposals:** Post and manage calls (projects, abstracts, community service) with deadlines and budget ceilings
-- **Publication & Award:** Journal-index paper submission, evaluation, approval, recording, and award tracking
-- **Notifications Centre:** In-app + email alerts with alerter roll-ups (overdue projects, over-budget disbursements)
-- **Public Research Repository:** Unauthenticated catalogue of ongoing/completed/terminated/rejected research
-- **Backup & Recovery:** On-demand and scheduled database backups with download/restore
-- **Legacy Data Migration:** Import existing paper-based project records from CSV/Excel
-- **Audit Trail:** Complete action logging for compliance
-- **Mobile Responsive:** Dark-themed, professional UI with collapsible sidebar on mobile
+- **Dual-Threshold Financial Governance:** Dean (<500k ETB) / RCSC (≥500k ETB) tiers
+- **Budget Management:** Tranche-based disbursement with payment vouchers (PDF)
+- **Progress Reports:** Quarterly/semi-annual/annual with milestone tracking
+- **Contract Signing:** Digital PI + VP ARTTCS contract workflow with PDF download
+- **PDF Certificates:** Completion certificates via DomPDF
+- **Project Lifecycle Events:** Extensions, PI transfers, terminations, budget amendments
+- **Calls for Proposals:** Projects, abstracts, community service with deadlines
+- **Publication & Award:** Papers, journal indexing, evaluations, awards
+
+### Pro-Level Upgrades ✨
+- **API v1 Layer:** RESTful JSON API with Sanctum auth, API Resources, rate limiting
+- **Event Architecture:** 8 domain events + queued listeners, all decoupled from controllers
+- **Queue System:** Database/Redis queue with ProcessBackupJob, ProcessCsvImportJob, ProjectStatusMail
+- **Two-Factor Authentication (TOTP):** QR setup, confirm, challenge (enforced for Admin/Finance)
+- **Security Headers:** X-Frame-Options, CSP, Referrer-Policy, Permissions-Policy middleware
+- **Password Policy:** Min 10 chars, complexity rules, 90-day rotation warning
+- **CacheService:** Role-keyed dashboard stats (60s TTL), thematic areas/departments (300s TTL)
+- **Versioned Document Management:** Upload, version tracking, signed temporary download URLs
+- **Institutional PDF Reports:** Annual Output, Grant Expenditure, Thematic Impact, Researcher Performance
+- **Advanced Analytics Engine:** 5 Chart.js charts, date-range filters, PDF export
+- **Advanced Search:** Full-text search, multi-filter, highlighted results, CSV/PDF export, server-side sort
+- **Notification Centre:** Categories, priorities, bulk actions, 30s JS polling badge updates
+- **Command Palette (Ctrl+K):** Instant page search with keyboard navigation
+- **Dark/Light Theme Toggle:** Persisted in localStorage, Inter variable font, RPMS design system
+- **Mobile Experience:** Card-stack tables, bottom navigation bar, FAB quick actions
+- **Health Check Endpoint:** `/health` — DB, storage, queue status in JSON
+- **Docker Compose:** MySQL 8 + Redis 7 + Nginx + PHP-FPM + Supervisor (queue worker)
+- **GitHub Actions CI/CD:** Parallel test matrix (PHP 8.1/8.2) + GHCR deploy pipeline
+- **Makefile:** `make install`, `make dev`, `make test`, `make build`, `make deploy`
+- **Audit Log Enhancement:** IP, user-agent, before/after JSON diff snapshots
+- **RPMS Log Channel:** Daily rotating, 90-day retention
 
 ## Test Accounts / Demo Logins
 

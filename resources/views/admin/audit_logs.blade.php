@@ -6,7 +6,10 @@
         <h4 class="fw-bold mb-0"><i class="bi bi-shield-check me-2 text-dark"></i>Audit Trail &amp; Security Logs</h4>
         <span class="badge bg-secondary d-none d-sm-inline-block">Immutable System Event Trail</span>
     </div>
-    <div>
+    <div class="d-flex gap-2">
+        <a href="{{ route('admin.audit-logs.pdf', request()->query()) }}" class="btn btn-outline-danger btn-sm fw-bold">
+            <i class="bi bi-file-earmark-pdf me-1"></i> <span class="d-none d-sm-inline">Export PDF</span><span class="d-inline d-sm-none">PDF</span>
+        </a>
         <button type="button" class="btn btn-outline-dark btn-sm fw-bold" id="exportAuditCsvBtn">
             <i class="bi bi-file-earmark-spreadsheet me-1"></i> <span class="d-none d-sm-inline">Export CSV</span><span class="d-inline d-sm-none">CSV</span>
         </button>
@@ -85,7 +88,27 @@
                         <span class="badge {{ $badgeClass }} px-2 py-1" style="font-size: 0.7rem;">{{ $log->action }}</span>
                     </td>
                     <td style="white-space: nowrap;"><small class="fw-semibold">{{ $log->entity_type ? $log->entity_type . ' #' . $log->entity_id : 'System' }}</small></td>
-                    <td><small class="text-dark">{{ $log->details ?: 'No additional metadata.' }}</small></td>
+                    <td>
+                        <small class="text-dark d-block">{{ $log->details ?: 'No additional metadata.' }}</small>
+                        @if(!empty($log->diff_json) && isset($log->diff_json['changes']) && count($log->diff_json['changes']) > 0)
+                            <details class="mt-1">
+                                <summary class="text-primary small fw-semibold" style="cursor: pointer; font-size: 0.72rem;">
+                                    View changes ({{ count($log->diff_json['changes']) }})
+                                </summary>
+                                <div class="bg-light border rounded p-2 mt-1 small font-monospace" style="font-size: 0.7rem;">
+                                    @foreach($log->diff_json['changes'] as $field => $change)
+                                        <div><strong>{{ $field }}:</strong> <span class="text-danger">{{ is_array($change['before']) ? json_encode($change['before']) : ($change['before'] ?? 'null') }}</span> &rarr; <span class="text-success">{{ is_array($change['after']) ? json_encode($change['after']) : ($change['after'] ?? 'null') }}</span></div>
+                                    @endforeach
+                                </div>
+                            </details>
+                        @endif
+                        @if($log->request_method || $log->request_url)
+                            <div class="text-muted small mt-1 font-monospace" style="font-size: 0.68rem;">
+                                @if($log->request_method)<span class="badge bg-secondary-subtle text-secondary py-0 px-1">{{ $log->request_method }}</span>@endif
+                                @if($log->request_url)<span title="{{ $log->request_url }}">{{ parse_url($log->request_url, PHP_URL_PATH) ?: $log->request_url }}</span>@endif
+                            </div>
+                        @endif
+                    </td>
                     <td style="white-space: nowrap;"><span class="badge bg-light text-dark border font-monospace" style="font-size: 0.72rem;">{{ $log->ip_address ?: '127.0.0.1' }}</span></td>
                 </tr>
                 @empty

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Gambella University RPMS - Thematic Area Impact Analysis</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10px; color: #1e293b; padding: 25px; }
+    .header { border-bottom: 2px solid #0f3e2e; padding-bottom: 10px; margin-bottom: 12px; text-align: center; }
+    .header h1 { color: #0f3e2e; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
+    .header h3 { color: #475569; font-size: 11px; font-weight: normal; margin-bottom: 4px; }
+    .doc-title { font-size: 13px; font-weight: bold; color: #047857; text-transform: uppercase; }
+
+    .meta-box { width: 100%; border: 1px solid #e2e8f0; background: #f8fafc; margin-bottom: 15px; border-collapse: collapse; font-size: 9px; }
+    .meta-box td { padding: 5px 8px; }
+
+    table.report-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+    table.report-table th, table.report-table td { border: 1px solid #cbd5e1; padding: 6px 7px; font-size: 8.5px; text-align: left; }
+    table.report-table th { background: #0f3e2e; color: #fff; font-weight: bold; text-transform: uppercase; font-size: 8px; }
+    table.report-table tr:nth-child(even) { background: #f8fafc; }
+
+    .signatures { width: 100%; margin-top: 35px; border-collapse: collapse; }
+    .signatures td { width: 50%; text-align: center; padding: 0 20px; vertical-align: top; }
+    .sig-line { border-top: 1px solid #475569; padding-top: 4px; font-weight: bold; font-size: 9px; color: #1e293b; margin-top: 40px; }
+
+    .footer { margin-top: 20px; border-top: 1px dashed #cbd5e1; padding-top: 6px; font-size: 8px; color: #64748b; text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Gambella University &bull; Directorate of Research &amp; Technology Transfer</h1>
+    <h3>Research Project Management System (RPMS) &bull; Priority Area Alignment</h3>
+    <div class="doc-title">Thematic Area Impact &amp; Resource Allocation Analysis</div>
+</div>
+
+<table class="meta-box">
+    <tr>
+        <td style="width: 25%;"><strong>Ref:</strong> {{ $refNumber }}</td>
+        <td style="width: 25%;"><strong>Thematic Areas Evaluated:</strong> {{ count($thematics) }} Areas</td>
+        <td style="width: 25%;"><strong>Total Portfolio Value:</strong> ETB {{ number_format($totalFunded, 0) }}</td>
+        <td style="width: 25%; text-align: right;"><strong>Date:</strong> {{ $generatedAt }}</td>
+    </tr>
+</table>
+
+<table class="report-table">
+    <thead>
+        <tr>
+            <th style="width: 35%;">Thematic Priority Area</th>
+            <th style="width: 15%;">Category</th>
+            <th style="width: 10%; text-align: center;">Total Grants</th>
+            <th style="width: 10%; text-align: center;">Active</th>
+            <th style="width: 10%; text-align: center;">Completed</th>
+            <th style="width: 20%; text-align: right;">Funding Allocated (ETB)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @forelse($thematics as $t)
+        <tr>
+            <td><strong>{{ $t->title }}</strong></td>
+            <td>{{ $t->category ?? 'General' }}</td>
+            <td style="text-align: center;">{{ $t->total_projects }}</td>
+            <td style="text-align: center; color: #15803d; font-weight: bold;">{{ $t->active_projects }}</td>
+            <td style="text-align: center; color: #0284c7;">{{ $t->completed_projects }}</td>
+            <td style="text-align: right; font-weight: bold;">{{ number_format((float) $t->total_funding, 2) }}</td>
+        </tr>
+        @empty
+        <tr><td colspan="6" style="text-align: center; color: #64748b;">No thematic area data available.</td></tr>
+        @endforelse
+    </tbody>
+</table>
+
+<table class="signatures">
+    <tr>
+        <td>
+            <div class="sig-line">Director, Research &amp; Community Service</div>
+            <div style="font-size: 8px; color: #64748b; margin-top: 2px;">Gambella University</div>
+        </td>
+        <td>
+            <div class="sig-line">Vice President, ARTTCS</div>
+            <div style="font-size: 8px; color: #64748b; margin-top: 2px;">Gambella University</div>
+        </td>
+    </tr>
+</table>
+
+<div class="footer">
+    Gambella University RPMS &bull; Strategic Research Portfolio Governance &bull; Prepared by {{ $generatedBy }}
+</div>
+
+</body>
+</html>

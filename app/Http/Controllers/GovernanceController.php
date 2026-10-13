@@ -9,6 +9,9 @@ use App\Models\IRERCClearance;
 use App\Models\BudgetRequest;
 use App\Models\Certificate;
 use App\Models\User;
+use App\Models\ThematicArea;
+use App\Models\Department;
+use App\Models\Paper;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
@@ -285,16 +288,42 @@ class GovernanceController extends Controller
         return back()->with('success', "Ethics review {$request->decision} successfully.");
     }
 
-    public function analytics()
+    public function analytics(Request $request)
     {
         $submittedProjectsQuery = Project::where('status', '!=', 'Draft');
 
-        $totalProjects       = (clone $submittedProjectsQuery)->count();
-        $activeProjects      = Project::where('status', 'Active')->count();
-        $completedProjects   = Project::where('status', 'Completed')->count();
-        $underReviewProjects = Project::whereIn('status', ['Submitted', 'DH_Screened', 'UnderReview', 'Dean_Review', 'RCSC_Review'])->count();
+        if ($request->filled('date_from')) {
+            $submittedProjectsQuery->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $submittedProjectsQuery->whereDate('created_at', '<=', $request->date_to);
+        }
+        if ($request->filled('thematic_id')) {
+            $submittedProjectsQuery->where('thematic_id', $request->thematic_id);
+        }
+        if ($request->filled('dept_id')) {
+            $submittedProjectsQuery->where('dept_id', $request->dept_id);
+        }
 
-        $statusCounts = Project::where('status', '!=', 'Draft')
+        $totalProjects       = (clone $submittedProjectsQuery)->count();
+        $activeProjects      = (clone $submittedProjectsQuery)->where('status', 'Active')->count();
+        $completedProjects   = (clone $submittedProjectsQuery)->where('status', 'Completed')->count();
+        $underReviewProjects = (clone $submittedProjectsQuery)->whereIn('status', ['Submitted', 'DH_Screened', 'UnderReview', 'Dean_Review', 'RCSC_Review'])->count();
+
+        // Financial KPIs
+        $totalRequested = (float) (clone $submittedProjectsQuery)->sum('requested_budget');
+        $totalApproved  = (float) (clone $submittedProjectsQuery)->whereNotNull('approved_budget')->sum('approved_budget');
+
+        $filteredProjectIds = (clone $submittedProjectsQuery)->pluck('project_id');
+        $totalDisbursed = (float) BudgetRequest::whereIn('project_id', $filteredProjectIds)
+            ->where('status', 'Released')
+            ->sum('approved_amount');
+
+        $remainingBudget = max(0, $totalApproved - $totalDisbursed);
+        $utilizationRate = $totalApproved > 0 ? round(($totalDisbursed / $totalApproved) * 100, 1) : 0;
+
+        // Status breakdown
+        $statusCounts = (clone $submittedProjectsQuery)
             ->select('status', DB::raw('count(*) as total'))
             ->groupBy('status')
             ->get();
@@ -302,10 +331,16 @@ class GovernanceController extends Controller
         $statusLabels = $statusCounts->pluck('status')->toArray();
         $statusData   = $statusCounts->pluck('total')->toArray();
 
+        // Thematic Area aggregation
         $budgetByThematic = DB::table('projects')
-            ->where('status', '!=', 'Draft')
+            ->where('projects.status', '!=', 'Draft')
+            ->when($request->filled('date_from'), fn($q) => $q->whereDate('projects.created_at', '>=', $request->date_from))
+            ->when($request->filled('date_to'), fn($q) => $q->whereDate('projects.created_at', '<=', $request->date_to))
+            ->when($request->filled('thematic_id'), fn($q) => $q->where('projects.thematic_id', $request->thematic_id))
+            ->when($request->filled('dept_id'), fn($q) => $q->where('projects.dept_id', $request->dept_id))
             ->join('thematic_areas', 'projects.thematic_id', '=', 'thematic_areas.id')
             ->select(
+                'thematic_areas.id as thematic_id',
                 'thematic_areas.title as thematic_title',
                 DB::raw('count(projects.project_id) as project_count'),
                 DB::raw('sum(projects.requested_budget) as total_requested'),
@@ -317,21 +352,64 @@ class GovernanceController extends Controller
         $thematicLabels  = $budgetByThematic->pluck('thematic_title')
             ->map(fn($t) => strlen($t) > 30 ? substr($t, 0, 30).'…' : $t)
             ->toArray();
-        $thematicBudgets = $budgetByThematic->pluck('total_requested')->toArray();
+        $thematicBudgets  = $budgetByThematic->pluck('total_requested')->toArray();
+        $thematicApproved = $budgetByThematic->pluck('total_approved')->toArray();
+
+        // Monthly submission trend (last 6 months)
+        $monthlySubmissions = [];
+        $monthlyLabels = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $mStart = now()->subMonths($i)->startOfMonth();
+            $mEnd   = now()->subMonths($i)->endOfMonth();
+            $count  = Project::where('status', '!=', 'Draft')
+                ->whereBetween('created_at', [$mStart, $mEnd])
+                ->count();
+            $monthlyLabels[] = $mStart->format('M Y');
+            $monthlySubmissions[] = $count;
+        }
+
+        // Publications Indexing breakdown
+        $publicationsByIndex = Paper::select('journal_index', DB::raw('count(*) as count'))
+            ->whereNotNull('journal_index')
+            ->where('journal_index', '!=', '')
+            ->groupBy('journal_index')
+            ->pluck('count', 'journal_index')
+            ->toArray();
+
+        $thematicAreas = ThematicArea::orderBy('title')->get();
+        $departments   = Department::orderBy('name')->get();
+        $filters       = $request->only(['date_from', 'date_to', 'thematic_id', 'dept_id']);
 
         return view('governance.analytics', compact(
             'totalProjects', 'activeProjects', 'completedProjects', 'underReviewProjects',
+            'totalRequested', 'totalApproved', 'totalDisbursed', 'remainingBudget', 'utilizationRate',
             'statusLabels', 'statusData',
-            'thematicLabels', 'thematicBudgets',
-            'budgetByThematic'
+            'thematicLabels', 'thematicBudgets', 'thematicApproved',
+            'budgetByThematic',
+            'monthlyLabels', 'monthlySubmissions',
+            'publicationsByIndex',
+            'thematicAreas', 'departments', 'filters'
         ));
     }
 
-    public function exportAnalyticsCsv()
+    public function exportAnalyticsCsv(Request $request)
     {
-        $projects = Project::where('status', '!=', 'Draft')
-            ->with(['thematicArea', 'pi'])
-            ->get();
+        $projectsQuery = Project::where('status', '!=', 'Draft')->with(['thematicArea', 'pi']);
+
+        if ($request->filled('date_from')) {
+            $projectsQuery->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $projectsQuery->whereDate('created_at', '<=', $request->date_to);
+        }
+        if ($request->filled('thematic_id')) {
+            $projectsQuery->where('thematic_id', $request->thematic_id);
+        }
+        if ($request->filled('dept_id')) {
+            $projectsQuery->where('dept_id', $request->dept_id);
+        }
+
+        $projects = $projectsQuery->get();
 
         $filename = 'UNI_Research_Portfolio_Data_' . date('Y_m_d_His') . '.csv';
 
@@ -385,22 +463,48 @@ class GovernanceController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 
-    public function exportAnalyticsPdf()
+    public function exportAnalyticsPdf(Request $request)
     {
         $submittedProjectsQuery = Project::where('status', '!=', 'Draft');
 
-        $totalProjects       = (clone $submittedProjectsQuery)->count();
-        $activeProjects      = Project::where('status', 'Active')->count();
-        $completedProjects   = Project::where('status', 'Completed')->count();
-        $underReviewProjects = Project::whereIn('status', ['Submitted', 'DH_Screened', 'UnderReview', 'Dean_Review', 'RCSC_Review'])->count();
+        if ($request->filled('date_from')) {
+            $submittedProjectsQuery->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $submittedProjectsQuery->whereDate('created_at', '<=', $request->date_to);
+        }
+        if ($request->filled('thematic_id')) {
+            $submittedProjectsQuery->where('thematic_id', $request->thematic_id);
+        }
+        if ($request->filled('dept_id')) {
+            $submittedProjectsQuery->where('dept_id', $request->dept_id);
+        }
 
-        $statusCounts = Project::where('status', '!=', 'Draft')
+        $totalProjects       = (clone $submittedProjectsQuery)->count();
+        $activeProjects      = (clone $submittedProjectsQuery)->where('status', 'Active')->count();
+        $completedProjects   = (clone $submittedProjectsQuery)->where('status', 'Completed')->count();
+        $underReviewProjects = (clone $submittedProjectsQuery)->whereIn('status', ['Submitted', 'DH_Screened', 'UnderReview', 'Dean_Review', 'RCSC_Review'])->count();
+
+        $filteredProjectIds = (clone $submittedProjectsQuery)->pluck('project_id');
+        $totalDisbursed = (float) BudgetRequest::whereIn('project_id', $filteredProjectIds)
+            ->where('status', 'Released')
+            ->sum('approved_amount');
+
+        $totalApproved = (float) (clone $submittedProjectsQuery)->whereNotNull('approved_budget')->sum('approved_budget');
+        $remainingBudget = max(0, $totalApproved - $totalDisbursed);
+        $utilizationRate = $totalApproved > 0 ? round(($totalDisbursed / $totalApproved) * 100, 1) : 0;
+
+        $statusCounts = (clone $submittedProjectsQuery)
             ->select('status', DB::raw('count(*) as total'))
             ->groupBy('status')
             ->get();
 
         $budgetByThematic = DB::table('projects')
-            ->where('status', '!=', 'Draft')
+            ->where('projects.status', '!=', 'Draft')
+            ->when($request->filled('date_from'), fn($q) => $q->whereDate('projects.created_at', '>=', $request->date_from))
+            ->when($request->filled('date_to'), fn($q) => $q->whereDate('projects.created_at', '<=', $request->date_to))
+            ->when($request->filled('thematic_id'), fn($q) => $q->where('projects.thematic_id', $request->thematic_id))
+            ->when($request->filled('dept_id'), fn($q) => $q->where('projects.dept_id', $request->dept_id))
             ->join('thematic_areas', 'projects.thematic_id', '=', 'thematic_areas.id')
             ->select(
                 'thematic_areas.title as thematic_title',
@@ -416,10 +520,15 @@ class GovernanceController extends Controller
             'activeProjects'      => $activeProjects,
             'completedProjects'   => $completedProjects,
             'underReviewProjects' => $underReviewProjects,
+            'totalApproved'       => $totalApproved,
+            'totalDisbursed'      => $totalDisbursed,
+            'remainingBudget'     => $remainingBudget,
+            'utilizationRate'     => $utilizationRate,
             'statusCounts'        => $statusCounts,
             'budgetByThematic'    => $budgetByThematic,
             'generatedAt'         => now()->format('M d, Y H:i:s'),
             'generatedBy'         => Auth::user()->name,
+            'filters'             => $request->only(['date_from', 'date_to', 'thematic_id', 'dept_id']),
         ])->setPaper('a4', 'portrait');
 
         return $pdf->download('UNI_Research_Portfolio_Report_' . date('Y_m_d_His') . '.pdf');

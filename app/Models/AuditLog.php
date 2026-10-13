@@ -15,7 +15,15 @@ class AuditLog extends Model
         'entity_type',
         'entity_id',
         'details',
-        'ip_address'
+        'ip_address',
+        'user_agent',
+        'request_method',
+        'request_url',
+        'diff_json',
+    ];
+
+    protected $casts = [
+        'diff_json' => 'array',
     ];
 
     public function user()
