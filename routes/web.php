@@ -17,6 +17,9 @@ use App\Http\Controllers\PaperController;
 use App\Http\Controllers\BackupController;
 use App\Http\Controllers\DataMigrationController;
 use App\Http\Controllers\ResearchController;
+use App\Http\Controllers\NotificationCenterController;
+use App\Http\Controllers\ProjectDocumentController;
+use App\Http\Controllers\ReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -147,6 +150,11 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/team/{memberId}', [TeamMemberController::class, 'update'])->name('team.update');
         Route::delete('/team/{memberId}', [TeamMemberController::class, 'destroy'])->name('team.destroy');
     });
+
+    // Versioned Project Document Management
+    Route::post('/projects/{projectId}/documents', [ProjectDocumentController::class, 'store'])->whereNumber('projectId')->name('projects.documents.store');
+    Route::get('/documents/{id}/download', [ProjectDocumentController::class, 'download'])->whereNumber('id')->name('documents.download');
+    Route::delete('/documents/{id}', [ProjectDocumentController::class, 'destroy'])->whereNumber('id')->name('documents.destroy');
 
     // SCR-08: Contract Signing (PI and VP sign; Coordinator and Admin can view)
     Route::middleware(['role:pi,vparttcs,coordinator,admin'])->group(function () {
@@ -593,6 +601,15 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/analytics/export/pdf', [GovernanceController::class, 'exportAnalyticsPdf'])->name('analytics.export.pdf');
     });
 
+    // Institutional PDF Reports Generator
+    Route::middleware(['role:coordinator,dean,rcsc,vparttcs,admin'])->group(function () {
+        Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+        Route::get('/reports/annual-output', [ReportController::class, 'annualOutput'])->name('reports.annual-output');
+        Route::get('/reports/financial-audit', [ReportController::class, 'financialAudit'])->name('reports.financial-audit');
+        Route::get('/reports/thematic-impact', [ReportController::class, 'thematicImpact'])->name('reports.thematic-impact');
+        Route::get('/reports/researcher-performance', [ReportController::class, 'researcherPerformance'])->name('reports.researcher-performance');
+    });
+
     // Admin-only Pages
     Route::middleware(['role:admin', 'permission:manage_users'])->group(function () {
         Route::get('/admin/users', [AdminController::class, 'users'])->name('admin.users');
@@ -662,12 +679,12 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/papers/{id}', [PaperController::class, 'destroy'])->whereNumber('id')->name('papers.destroy');
 
     // ---------------------------------------------------------------------
-    // Module: Notifications
+    // Module: Notification Centre & In-App Alerts
     // ---------------------------------------------------------------------
-    Route::post('/notifications/read-all', function () {
-        \App\Services\NotificationService::markAllRead(\Auth::id());
-        return back()->with('success', 'All notifications marked as read.');
-    })->name('notifications.read-all');
+    Route::get('/notifications', [NotificationCenterController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/read', [NotificationCenterController::class, 'markRead'])->whereNumber('id')->name('notifications.read');
+    Route::post('/notifications/read-all', [NotificationCenterController::class, 'markAllRead'])->name('notifications.read-all');
+    Route::delete('/notifications/{id}', [NotificationCenterController::class, 'destroy'])->whereNumber('id')->name('notifications.destroy');
 
     // ---------------------------------------------------------------------
     // Module: Backup / Recovery (Admin)
