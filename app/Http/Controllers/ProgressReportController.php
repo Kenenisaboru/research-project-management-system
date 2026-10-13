@@ -89,9 +89,6 @@ class ProgressReportController extends Controller
             }
         }
 
-        $minProgress = $project->milestoneReports()->max('progress_percentage') ?? 0;
-
-
         $filePath = null;
         if ($request->hasFile('deliverable_file')) {
             $filePath = $request->file('deliverable_file')->store('progress_deliverables', 'public');
