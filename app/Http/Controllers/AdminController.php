@@ -12,6 +12,7 @@ use App\Models\Department;
 use App\Models\Role;
 use App\Http\Requests\AdminUserStoreRequest;
 use App\Http\Requests\AdminUserUpdateRequest;
+use App\Services\CacheService;
 
 class AdminController extends Controller
 {
@@ -190,6 +191,7 @@ class AdminController extends Controller
         ]);
 
         ThematicArea::create($request->only('title', 'category', 'description'));
+        CacheService::invalidateRefData();
 
         return back()->with('success', 'Thematic area created successfully.');
     }
@@ -204,6 +206,7 @@ class AdminController extends Controller
 
         $thematic = ThematicArea::findOrFail($id);
         $thematic->update($request->only('title', 'category', 'description'));
+        CacheService::invalidateRefData();
 
         return back()->with('success', 'Thematic area updated successfully.');
     }
@@ -211,6 +214,7 @@ class AdminController extends Controller
     public function destroyThematicArea($id)
     {
         ThematicArea::findOrFail($id)->delete();
+        CacheService::invalidateRefData();
         return back()->with('success', 'Thematic area deleted successfully.');
     }
 
@@ -267,6 +271,7 @@ class AdminController extends Controller
         ]);
 
         Department::create($request->only('name', 'code', 'college_id'));
+        CacheService::invalidateRefData();
 
         return back()->with('success', 'Department created successfully.');
     }
@@ -281,6 +286,7 @@ class AdminController extends Controller
 
         $dept = Department::findOrFail($id);
         $dept->update($request->only('name', 'code', 'college_id'));
+        CacheService::invalidateRefData();
 
         return back()->with('success', 'Department updated successfully.');
     }
@@ -288,6 +294,7 @@ class AdminController extends Controller
     public function destroyDepartment($id)
     {
         Department::findOrFail($id)->delete();
+        CacheService::invalidateRefData();
         return back()->with('success', 'Department deleted successfully.');
     }
 
@@ -306,6 +313,7 @@ class AdminController extends Controller
         ]);
 
         \App\Models\College::create($request->only('name', 'code'));
+        CacheService::invalidateRefData();
 
         return back()->with('success', 'College created successfully.');
     }
@@ -319,6 +327,7 @@ class AdminController extends Controller
 
         $college = \App\Models\College::findOrFail($id);
         $college->update($request->only('name', 'code'));
+        CacheService::invalidateRefData();
 
         return back()->with('success', 'College updated successfully.');
     }
@@ -326,6 +335,7 @@ class AdminController extends Controller
     public function destroyCollege($id)
     {
         \App\Models\College::findOrFail($id)->delete();
+        CacheService::invalidateRefData();
         return back()->with('success', 'College deleted successfully.');
     }
 }
