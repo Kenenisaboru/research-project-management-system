@@ -13,7 +13,6 @@ use App\Models\User;
 use App\Models\Department;
 use App\Services\BlindReviewService;
 use App\Http\Requests\ProjectStoreRequest;
-use App\Http\Requests\ProjectDraftRequest;
 use App\Http\Requests\ProjectUpdateRequest;
 
 class ProjectController extends Controller
@@ -109,7 +108,6 @@ class ProjectController extends Controller
 
     public function store(ProjectStoreRequest $request)
     {
-
         $user = Auth::user();
 
         // Handle PDF upload (SDD SCR-03, RSK-02)
@@ -135,9 +133,8 @@ class ProjectController extends Controller
             ->with('success', 'Research proposal saved as draft. You can submit it when ready.');
     }
 
-    public function storeDraft(ProjectDraftRequest $request)
+    public function storeDraft(ProjectStoreRequest $request)
     {
-
         $user = Auth::user();
 
         $docPath = null;
@@ -183,6 +180,15 @@ class ProjectController extends Controller
     public function update(ProjectUpdateRequest $request, $id)
     {
         $project = Project::findOrFail($id);
+        $user = Auth::user();
+
+        if ($user->role !== 'pi' || (int) $project->pi_id !== (int) $user->id) {
+            abort(403, 'You can only edit your own projects.');
+        }
+
+        if (!in_array($project->status, ['Draft', 'Withdrawn', 'Returned', 'Rejected'])) {
+            return back()->with('error', 'Only draft, withdrawn, returned, or rejected proposals can be edited.');
+        }
 
         $data = [
             'title'            => $request->title,
