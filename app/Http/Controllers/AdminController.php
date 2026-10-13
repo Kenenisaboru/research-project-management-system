@@ -67,7 +67,8 @@ class AdminController extends Controller
 
         $user = User::findOrFail($id);
         $user->update([
-            'password' => Hash::make($request->new_password),
+            'password'            => Hash::make($request->new_password),
+            'password_changed_at' => now(),
         ]);
 
         \App\Services\AuditService::log('RESET_PASSWORD', 'User', $user->id, "Admin reset password for user '{$user->name}' ({$user->email})");
