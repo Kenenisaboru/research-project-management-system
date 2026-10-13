@@ -76,6 +76,33 @@
         </tr>
     </table>
 
+    @if(isset($totalApproved))
+    <table class="kpi-row" style="margin-top: -10px;">
+        <tr>
+            <td class="kpi-box">
+                <div class="kpi-title">Approved Budget</div>
+                <div class="kpi-val" style="font-size: 13px;">ETB {{ number_format($totalApproved, 2) }}</div>
+                <div class="kpi-sub">Total Authorized</div>
+            </td>
+            <td class="kpi-box">
+                <div class="kpi-title">Disbursed Funds</div>
+                <div class="kpi-val" style="font-size: 13px; color: #15803d;">ETB {{ number_format($totalDisbursed, 2) }}</div>
+                <div class="kpi-sub">Released to Grants</div>
+            </td>
+            <td class="kpi-box">
+                <div class="kpi-title">Remaining Funds</div>
+                <div class="kpi-val" style="font-size: 13px; color: #b45309;">ETB {{ number_format($remainingBudget, 2) }}</div>
+                <div class="kpi-sub">Committed Balance</div>
+            </td>
+            <td class="kpi-box">
+                <div class="kpi-title">Utilization Rate</div>
+                <div class="kpi-val" style="font-size: 14px; color: #0369a1;">{{ $utilizationRate }}%</div>
+                <div class="kpi-sub">Disbursement vs Budget</div>
+            </td>
+        </tr>
+    </table>
+    @endif
+
     <div class="section-title">1. Financial Overview &amp; Governance Allocation by Thematic Area</div>
     <table class="data-table">
         <thead>
