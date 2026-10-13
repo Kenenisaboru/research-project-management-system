@@ -49,6 +49,7 @@ Route::prefix('v1')->group(function () {
         // In-App Notifications
         Route::prefix('notifications')->group(function () {
             Route::get('/', [NotificationController::class, 'index'])->name('api.v1.notifications.index');
+            Route::get('/poll', [NotificationController::class, 'poll'])->name('api.v1.notifications.poll');
             Route::get('/unread-count', [NotificationController::class, 'unreadCount'])->name('api.v1.notifications.unread-count');
             Route::post('/{id}/read', [NotificationController::class, 'markAsRead'])->name('api.v1.notifications.read');
             Route::post('/read-all', [NotificationController::class, 'markAllRead'])->name('api.v1.notifications.read-all');
