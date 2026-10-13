@@ -92,7 +92,7 @@
                 </button>
             </form>
 
-            @if(app()->environment('local', 'staging'))
+            @if(app()->environment('local'))
             <div class="login-demo">
                 <div class="login-divider"><span>Development access</span></div>
                 <form action="{{ route('login') }}" method="POST" autocomplete="off" id="demoLoginForm">

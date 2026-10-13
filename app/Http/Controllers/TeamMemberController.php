@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Project;
 use App\Models\ProjectMember;
 use App\Models\User;
+use App\Http\Requests\TeamMemberStoreRequest;
 
 class TeamMemberController extends Controller
 {
@@ -31,7 +32,7 @@ class TeamMemberController extends Controller
         return view('team.index', compact('project', 'availableUsers'));
     }
 
-    public function store(Request $request, $projectId)
+    public function store(TeamMemberStoreRequest $request, $projectId)
     {
         $user = Auth::user();
         $project = Project::where('project_id', $projectId)->firstOrFail();
@@ -39,12 +40,6 @@ class TeamMemberController extends Controller
         if ((int) $project->pi_id !== (int) $user->id) {
             abort(403, 'You can only manage team members for your own projects.');
         }
-
-        $request->validate([
-            'user_id'                => 'required|exists:users,id',
-            'role_in_project'        => 'required|string|max:255',
-            'contribution_percentage'=> 'required|numeric|min:0|max:100',
-        ]);
 
         ProjectMember::create([
             'project_id'             => $projectId,
@@ -56,7 +51,7 @@ class TeamMemberController extends Controller
         return back()->with('success', 'Team member added successfully.');
     }
 
-    public function update(Request $request, $memberId)
+    public function update(TeamMemberStoreRequest $request, $memberId)
     {
         $user = Auth::user();
         $member = ProjectMember::findOrFail($memberId);
@@ -65,11 +60,6 @@ class TeamMemberController extends Controller
         if ((int) $project->pi_id !== (int) $user->id) {
             abort(403, 'You can only update team members for your own projects.');
         }
-
-        $request->validate([
-            'role_in_project'        => 'required|string|max:255',
-            'contribution_percentage'=> 'required|numeric|min:0|max:100',
-        ]);
 
         $member->update($request->only('role_in_project', 'contribution_percentage'));
 

@@ -12,6 +12,8 @@ use App\Models\Evaluation;
 use App\Models\User;
 use App\Models\Department;
 use App\Services\BlindReviewService;
+use App\Http\Requests\ProjectStoreRequest;
+use App\Http\Requests\ProjectUpdateRequest;
 
 class ProjectController extends Controller
 {
@@ -24,6 +26,12 @@ class ProjectController extends Controller
 
     public function index(Request $request)
     {
+        $request->validate([
+            'search' => 'nullable|string|max:255',
+            'status' => 'nullable|string|max:50',
+            'thematic_area' => 'nullable|integer|exists:thematic_areas,id',
+        ]);
+
         $user = Auth::user();
         $query = Project::with(['pi', 'thematicArea', 'department', 'irercClearance']);
 
@@ -98,16 +106,8 @@ class ProjectController extends Controller
         return view('projects.create', compact('thematicAreas'));
     }
 
-    public function store(Request $request)
+    public function store(ProjectStoreRequest $request)
     {
-        $request->validate([
-            'title'             => 'required|string|max:500',
-            'abstract_text'     => 'required|string',
-            'thematic_id'       => 'required|exists:thematic_areas,id',
-            'requested_budget'  => 'required|numeric|min:0',
-            'proposal_document' => 'required|file|mimes:pdf,doc,docx|max:51200',
-        ]);
-
         $user = Auth::user();
 
         // Handle PDF upload (SDD SCR-03, RSK-02)
@@ -133,16 +133,8 @@ class ProjectController extends Controller
             ->with('success', 'Research proposal saved as draft. You can submit it when ready.');
     }
 
-    public function storeDraft(Request $request)
+    public function storeDraft(ProjectStoreRequest $request)
     {
-        $request->validate([
-            'title'             => 'required|string|max:500',
-            'abstract_text'     => 'required|string',
-            'thematic_id'       => 'required|exists:thematic_areas,id',
-            'requested_budget'  => 'required|numeric|min:0',
-            'proposal_document' => 'nullable|file|mimes:pdf,doc,docx|max:51200',
-        ]);
-
         $user = Auth::user();
 
         $docPath = null;
@@ -185,7 +177,7 @@ class ProjectController extends Controller
         return view('projects.edit', compact('project', 'thematicAreas'));
     }
 
-    public function update(Request $request, $id)
+    public function update(ProjectUpdateRequest $request, $id)
     {
         $project = Project::findOrFail($id);
         $user = Auth::user();
@@ -197,14 +189,6 @@ class ProjectController extends Controller
         if (!in_array($project->status, ['Draft', 'Withdrawn', 'Returned', 'Rejected'])) {
             return back()->with('error', 'Only draft, withdrawn, returned, or rejected proposals can be edited.');
         }
-
-        $request->validate([
-            'title'             => 'required|string|max:500',
-            'abstract_text'     => 'required|string',
-            'thematic_id'       => 'required|exists:thematic_areas,id',
-            'requested_budget'  => 'required|numeric|min:0',
-            'proposal_document' => 'nullable|file|mimes:pdf,doc,docx|max:51200',
-        ]);
 
         $data = [
             'title'            => $request->title,
@@ -283,6 +267,7 @@ class ProjectController extends Controller
         $project = Project::with(['pi', 'thematicArea', 'department', 'members.user', 'evaluations', 'budgetRequests', 'extensions'])->findOrFail($id);
         $user = Auth::user();
         $anonymized = null;
+        $pendingReviewCount = $project->evaluations->where('decision', 'Pending')->count();
 
         if ($user->role === 'pi' && (int) $project->pi_id !== (int) $user->id) {
             abort(403, 'You can only view your own projects.');
@@ -296,9 +281,29 @@ class ProjectController extends Controller
             $anonymized = $this->blindReviewService->getAnonymizedProposal($project);
         }
 
+        $workflowGuidance = [
+            'Draft' => ['actor' => 'Principal Investigator', 'action' => 'Complete the proposal and submit it for department screening.'],
+            'Submitted' => ['actor' => 'Department Head', 'action' => 'Screen the submitted proposal and record the screening decision.'],
+            'DH_Screened' => ['actor' => 'Research Coordinator', 'action' => 'Assign peer reviewers to begin the evaluation stage.'],
+            'UnderReview' => [
+                'actor' => $pendingReviewCount > 0 ? 'Assigned Peer Reviewer(s)' : 'Research Coordinator',
+                'action' => $pendingReviewCount > 0
+                    ? "{$pendingReviewCount} peer review(s) are still pending."
+                    : 'All assigned reviews are complete; record the next governance decision.',
+            ],
+            'Returned' => ['actor' => 'Principal Investigator', 'action' => 'Address the feedback, update the proposal, and resubmit it.'],
+            'Rejected' => ['actor' => 'Principal Investigator', 'action' => 'Review the decision and feedback before deciding whether to revise and resubmit.'],
+            'Approved' => ['actor' => 'Principal Investigator / Vice President', 'action' => 'Complete the required ethics clearance and contract signatures before project activation.'],
+            'Active' => ['actor' => 'Principal Investigator and Project Team', 'action' => 'Submit progress reports and complete approved project milestones.'],
+            'Completed' => ['actor' => 'Research Coordinator', 'action' => 'Issue the completion certificate if one has not already been issued.'],
+            'PendingCancellation' => ['actor' => 'Research Administration', 'action' => 'Review and decide the pending withdrawal request.'],
+            'Withdrawn' => ['actor' => 'No action pending', 'action' => 'This proposal has been withdrawn.'],
+            'Terminated' => ['actor' => 'No action pending', 'action' => 'This project has been terminated.'],
+        ][$project->status] ?? ['actor' => 'Research Administration', 'action' => 'Review the project status and contact the responsible office for the next step.'];
+
         $reviewers = \App\Models\User::where('role', 'reviewer')->get();
 
-        return view('projects.show', compact('project', 'anonymized', 'reviewers'));
+        return view('projects.show', compact('project', 'anonymized', 'reviewers', 'workflowGuidance', 'pendingReviewCount'));
     }
 
     public function assignReviewer(Request $request, $id)
@@ -436,4 +441,3 @@ class ProjectController extends Controller
         return back()->with('success', 'Withdrawal request rejected. Project restored.');
     }
 }
-

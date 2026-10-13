@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Project;
 use App\Services\LifecycleChangeService;
+use App\Http\Requests\ExtensionRequestRequest;
+use App\Http\Requests\AmendmentRequestRequest;
+use App\Http\Requests\TerminationRequestRequest;
 use Exception;
 
 class LifecycleController extends Controller
@@ -17,7 +20,7 @@ class LifecycleController extends Controller
         $this->lifecycleService = $lifecycleService;
     }
 
-    public function requestExtension(Request $request, $projectId)
+    public function requestExtension(ExtensionRequestRequest $request, $projectId)
     {
         $user = Auth::user();
         $project = Project::findOrFail($projectId);
@@ -30,11 +33,6 @@ class LifecycleController extends Controller
             return back()->with('error', 'Extensions can only be requested for Active or Approved projects.');
         }
 
-        $request->validate([
-            'reason' => 'required|string',
-            'months' => 'required|integer|min:1|max:6',
-        ]);
-
         try {
             $extension = $this->lifecycleService->requestExtension($project, $request->reason, $request->months);
             return back()->with('success', "Extension request #{$extension->extension_number} submitted for {$extension->approver_role} approval.");
@@ -43,7 +41,7 @@ class LifecycleController extends Controller
         }
     }
 
-    public function requestAmendment(Request $request, $projectId)
+    public function requestAmendment(AmendmentRequestRequest $request, $projectId)
     {
         $user = Auth::user();
         $project = Project::findOrFail($projectId);
@@ -56,11 +54,6 @@ class LifecycleController extends Controller
             return back()->with('error', 'Budget amendments can only be requested for Active or Approved projects.');
         }
 
-        $request->validate([
-            'delta_amount' => 'required|numeric|min:0',
-            'justification' => 'required|string',
-        ]);
-
         \App\Models\BudgetAmendment::create([
             'project_id' => $project->project_id,
             'delta_amount' => $request->delta_amount,
@@ -71,7 +64,7 @@ class LifecycleController extends Controller
         return back()->with('success', 'Budget amendment request submitted for RCSC/Coordinator approval.');
     }
 
-    public function terminate(Request $request, $projectId)
+    public function terminate(TerminationRequestRequest $request, $projectId)
     {
         $user = Auth::user();
         $project = Project::findOrFail($projectId);
@@ -83,11 +76,6 @@ class LifecycleController extends Controller
         if (!in_array($project->status, ['Active', 'Approved'])) {
             return back()->with('error', 'Termination can only be requested for Active or Approved projects.');
         }
-
-        $request->validate([
-            'reason' => 'required|string',
-            'verified_value' => 'required|numeric|min:0',
-        ]);
 
         $termination = $this->lifecycleService->terminateProject($project, $request->reason, $request->verified_value);
 
