@@ -33,7 +33,6 @@ class LifecycleController extends Controller
             return back()->with('error', 'Extensions can only be requested for Active or Approved projects.');
         }
 
-
         try {
             $extension = $this->lifecycleService->requestExtension($project, $request->reason, $request->months);
             return back()->with('success', "Extension request #{$extension->extension_number} submitted for {$extension->approver_role} approval.");
@@ -54,7 +53,6 @@ class LifecycleController extends Controller
         if (!in_array($project->status, ['Active', 'Approved'])) {
             return back()->with('error', 'Budget amendments can only be requested for Active or Approved projects.');
         }
-
 
         \App\Models\BudgetAmendment::create([
             'project_id' => $project->project_id,
@@ -78,7 +76,6 @@ class LifecycleController extends Controller
         if (!in_array($project->status, ['Active', 'Approved'])) {
             return back()->with('error', 'Termination can only be requested for Active or Approved projects.');
         }
-
 
         $termination = $this->lifecycleService->terminateProject($project, $request->reason, $request->verified_value);
 
