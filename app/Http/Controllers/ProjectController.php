@@ -12,6 +12,7 @@ use App\Models\Evaluation;
 use App\Models\User;
 use App\Models\Department;
 use App\Services\BlindReviewService;
+use App\Services\ProjectSearchService;
 use App\Http\Requests\ProjectStoreRequest;
 use App\Http\Requests\ProjectUpdateRequest;
 
@@ -27,52 +28,23 @@ class ProjectController extends Controller
     public function index(Request $request)
     {
         $request->validate([
-            'search' => 'nullable|string|max:255',
-            'status' => 'nullable|string|max:50',
-            'thematic_area' => 'nullable|integer|exists:thematic_areas,id',
+            'search'        => 'nullable|string|max:255',
+            'status'        => 'nullable|string|max:50',
+            'thematic_area' => 'nullable',
         ]);
 
-        $user = Auth::user();
-        $query = Project::with(['pi', 'thematicArea', 'department', 'irercClearance']);
+        $query = ProjectSearchService::buildQuery($request, Auth::user());
 
-        if ($user->role === 'pi') {
-            $query->where('pi_id', $user->id);
-        } elseif ($user->role === 'tm') {
-            $teamProjectIds = ProjectMember::where('user_id', $user->id)->pluck('project_id')->toArray();
-            $query->whereIn('project_id', $teamProjectIds);
-        } elseif ($user->role === 'reviewer') {
-            $assignedProjectIds = Evaluation::where('examiner_id', $user->id)->pluck('project_id')->toArray();
-            $query->whereIn('project_id', $assignedProjectIds);
-        } elseif ($user->role === 'dh') {
-            $query->where('projects.dept_id', $user->dept_id)
-                  ->where('status', '!=', 'Draft');
-        } elseif (in_array($user->role, ['coordinator', 'dean'])) {
-            $collegeId = Department::where('id', $user->dept_id)->value('college_id');
-            $collegeDeptIds = Department::where('college_id', $collegeId)->pluck('id')->toArray();
-            $query->whereIn('projects.dept_id', $collegeDeptIds)
-                  ->where('status', '!=', 'Draft');
-        } else {
-            $query->where('status', '!=', 'Draft');
+        if ($request->input('export') === 'csv') {
+            return ProjectSearchService::exportCsv($query->get());
         }
 
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where('title', 'LIKE', "%{$search}%");
-        }
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->input('status'));
-        }
-
-        if ($request->filled('thematic_area')) {
-            $query->where('thematic_id', $request->input('thematic_area'));
-        }
-
+        $projects      = $query->paginate(10)->withQueryString();
         $thematicAreas = \App\Models\ThematicArea::where('is_active', true)->get();
+        $departments   = \App\Models\Department::orderBy('name')->get();
+        $filters       = $request->all();
 
-        $projects = $query->latest()->paginate(10)->withQueryString();
-
-        return view('projects.index', compact('projects', 'thematicAreas'));
+        return view('projects.index', compact('projects', 'thematicAreas', 'departments', 'filters'));
     }
 
     public function submit($id)
