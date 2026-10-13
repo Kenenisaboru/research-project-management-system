@@ -2,26 +2,36 @@
 
 namespace App\Http\Requests;
 
+use App\Services\RbacService;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
 
 /**
- * Form request for creating a new user account (Admin only).
+ * Class AdminUserStoreRequest
  *
- * @author  RPMS Pro Upgrade
+ * Validates administrative user creation and account provisioning.
  */
 class AdminUserStoreRequest extends FormRequest
 {
     /**
-     * Only System Administrators may create user accounts.
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
      */
     public function authorize(): bool
     {
-        return Auth::check() && Auth::user()->role === 'admin';
+        $user = $this->user();
+        if (!$user) {
+            return false;
+        }
+
+        return $user->role === 'admin'
+            || RbacService::userHasPermission($user, 'manage_users');
     }
 
     /**
+     * Get the validation rules that apply to the request.
+     *
      * @return array<string, mixed>
      */
     public function rules(): array
@@ -30,48 +40,47 @@ class AdminUserStoreRequest extends FormRequest
             'staff_id' => ['required', 'string', 'max:100', 'unique:users,staff_id'],
             'name'     => ['required', 'string', 'max:255'],
             'email'    => ['required', 'email', 'max:255', 'unique:users,email'],
-            'password' => [
-                'required',
-                'confirmed',
-                Password::min(10)
-                    ->mixedCase()
-                    ->numbers()
-                    ->symbols(),
-            ],
-            'role'    => [
-                'required',
-                'string',
-                'in:pi,tm,reviewer,dh,coordinator,dean,irerc,vparttcs,rcsc,finance,admin',
-            ],
-            'dept_id' => ['nullable', 'integer', 'exists:departments,id'],
+            'password' => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
+            'role'     => ['required', 'in:pi,tm,reviewer,dh,coordinator,dean,irerc,vparttcs,rcsc,finance,admin'],
+            'dept_id'  => ['nullable', 'integer', 'exists:departments,id'],
         ];
     }
 
     /**
-     * @return array<string, string>
-     */
-    public function attributes(): array
-    {
-        return [
-            'staff_id' => __('staff ID'),
-            'name'     => __('full name'),
-            'email'    => __('email address'),
-            'password' => __('password'),
-            'role'     => __('system role'),
-            'dept_id'  => __('department'),
-        ];
-    }
-
-    /**
+     * Custom validation messages.
+     *
      * @return array<string, string>
      */
     public function messages(): array
     {
         return [
-            'staff_id.unique'  => __('This staff ID is already registered in the system.'),
-            'email.unique'     => __('An account with this email address already exists.'),
-            'password.min'     => __('Passwords must be at least 10 characters and include uppercase, lowercase, numbers, and symbols.'),
-            'role.in'          => __('Please select a valid system role.'),
+            'staff_id.required'  => __('Institutional Staff / Faculty ID is required.'),
+            'staff_id.unique'    => __('This Staff ID is already assigned to an existing user.'),
+            'name.required'      => __('Full staff or faculty name is required.'),
+            'email.required'     => __('Institutional email address is required.'),
+            'email.unique'       => __('This email address is already registered in the system.'),
+            'password.required'  => __('A secure initial account password is required.'),
+            'password.confirmed' => __('Password confirmation does not match.'),
+            'role.required'      => __('An operational RBAC role must be assigned to the user.'),
+            'role.in'            => __('Selected role is not recognized by the system architecture.'),
+            'dept_id.exists'     => __('Assigned academic department is invalid.'),
+        ];
+    }
+
+    /**
+     * Custom attribute names for validation.
+     *
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'staff_id' => __('Staff ID'),
+            'name'     => __('Full Name'),
+            'email'    => __('Email Address'),
+            'password' => __('Account Password'),
+            'role'     => __('System Role'),
+            'dept_id'  => __('Department'),
         ];
     }
 }
