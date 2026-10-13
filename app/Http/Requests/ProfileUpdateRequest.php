@@ -3,29 +3,32 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 
 /**
- * Form request for updating a user's own profile (name, email, avatar).
+ * Class ProfileUpdateRequest
  *
- * @author  RPMS Pro Upgrade
+ * Validates self-service personal profile updates and profile avatar uploads.
  */
 class ProfileUpdateRequest extends FormRequest
 {
     /**
-     * All authenticated users may update their own profile.
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
      */
     public function authorize(): bool
     {
-        return Auth::check();
+        return $this->user() !== null;
     }
 
     /**
+     * Get the validation rules that apply to the request.
+     *
      * @return array<string, mixed>
      */
     public function rules(): array
     {
-        $userId = Auth::id();
+        $userId = $this->user()?->id;
 
         return [
             'name'   => ['sometimes', 'required', 'string', 'max:255'],
@@ -35,27 +38,33 @@ class ProfileUpdateRequest extends FormRequest
     }
 
     /**
-     * @return array<string, string>
-     */
-    public function attributes(): array
-    {
-        return [
-            'name'   => __('full name'),
-            'email'  => __('email address'),
-            'avatar' => __('profile photo'),
-        ];
-    }
-
-    /**
+     * Custom validation messages.
+     *
      * @return array<string, string>
      */
     public function messages(): array
     {
         return [
-            'email.unique'   => __('This email address is already used by another account.'),
-            'avatar.image'   => __('Profile photo must be a valid image file.'),
-            'avatar.mimes'   => __('Profile photo must be a JPG, JPEG, PNG, or WebP file.'),
-            'avatar.max'     => __('Profile photo may not exceed 2 MB.'),
+            'name.required'  => __('Full name is required.'),
+            'email.required' => __('Valid email address is required.'),
+            'email.unique'   => __('This email address is already registered to another user.'),
+            'avatar.image'   => __('Profile avatar must be an image file.'),
+            'avatar.mimes'   => __('Profile avatar format must be JPG, JPEG, PNG, or WEBP.'),
+            'avatar.max'     => __('Profile photo size must not exceed 2MB.'),
+        ];
+    }
+
+    /**
+     * Custom attribute names for validation.
+     *
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'name'   => __('Full Name'),
+            'email'  => __('Email Address'),
+            'avatar' => __('Profile Avatar Photo'),
         ];
     }
 }
