@@ -62,6 +62,37 @@ class PasswordPolicy
     }
 
     /**
+     * Return detailed strength validation results.
+     *
+     * @param  string  $password
+     * @return array{valid: bool, errors: array<int, string>}
+     */
+    public static function validateStrength(string $password): array
+    {
+        $errors = [];
+        if (strlen($password) < 10) {
+            $errors[] = 'Password must be at least 10 characters.';
+        }
+        if (!preg_match('/[a-z]/', $password)) {
+            $errors[] = 'Password must contain at least one lowercase letter.';
+        }
+        if (!preg_match('/[A-Z]/', $password)) {
+            $errors[] = 'Password must contain at least one uppercase letter.';
+        }
+        if (!preg_match('/[0-9]/', $password)) {
+            $errors[] = 'Password must contain at least one numeric digit.';
+        }
+        if (!preg_match('/[^a-zA-Z0-9]/', $password)) {
+            $errors[] = 'Password must contain at least one special symbol.';
+        }
+
+        return [
+            'valid'  => empty($errors),
+            'errors' => $errors,
+        ];
+    }
+
+    /**
      * Check if the user password is older than 90 days.
      *
      * @param  \App\Models\User  $user
