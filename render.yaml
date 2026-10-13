@@ -21,3 +21,5 @@ services:
         value: /data/database.sqlite
       - key: SESSION_DRIVER
         value: database
+      - key: RPMS_SEED_DEMO_DATA
+        value: false
