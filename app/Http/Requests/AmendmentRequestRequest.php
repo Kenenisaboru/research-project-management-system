@@ -2,57 +2,80 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Project;
 use App\Services\RbacService;
+use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * Form request for requesting a budget amendment (supplemental funding).
+ * Class AmendmentRequestRequest
  *
- * @author  RPMS Pro Upgrade
+ * Validates budget amendment and supplemental fund requests submitted by Principal Investigators.
  */
 class AmendmentRequestRequest extends FormRequest
 {
     /**
-     * Only users with the request_amendment permission may submit budget amendments.
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
      */
     public function authorize(): bool
     {
-        $user = Auth::user();
+        $user = $this->user();
+        if (!$user) {
+            return false;
+        }
 
-        return $user && RbacService::userHasPermission($user, 'request_amendment');
+        $projectId = $this->route('projectId') ?? $this->route('id') ?? $this->route('project');
+        if ($projectId) {
+            $project = Project::find($projectId);
+            if ($project && (int) $project->pi_id !== (int) $user->id && $user->role !== 'admin') {
+                return false;
+            }
+        }
+
+        return $user->role === 'pi' || $user->role === 'admin'
+            || RbacService::userHasPermission($user, 'request_amendment');
     }
 
     /**
+     * Get the validation rules that apply to the request.
+     *
      * @return array<string, mixed>
      */
     public function rules(): array
     {
         return [
-            'delta_amount'  => ['required', 'numeric', 'min:1000'],
-            'justification' => ['required', 'string', 'min:50', 'max:3000'],
+            'delta_amount'  => ['required', 'numeric', 'min:0'],
+            'justification' => ['required', 'string', 'min:10'],
         ];
     }
 
     /**
-     * @return array<string, string>
-     */
-    public function attributes(): array
-    {
-        return [
-            'delta_amount'  => __('additional budget requested (ETB)'),
-            'justification' => __('justification'),
-        ];
-    }
-
-    /**
+     * Custom validation messages.
+     *
      * @return array<string, string>
      */
     public function messages(): array
     {
         return [
-            'delta_amount.min'   => __('The minimum budget amendment is ETB 1,000.'),
-            'justification.min'  => __('Justification must be at least 50 characters explaining the need for additional funds.'),
+            'delta_amount.required'  => __('Requested additional amendment budget amount (ETB) is required.'),
+            'delta_amount.numeric'   => __('Amendment amount must be numeric.'),
+            'delta_amount.min'       => __('Amendment amount cannot be negative.'),
+            'justification.required' => __('A financial and technical justification for the budget amendment is required.'),
+            'justification.min'      => __('Justification must be at least 10 characters.'),
+        ];
+    }
+
+    /**
+     * Custom attribute names for validation.
+     *
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'delta_amount'  => __('Requested Supplemental Budget'),
+            'justification' => __('Amendment Justification'),
         ];
     }
 }
