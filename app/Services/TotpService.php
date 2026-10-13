@@ -79,6 +79,30 @@ class TotpService
     }
 
     /**
+     * Alias for getCode() at current timestamp.
+     *
+     * @param  string  $secret
+     * @return string
+     */
+     public static function getCurrentCode(string $secret): string
+     {
+         return self::getCode($secret);
+     }
+
+    /**
+     * Alias for verify().
+     *
+     * @param  string  $secret
+     * @param  string  $code
+     * @param  int  $driftSteps
+     * @return bool
+     */
+    public static function verifyCode(string $secret, string $code, int $driftSteps = 1): bool
+    {
+        return self::verify($secret, $code, $driftSteps);
+    }
+
+    /**
      * Generate an otpauth:// URI compatible with Google Authenticator, Microsoft Authenticator, Authy.
      *
      * @param  string  $accountName
