@@ -41,7 +41,6 @@ class TeamMemberController extends Controller
             abort(403, 'You can only manage team members for your own projects.');
         }
 
-
         ProjectMember::create([
             'project_id'             => $projectId,
             'user_id'                => $request->user_id,
@@ -52,7 +51,7 @@ class TeamMemberController extends Controller
         return back()->with('success', 'Team member added successfully.');
     }
 
-    public function update(Request $request, $memberId)
+    public function update(TeamMemberStoreRequest $request, $memberId)
     {
         $user = Auth::user();
         $member = ProjectMember::findOrFail($memberId);
@@ -61,11 +60,6 @@ class TeamMemberController extends Controller
         if ((int) $project->pi_id !== (int) $user->id) {
             abort(403, 'You can only update team members for your own projects.');
         }
-
-        $request->validate([
-            'role_in_project'        => 'required|string|max:255',
-            'contribution_percentage'=> 'required|numeric|min:0|max:100',
-        ]);
 
         $member->update($request->only('role_in_project', 'contribution_percentage'));
 
