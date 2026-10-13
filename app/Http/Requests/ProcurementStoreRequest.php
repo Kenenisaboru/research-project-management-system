@@ -2,30 +2,44 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Project;
 use App\Services\RbacService;
+use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * Form request for submitting a procurement (purchase) request for a project.
+ * Class ProcurementStoreRequest
  *
- * @author  RPMS Pro Upgrade
+ * Validates procurement requests for equipment, reagents, and consumables.
  */
 class ProcurementStoreRequest extends FormRequest
 {
     /**
-     * PIs with the submit_procurement permission may raise procurement requests.
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
      */
     public function authorize(): bool
     {
-        $user = Auth::user();
+        $user = $this->user();
+        if (!$user) {
+            return false;
+        }
 
-        return $user
-            && $user->role === 'pi'
-            && RbacService::userHasPermission($user, 'submit_procurement');
+        $projectId = $this->input('project_id');
+        if ($projectId) {
+            $project = Project::where('project_id', $projectId)->first();
+            if ($project && (int) $project->pi_id !== (int) $user->id && $user->role !== 'admin') {
+                return false;
+            }
+        }
+
+        return $user->role === 'pi' || $user->role === 'admin'
+            || RbacService::userHasPermission($user, 'submit_procurement');
     }
 
     /**
+     * Get the validation rules that apply to the request.
+     *
      * @return array<string, mixed>
      */
     public function rules(): array
@@ -33,35 +47,44 @@ class ProcurementStoreRequest extends FormRequest
         return [
             'item_name'      => ['required', 'string', 'max:255'],
             'description'    => ['nullable', 'string', 'max:2000'],
-            'category'       => ['required', 'string', 'in:Equipment,Reagents,Consumables,Other'],
+            'category'       => ['required', 'in:Equipment,Reagents,Consumables,Other'],
             'estimated_cost' => ['required', 'numeric', 'min:0'],
-            'project_id'     => ['required', 'integer', 'exists:projects,project_id'],
+            'project_id'     => ['required', 'exists:projects,project_id'],
         ];
     }
 
     /**
-     * @return array<string, string>
-     */
-    public function attributes(): array
-    {
-        return [
-            'item_name'      => __('item name'),
-            'description'    => __('item description'),
-            'category'       => __('procurement category'),
-            'estimated_cost' => __('estimated cost'),
-            'project_id'     => __('project'),
-        ];
-    }
-
-    /**
+     * Custom validation messages.
+     *
      * @return array<string, string>
      */
     public function messages(): array
     {
         return [
-            'category.in'          => __('Category must be one of: Equipment, Reagents, Consumables, or Other.'),
-            'estimated_cost.min'   => __('Estimated cost cannot be negative.'),
-            'project_id.exists'    => __('The selected project does not exist.'),
+            'item_name.required'      => __('Item title or specification is required.'),
+            'category.required'       => __('Please select a procurement category (Equipment, Reagents, Consumables, or Other).'),
+            'category.in'             => __('Selected procurement category is invalid.'),
+            'estimated_cost.required' => __('Estimated procurement cost is required.'),
+            'estimated_cost.numeric'  => __('Estimated cost must be a numeric amount.'),
+            'estimated_cost.min'      => __('Estimated cost cannot be negative.'),
+            'project_id.required'     => __('Associated research project must be specified.'),
+            'project_id.exists'       => __('Selected project does not exist.'),
+        ];
+    }
+
+    /**
+     * Custom attribute names for validation.
+     *
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'item_name'      => __('Item Name'),
+            'description'    => __('Item Description'),
+            'category'       => __('Procurement Category'),
+            'estimated_cost' => __('Estimated Cost'),
+            'project_id'     => __('Project ID'),
         ];
     }
 }
