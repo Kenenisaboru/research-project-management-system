@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Evaluation;
 use App\Models\Project;
+use App\Http\Requests\EvaluationSubmitRequest;
 
 class EvaluationController extends Controller
 {
@@ -32,13 +33,8 @@ class EvaluationController extends Controller
         return view('evaluations.show', compact('evaluation'));
     }
 
-    public function submitScore(Request $request, $evalId)
+    public function submitScore(EvaluationSubmitRequest $request, $evalId)
     {
-        $request->validate([
-            'score' => 'required|numeric|min:0|max:100',
-            'decision' => 'required|in:Accepted,AcceptedWithMinorMods,AcceptedWithMajorMods,Rejected',
-            'comments' => 'required|string',
-        ]);
 
         $evaluation = Evaluation::where('eval_id', $evalId)
             ->where('examiner_id', Auth::id())

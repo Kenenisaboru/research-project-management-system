@@ -36,6 +36,7 @@ class Project extends Model
         'cancelled_by_pi',
         'cancellation_reason',
         'admin_cancel_notes',
+        'project_code',
     ];
 
     protected $casts = [
@@ -50,6 +51,32 @@ class Project extends Model
         'completed_at' => 'datetime',
         'cancelled_at' => 'datetime',
     ];
+
+    /**
+     * Bootstrap model event hooks.
+     *
+     * Auto-generates a unique project_code in the format UNI-PRJ-{YEAR}-{NNNNN}
+     * whenever a new Project record is created without one already set.
+     */
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::creating(function (self $project): void {
+            if (empty($project->project_code)) {
+                $year      = now()->format('Y');
+                $lastCode  = static::where('project_code', 'like', "UNI-PRJ-{$year}-%")
+                    ->orderByDesc('project_code')
+                    ->value('project_code');
+
+                $seq = $lastCode
+                    ? ((int) substr($lastCode, -5)) + 1
+                    : 1;
+
+                $project->project_code = sprintf('UNI-PRJ-%s-%05d', $year, $seq);
+            }
+        });
+    }
 
     public function pi()
     {
