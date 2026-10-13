@@ -16,22 +16,32 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'password_changed_at',
         'role',
         'role_id',
         'dept_id',
         'status',
         'last_login_at',
         'avatar_path',
+        'two_factor_secret',
+        'two_factor_enabled',
+        'two_factor_confirmed_at',
+        'two_factor_recovery_codes',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
     ];
 
     protected $casts = [
-        'email_verified_at' => 'datetime',
-        'last_login_at'     => 'datetime',
+        'email_verified_at'       => 'datetime',
+        'last_login_at'           => 'datetime',
+        'password_changed_at'     => 'datetime',
+        'two_factor_enabled'      => 'boolean',
+        'two_factor_confirmed_at' => 'datetime',
     ];
 
     public function department()
