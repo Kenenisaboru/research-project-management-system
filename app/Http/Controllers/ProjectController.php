@@ -12,6 +12,9 @@ use App\Models\Evaluation;
 use App\Models\User;
 use App\Models\Department;
 use App\Services\BlindReviewService;
+use App\Http\Requests\ProjectStoreRequest;
+use App\Http\Requests\ProjectDraftRequest;
+use App\Http\Requests\ProjectUpdateRequest;
 
 class ProjectController extends Controller
 {
@@ -104,15 +107,8 @@ class ProjectController extends Controller
         return view('projects.create', compact('thematicAreas'));
     }
 
-    public function store(Request $request)
+    public function store(ProjectStoreRequest $request)
     {
-        $request->validate([
-            'title'             => 'required|string|max:500',
-            'abstract_text'     => 'required|string',
-            'thematic_id'       => 'required|exists:thematic_areas,id',
-            'requested_budget'  => 'required|numeric|min:0',
-            'proposal_document' => 'required|file|mimes:pdf,doc,docx|max:51200',
-        ]);
 
         $user = Auth::user();
 
@@ -139,15 +135,8 @@ class ProjectController extends Controller
             ->with('success', 'Research proposal saved as draft. You can submit it when ready.');
     }
 
-    public function storeDraft(Request $request)
+    public function storeDraft(ProjectDraftRequest $request)
     {
-        $request->validate([
-            'title'             => 'required|string|max:500',
-            'abstract_text'     => 'required|string',
-            'thematic_id'       => 'required|exists:thematic_areas,id',
-            'requested_budget'  => 'required|numeric|min:0',
-            'proposal_document' => 'nullable|file|mimes:pdf,doc,docx|max:51200',
-        ]);
 
         $user = Auth::user();
 
@@ -191,26 +180,9 @@ class ProjectController extends Controller
         return view('projects.edit', compact('project', 'thematicAreas'));
     }
 
-    public function update(Request $request, $id)
+    public function update(ProjectUpdateRequest $request, $id)
     {
         $project = Project::findOrFail($id);
-        $user = Auth::user();
-
-        if ($user->role !== 'pi' || (int) $project->pi_id !== (int) $user->id) {
-            abort(403, 'You can only edit your own projects.');
-        }
-
-        if (!in_array($project->status, ['Draft', 'Withdrawn', 'Returned', 'Rejected'])) {
-            return back()->with('error', 'Only draft, withdrawn, returned, or rejected proposals can be edited.');
-        }
-
-        $request->validate([
-            'title'             => 'required|string|max:500',
-            'abstract_text'     => 'required|string',
-            'thematic_id'       => 'required|exists:thematic_areas,id',
-            'requested_budget'  => 'required|numeric|min:0',
-            'proposal_document' => 'nullable|file|mimes:pdf,doc,docx|max:51200',
-        ]);
 
         $data = [
             'title'            => $request->title,

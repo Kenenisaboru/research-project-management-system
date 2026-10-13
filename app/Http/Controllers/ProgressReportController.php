@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Project;
 use App\Models\ProjectMember;
 use App\Models\MilestoneReport;
+use App\Http\Requests\ProgressReportStoreRequest;
 
 class ProgressReportController extends Controller
 {
@@ -72,7 +73,7 @@ class ProgressReportController extends Controller
         return view('progress.show', compact('project', 'reports'));
     }
 
-    public function store(Request $request, $projectId)
+    public function store(ProgressReportStoreRequest $request, $projectId)
     {
         $user = Auth::user();
         $project = Project::where('project_id', $projectId)->firstOrFail();
@@ -90,14 +91,6 @@ class ProgressReportController extends Controller
 
         $minProgress = $project->milestoneReports()->max('progress_percentage') ?? 0;
 
-        $request->validate([
-            'milestone_name'          => 'required|string|max:255',
-            'progress_percentage'     => 'required|numeric|min:' . $minProgress . '|max:100',
-            'summary_text'            => 'required|string',
-            'deliverable_file'        => 'nullable|file|mimes:pdf,doc,docx,zip,rar,txt,xlsx,csv|max:51200',
-            'deliverable_link_url'    => 'nullable|url|max:500',
-            'deliverable_document_url'=> 'nullable|string|max:500',
-        ]);
 
         $filePath = null;
         if ($request->hasFile('deliverable_file')) {

@@ -10,6 +10,8 @@ use App\Models\AuditLog;
 use App\Models\ThematicArea;
 use App\Models\Department;
 use App\Models\Role;
+use App\Http\Requests\AdminUserStoreRequest;
+use App\Http\Requests\AdminUserUpdateRequest;
 
 class AdminController extends Controller
 {
@@ -38,16 +40,8 @@ class AdminController extends Controller
         return view('admin.users', compact('users', 'departments'));
     }
 
-    public function storeUser(Request $request)
+    public function storeUser(AdminUserStoreRequest $request)
     {
-        $request->validate([
-            'staff_id' => 'required|string|unique:users,staff_id',
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:users,email',
-            'password' => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
-            'role'     => 'required|in:pi,tm,reviewer,dh,coordinator,dean,irerc,vparttcs,rcsc,finance,admin',
-            'dept_id'  => 'nullable|exists:departments,id',
-        ]);
 
         $newUser = User::create([
             'staff_id' => $request->staff_id,
@@ -81,18 +75,10 @@ class AdminController extends Controller
         return back()->with('success', "Password for user '{$user->name}' reset successfully.");
     }
 
-    public function updateUser(Request $request, $id)
+    public function updateUser(AdminUserUpdateRequest $request, $id)
     {
         $user = User::findOrFail($id);
 
-        $request->validate([
-            'staff_id' => 'required|string|max:100|unique:users,staff_id,' . $user->id,
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|max:255|unique:users,email,' . $user->id,
-            'role'     => 'required|in:pi,tm,reviewer,dh,coordinator,dean,irerc,vparttcs,rcsc,finance,admin',
-            'dept_id'  => 'nullable|exists:departments,id',
-            'status'   => 'required|in:active,inactive',
-        ]);
 
         if (\Auth::id() === $user->id && $request->role !== 'admin') {
             return back()->with('error', 'You cannot demote your own active Administrator role.');

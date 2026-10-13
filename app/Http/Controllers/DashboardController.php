@@ -12,6 +12,7 @@ use App\Models\ProjectMember;
 use App\Models\IRERCClearance;
 use App\Models\ProjectExtension;
 use App\Models\Department;
+use App\Services\CacheService;
 
 class DashboardController extends Controller
 {
@@ -20,7 +21,11 @@ class DashboardController extends Controller
         $user = Auth::user();
         $role = $user->role;
 
-        $stats = $this->getRoleSpecificStats($user, $role);
+        $stats = CacheService::remember(
+            CacheService::dashboardStatsKey($user->id, $role),
+            CacheService::TTL_DASHBOARD_STATS,
+            fn () => $this->getRoleSpecificStats($user, $role)
+        );
 
         $myProjects = collect();
         $assignedReviews = collect();
