@@ -42,7 +42,6 @@ class AdminController extends Controller
 
     public function storeUser(AdminUserStoreRequest $request)
     {
-
         $newUser = User::create([
             'staff_id' => $request->staff_id,
             'name' => $request->name,
@@ -78,7 +77,6 @@ class AdminController extends Controller
     public function updateUser(AdminUserUpdateRequest $request, $id)
     {
         $user = User::findOrFail($id);
-
 
         if (\Auth::id() === $user->id && $request->role !== 'admin') {
             return back()->with('error', 'You cannot demote your own active Administrator role.');
