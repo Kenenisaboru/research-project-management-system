@@ -136,9 +136,14 @@
 
 <div class="card shadow-sm border-0 mb-4">
     <div class="card-header bg-white border-bottom py-3">
-        <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-diagram-3 me-2 text-success"></i>Project Lifecycle</h6>
+        <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-diagram-3 me-2 text-success"></i>Project Lifecycle &amp; Next Step</h6>
     </div>
     <div class="card-body p-4">
+        <div class="alert alert-light border-start border-4 border-success mb-4">
+            <div class="small text-muted text-uppercase fw-bold mb-1">Current stage: {{ str_replace('_', ' ', $project->status) }}</div>
+            <div class="fw-bold">{{ $workflowGuidance['actor'] }} <span class="fw-normal">should act next</span></div>
+            <div class="small text-muted">{{ $workflowGuidance['action'] }}</div>
+        </div>
         <div class="timeline-container">
             @foreach($stages as $key => $stage)
                 @php
@@ -976,4 +981,3 @@
     </div>
 </div>
 @endsection
-
