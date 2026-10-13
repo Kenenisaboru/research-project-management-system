@@ -1,8 +1,9 @@
 #!/bin/sh
+set -eu
 
 # Ensure storage directories exist and have correct permissions
 mkdir -p /var/www/storage/logs
-mkdir -p /var/www/storage/framework/{cache,sessions,views}
+mkdir -p /var/www/storage/framework/cache /var/www/storage/framework/sessions /var/www/storage/framework/views
 mkdir -p /var/www/bootstrap/cache
 chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 chmod -R 775 /var/www/storage /var/www/bootstrap/cache
@@ -23,7 +24,10 @@ chmod 664 "$DB_PATH"
 
 # Run Laravel migrations and seeders (force for production)
 php /var/www/artisan migrate --force
-php /var/www/artisan db:seed --force
+php /var/www/artisan db:seed --class=RbacSeeder --force
+if [ "${RPMS_SEED_DEMO_DATA:-false}" = "true" ]; then
+    php /var/www/artisan db:seed --force
+fi
 
 # Optimize Laravel for production
 php /var/www/artisan config:cache

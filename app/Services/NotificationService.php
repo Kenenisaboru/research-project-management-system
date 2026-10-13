@@ -66,14 +66,8 @@ class NotificationService
                 return;
             }
 
-            $subject = 'RPMS Notification: ' . ucwords(strtolower(str_replace('_', ' ', $type)));
-
-            \Illuminate\Support\Facades\Mail::raw(
-                "{$message}\n\n---\nResearch Project Management System\nGambella University",
-                function ($mail) use ($user, $subject) {
-                    $mail->to($user->email)->subject($subject);
-                }
-            );
+            \Illuminate\Support\Facades\Mail::to($user->email)
+                ->queue(new \App\Mail\ProjectStatusMail($type, $message, $user->name));
         } catch (\Throwable $e) {
             // LAN deployments frequently lack SMTP; in-app notification still delivered.
             report($e);

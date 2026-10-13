@@ -82,13 +82,13 @@
             <h5 class="fw-bold mb-3"><i class="bi bi-arrow-counterclockwise me-2 text-danger"></i>Restore from Backup</h5>
             <div class="alert alert-warning small">
                 <i class="bi bi-exclamation-triangle-fill me-1"></i>
-                Restoring will overwrite current data. A pre-restore snapshot is kept automatically for SQLite.
+                Restoring replaces current data. A pre-restore backup is created first; verify backups regularly and store a separate copy off this server.
             </div>
             <form method="POST" action="{{ route('admin.backups.restore') }}" enctype="multipart/form-data">
                 @csrf
                 <div class="mb-3">
                     <label class="form-label fw-bold">Upload Backup File (.json / .sqlite)</label>
-                    <input type="file" name="backup_file" class="form-control" accept=".json,.sqlite,.sql,.txt" required>
+                    <input type="file" name="backup_file" class="form-control" accept=".json,.sqlite" required>
                 </div>
                 <button type="button" class="btn btn-danger fw-bold w-100 confirm-btn"
                         data-confirm-title="Restore Database"

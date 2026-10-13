@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
 use App\Models\User;
 use App\Models\AuditLog;
+use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Requests\ProfilePasswordRequest;
 
 class ProfileController extends Controller
 {
@@ -70,15 +72,9 @@ class ProfileController extends Controller
         return back()->with('success', 'Profile photo removed.');
     }
 
-    public function update(Request $request)
+    public function update(ProfileUpdateRequest $request)
     {
         $user = Auth::user();
-
-        $request->validate([
-            'name'   => 'sometimes|required|string|max:255',
-            'email'  => 'sometimes|required|email|unique:users,email,' . $user->id,
-            'avatar' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-        ]);
 
         $data = $request->only('name', 'email');
 
@@ -103,20 +99,8 @@ class ProfileController extends Controller
         return back()->with('success', 'Profile updated successfully.');
     }
 
-    public function changePassword(Request $request)
+    public function changePassword(ProfilePasswordRequest $request)
     {
-        $request->validate([
-            'current_password' => 'required',
-            'new_password'     => [
-                'required',
-                'confirmed',
-                Password::min(8)
-                    ->mixedCase()
-                    ->numbers()
-                    ->symbols(),
-            ],
-        ]);
-
         $user = Auth::user();
 
         if (!Hash::check($request->current_password, $user->password)) {

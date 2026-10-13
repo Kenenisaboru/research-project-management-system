@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\BudgetRequest;
 use App\Models\Project;
 use App\Services\BudgetWorkflowEngine;
+use App\Http\Requests\BudgetRequestRequest;
 
 class BudgetController extends Controller
 {
@@ -17,11 +18,8 @@ class BudgetController extends Controller
         $this->budgetEngine = $budgetEngine;
     }
 
-    public function approveProjectBudget(Request $request, $projectId)
+    public function approveProjectBudget(BudgetRequestRequest $request, $projectId)
     {
-        $request->validate([
-            'approved_budget' => 'required|numeric|min:0',
-        ]);
 
         $project = Project::findOrFail($projectId);
 

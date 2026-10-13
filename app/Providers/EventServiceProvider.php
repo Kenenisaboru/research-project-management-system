@@ -18,6 +18,30 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+        \App\Events\ProjectSubmitted::class => [
+            \App\Listeners\LogAndNotifyProjectSubmitted::class,
+        ],
+        \App\Events\ProjectApproved::class => [
+            \App\Listeners\LogAndNotifyProjectApproved::class,
+        ],
+        \App\Events\ProjectActivated::class => [
+            \App\Listeners\LogAndNotifyProjectActivated::class,
+        ],
+        \App\Events\ProjectCompleted::class => [
+            \App\Listeners\LogAndNotifyProjectCompleted::class,
+        ],
+        \App\Events\BudgetDisbursed::class => [
+            \App\Listeners\LogAndNotifyBudgetDisbursed::class,
+        ],
+        \App\Events\EvaluationSubmitted::class => [
+            \App\Listeners\LogAndNotifyEvaluationSubmitted::class,
+        ],
+        \App\Events\PaperApproved::class => [
+            \App\Listeners\LogAndNotifyPaperApproved::class,
+        ],
+        \App\Events\ExtensionApproved::class => [
+            \App\Listeners\LogAndNotifyExtensionApproved::class,
+        ],
     ];
 
     /**

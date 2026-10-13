@@ -26,7 +26,7 @@ A full-featured web application for managing the complete lifecycle of academic 
 
 ## Test Accounts / Demo Logins
 
-If you have run the database seeders (`php artisan migrate --seed`), you can log in with any of the following demo accounts. **All accounts share the same password:** `UNI@Demo1`
+For local development only, seed the demo data (`php artisan migrate --seed`) and use one of the following accounts. **All demo accounts share the same password:** `UNI@Demo1`. Never use these seeded accounts in a production deployment.
 
 | Role                               | Email Address                   |
 | :--------------------------------- | :------------------------------ |
@@ -121,6 +121,7 @@ Key variables in `.env`:
 | `RPMS_BUDGET_ALERT_PERCENT` | Released-vs-approved budget alert threshold | `90` |
 | `RPMS_BACKUP_RETENTION_DAYS` | Backup retention window (auto-prune) | `30` |
 | `RPMS_SCHEDULED_BACKUP` | Enable the daily scheduled backup | `true` |
+| `RPMS_SEED_DEMO_DATA` | Seed demo accounts and sample records (local/testing by default; keep `false` in production) | `false` |
 
 ## Docker Deployment
 
@@ -134,9 +135,11 @@ docker run -p 8000:8000 -v data:/data rpms
 The container handles automatically on startup:
 
 1. Environment variable overrides for production
-2. Database migration and seeding
+2. Database migrations and RBAC role/permission seeding
 3. Config, route, and view cache rebuild
 4. Nginx and PHP-FPM launch
+
+Demo users and sample records are not seeded in production by default. To provision the first production administrator, run `php artisan rpms:create-admin` inside the running container and follow the prompts. Set `RPMS_SEED_DEMO_DATA=true` only for an explicitly isolated demo deployment; it creates accounts with the published demo password.
 
 ## RBAC Permissions
 
@@ -168,7 +171,7 @@ The following assumptions were made while implementing the specification. They a
 6. **Paper evaluation:** Paper evaluation is single-round and score-based; any evaluator with `evaluate_paper` may score a paper. Approval (`approve_paper`) is restricted to VP ARTTCS / RCSC / Admin, matching the publication governance chain.
 7. **Journal index:** Journal indexing accepts the descriptive labels (`SCIE`, `SSCI`, `Scopus`, `ESCI`, `National`, `None`) as free text rather than a fixed enum, because indexing databases change.
 8. **Notifications:** Email delivery uses Laravel's mailer and is **guarded** — on an offline/LAN-only deployment without SMTP, in-app notifications still work and mail failures are swallowed so they never break a user action.
-9. **Backups:** For SQLite the backup is a byte-for-byte copy of the database file; for MySQL `mysqldump` is used when available, otherwise a portable JSON table dump is produced. Scheduled backups run `backups:create --prune` daily at 02:00 (enable via cron / `schedule:run`).
+9. **Backups:** SQLite backups use SQLite's consistent `VACUUM INTO` snapshot. Other database drivers use a versioned JSON table backup, which can be restored through the admin recovery screen. JSON restores validate the schema and data shape, run transactionally, and create a pre-restore snapshot first. SQLite restores check file integrity and required tables before staging an atomic replacement. Keep an off-server copy of backups; scheduled backups run `backups:create --prune` daily at 02:00 (enable via cron / `schedule:run`).
 10. **Legacy import:** The CSV importer is intentionally forgiving — unknown departments/thematic areas fall back to the first available record and an unmatched `pi_email` falls back to the first PI account, so a bulk import never hard-fails mid-file. Skipped rows are reported back to the administrator.
 11. **Public repository fields:** Only title, abstract, status, department and thematic area are exposed publicly. Budget figures, PI contact details, and files are never shown.
 12. **File storage:** Paper PDFs (when supplied) are stored on the `public` disk under `storage/app/public/papers`; run `php artisan storage:link` in any real deployment.

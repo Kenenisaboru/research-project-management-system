@@ -2,6 +2,8 @@
 
 return [
 
+    'seed_demo_data' => env('RPMS_SEED_DEMO_DATA', false),
+
     /*
     |--------------------------------------------------------------------------
     | Overdue project threshold (months)
