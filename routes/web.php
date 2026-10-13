@@ -390,19 +390,12 @@ Route::middleware(['auth'])->group(function () {
         })->name('procurement.index');
     });
     Route::middleware(['role:pi', 'permission:submit_procurement'])->group(function () {
-        Route::post('/procurement', function () {
-            request()->validate([
-                'item_name' => 'required|string|max:255',
-                'description' => 'nullable|string',
-                'category' => 'required|in:Equipment,Reagents,Consumables,Other',
-                'estimated_cost' => 'required|numeric|min:0',
-                'project_id' => 'required|exists:projects,project_id',
-            ]);
-            $project = \App\Models\Project::where('project_id', request('project_id'))->first();
+        Route::post('/procurement', function (\App\Http\Requests\ProcurementStoreRequest $request) {
+            $project = \App\Models\Project::where('project_id', $request->project_id)->first();
             if ((int) $project->pi_id !== (int) \Auth::id()) {
                 return back()->with('error', 'You can only submit procurement requests for your own projects.');
             }
-            \App\Models\ProcurementRequest::create(array_merge(request()->all(), ['status' => 'Pending']));
+            \App\Models\ProcurementRequest::create(array_merge($request->validated(), ['status' => 'Pending']));
             return back()->with('success', 'Purchase request submitted successfully.');
         })->name('procurement.store');
     });
