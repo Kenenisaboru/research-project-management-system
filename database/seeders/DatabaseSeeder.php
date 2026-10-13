@@ -23,6 +23,10 @@ class DatabaseSeeder extends Seeder
             RbacSeeder::class,
         ]);
 
+        if (! app()->environment('local', 'testing') && ! filter_var(config('rpms.seed_demo_data'), FILTER_VALIDATE_BOOLEAN)) {
+            return;
+        }
+
         // Use firstOrCreate to avoid duplicates on re-seed
         $c1 = College::firstOrCreate(['code' => 'CET'], ['name' => 'College of Engineering & Technology']);
         $c2 = College::firstOrCreate(['code' => 'CANR'], ['name' => 'College of Agriculture & Natural Resources']);
