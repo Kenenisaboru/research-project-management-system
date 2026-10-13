@@ -20,12 +20,16 @@ use App\Http\Controllers\ResearchController;
 use App\Http\Controllers\NotificationCenterController;
 use App\Http\Controllers\ProjectDocumentController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\HealthCheckController;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
 */
+
+// Public Health Check (no auth — for uptime monitors / Docker HEALTHCHECK)
+Route::get('/health', [HealthCheckController::class, 'check'])->name('health');
 
 Route::get('/', function () {
     return redirect()->route('login');
