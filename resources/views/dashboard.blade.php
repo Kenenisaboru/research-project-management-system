@@ -107,16 +107,13 @@
 </div>
 @endif
 @endisset
-@php
-    $pendingCancellations = App\Models\Project::where('status', 'PendingCancellation')->get();
-@endphp
 @if(in_array($role, ['admin', 'coordinator', 'dean', 'rcsc', 'vparttcs']) && $pendingCancellations->count() > 0)
 <div class="alert alert-warning d-flex align-items-center mb-4 shadow-sm">
     <i class="bi bi-exclamation-triangle-fill fs-3 me-3"></i>
     <div class="flex-grow-1">
         <strong>{{ $pendingCancellations->count() }} pending withdrawal request(s)</strong> awaiting your review.
     </div>
-    <a href="{{ route('projects.index') }}" class="btn btn-warning fw-bold">Review Now</a>
+    <a href="{{ route('projects.index', ['status' => 'PendingCancellation']) }}" class="btn btn-warning fw-bold">Review Now</a>
 </div>
 @endif
 
@@ -256,7 +253,7 @@
                 <div>
                     <div class="text-muted small text-uppercase fw-bold" style="font-size: 0.72rem; letter-spacing: 0.5px;">Drafts</div>
                     <div class="fs-2 fw-bold mt-1 text-dark">{{ $stats['draft'] ?? 0 }}</div>
-                    <div class="small text-muted" style="font-size: 0.75rem;">Not yet submitted</div>
+                    <a href="{{ route('projects.index', ['status' => 'Draft']) }}" class="small text-success text-decoration-none" style="font-size: 0.75rem;">Open drafts <i class="bi bi-arrow-right"></i></a>
                 </div>
                 <div class="stat-bubble">
                     <i class="bi bi-pencil-square text-dark"></i>
@@ -301,7 +298,7 @@
                 <div>
                     <div class="text-muted small text-uppercase fw-bold" style="font-size: 0.72rem; letter-spacing: 0.5px;">Pending Reviews</div>
                     <div class="fs-2 fw-bold text-dark mt-1">{{ $stats['pending_reviews'] ?? 0 }}</div>
-                    <div class="small text-muted" style="font-size: 0.75rem;">Awaiting evaluation</div>
+                    <a href="{{ route('evaluations.index') }}" class="small text-success text-decoration-none" style="font-size: 0.75rem;">Open review queue <i class="bi bi-arrow-right"></i></a>
                 </div>
                 <div class="stat-bubble">
                     <i class="bi bi-clock-history text-dark" style="font-size: 1.35rem;"></i>
@@ -346,7 +343,7 @@
                 <div>
                     <div class="text-muted small text-uppercase fw-bold" style="font-size: 0.72rem; letter-spacing: 0.5px;">Pending Screening</div>
                     <div class="fs-2 fw-bold text-dark mt-1">{{ $stats['pending_screening'] ?? 0 }}</div>
-                    <div class="small text-muted" style="font-size: 0.75rem;">Dept proposals</div>
+                    <a href="{{ route('dh.screening') }}" class="small text-success text-decoration-none" style="font-size: 0.75rem;">Open screening queue <i class="bi bi-arrow-right"></i></a>
                 </div>
                 <div class="stat-bubble">
                     <i class="bi bi-funnel text-dark" style="font-size: 1.35rem;"></i>
@@ -391,7 +388,7 @@
                 <div>
                     <div class="text-muted small text-uppercase fw-bold" style="font-size: 0.72rem; letter-spacing: 0.5px;">Need Reviewer</div>
                     <div class="fs-2 fw-bold text-dark mt-1">{{ $stats['need_reviewer'] ?? 0 }}</div>
-                    <div class="small text-muted" style="font-size: 0.75rem;">Awaiting assignment</div>
+                    <a href="{{ route('coordinator.hub') }}" class="small text-success text-decoration-none" style="font-size: 0.75rem;">Open assignment queue <i class="bi bi-arrow-right"></i></a>
                 </div>
                 <div class="stat-bubble">
                     <i class="bi bi-person-plus text-dark" style="font-size: 1.35rem;"></i>
@@ -436,7 +433,7 @@
                 <div>
                     <div class="text-muted small text-uppercase fw-bold" style="font-size: 0.72rem; letter-spacing: 0.5px;">Pending Approval</div>
                     <div class="fs-2 fw-bold text-dark mt-1">{{ $stats['pending_approval'] ?? 0 }}</div>
-                    <div class="small text-muted" style="font-size: 0.75rem;">Awaiting decision</div>
+                    <a href="{{ route('dean.approvals') }}" class="small text-success text-decoration-none" style="font-size: 0.75rem;">Open approval queue <i class="bi bi-arrow-right"></i></a>
                 </div>
                 <div class="stat-bubble">
                     <i class="bi bi-hourglass-split text-dark" style="font-size: 1.35rem;"></i>
@@ -481,7 +478,7 @@
                 <div>
                     <div class="text-muted small text-uppercase fw-bold" style="font-size: 0.72rem; letter-spacing: 0.5px;">Pending Ethics</div>
                     <div class="fs-2 fw-bold text-dark mt-1">{{ $stats['pending_ethics'] ?? 0 }}</div>
-                    <div class="small text-muted" style="font-size: 0.75rem;">Ethical clearance</div>
+                    <a href="{{ route('irerc.panel') }}" class="small text-success text-decoration-none" style="font-size: 0.75rem;">Open ethics queue <i class="bi bi-arrow-right"></i></a>
                 </div>
                 <div class="stat-bubble">
                     <i class="bi bi-shield-exclamation text-dark" style="font-size: 1.35rem;"></i>
@@ -526,7 +523,7 @@
                 <div>
                     <div class="text-muted small text-uppercase fw-bold" style="font-size: 0.72rem; letter-spacing: 0.5px;">Pending Governance</div>
                     <div class="fs-2 fw-bold text-dark mt-1">{{ $stats['rcsc_pending'] ?? 0 }}</div>
-                    <div class="small text-muted" style="font-size: 0.75rem;">Under review (&ge;500k)</div>
+                    <a href="{{ route('rcsc.portal') }}" class="small text-success text-decoration-none" style="font-size: 0.75rem;">Open governance queue <i class="bi bi-arrow-right"></i></a>
                 </div>
                 <div class="stat-bubble">
                     <i class="bi bi-shield-lock text-dark" style="font-size: 1.35rem;"></i>
@@ -585,7 +582,7 @@
                 <div>
                     <div class="text-muted small text-uppercase fw-bold" style="font-size: 0.72rem; letter-spacing: 0.5px;">Pending Release</div>
                     <div class="fs-2 fw-bold text-dark mt-1">{{ $stats['pending_release'] ?? 0 }}</div>
-                    <div class="small text-muted" style="font-size: 0.75rem;">Tranche queue</div>
+                    <a href="{{ route('finance.disbursement') }}" class="small text-success text-decoration-none" style="font-size: 0.75rem;">Open disbursement queue <i class="bi bi-arrow-right"></i></a>
                 </div>
                 <div class="stat-bubble">
                     <i class="bi bi-hourglass-split text-dark" style="font-size: 1.35rem;"></i>
