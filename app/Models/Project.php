@@ -98,6 +98,11 @@ class Project extends Model
         return $this->hasMany(ProjectMember::class, 'project_id', 'project_id');
     }
 
+    public function teamMembers()
+    {
+        return $this->members();
+    }
+
     public function evaluations()
     {
         return $this->hasMany(Evaluation::class, 'project_id', 'project_id');
@@ -146,6 +151,11 @@ class Project extends Model
     public function certificates()
     {
         return $this->hasMany(Certificate::class, 'project_id', 'project_id');
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(ProjectDocument::class, 'project_id', 'project_id');
     }
 }
 
