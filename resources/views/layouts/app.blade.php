@@ -1,14 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UNI - Research Project Management System</title>
+    <meta name="user-role" content="{{ auth()->check() ? auth()->user()->role : '' }}">
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Bootstrap 5.3 CSS (CDN) -->
     <link href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
     <!-- Bootstrap Icons (CDN) -->
     <link href="{{ asset('vendor/bootstrap/css/bootstrap-icons.subset.css') }}" rel="stylesheet">
-    <!-- Page Transition Loader Removed -->
+    <!-- RPMS Design System -->
+    <link href="{{ asset('css/rpms-theme.css') }}" rel="stylesheet">
     <style>
         :root {
             --UNI-primary: #0f3e2e;
@@ -1046,6 +1051,17 @@
 
                 <!-- User Profile & Action Controls -->
                 <div class="d-flex align-items-center text-white ms-auto gap-3">
+                    {{-- Command Palette Trigger --}}
+                    <button id="rpms-search-trigger" type="button" class="btn btn-link p-0 border-0 d-none d-md-flex align-items-center text-decoration-none text-white-50 gap-1" title="Search (Ctrl+K)" style="font-size:0.8rem;">
+                        <i class="bi bi-search fs-5"></i>
+                        <kbd style="font-size:0.65rem; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); padding:1px 5px; border-radius:4px; color:rgba(255,255,255,0.6);">Ctrl K</kbd>
+                    </button>
+
+                    {{-- Theme Toggle --}}
+                    <button id="rpms-theme-btn" type="button" class="btn btn-link p-0 border-0 d-flex align-items-center text-decoration-none text-white-50" title="Toggle Light/Dark Mode">
+                        <i class="bi bi-sun-fill fs-5"></i>
+                    </button>
+
                     {{-- Notifications Bell Dropdown (SCR-17) --}}
                     {{-- Notifications loaded via LoadNotifications middleware --}}
 
@@ -1053,9 +1069,11 @@
                         <button class="btn btn-link p-0 border-0 position-relative d-flex align-items-center text-decoration-none" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
                             <i class="bi bi-bell-fill fs-5 text-warning"></i>
                             @if($notifCount > 0)
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.65rem; margin-top: -2px;">
+                                <span id="rpms-notif-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.65rem; margin-top: -2px;">
                                     {{ $notifCount > 99 ? '99+' : $notifCount }}
                                 </span>
+                            @else
+                                <span id="rpms-notif-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.65rem; margin-top: -2px; display:none;">0</span>
                             @endif
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end p-2 shadow-lg" style="width: 320px; max-height: 380px; overflow-y: auto;">
@@ -1787,5 +1805,64 @@
     </style>
 
     @stack('scripts')
+
+    <!-- RPMS Pro: Command Palette Overlay -->
+    <div id="rpms-command-overlay" class="rpms-command-overlay">
+        <div class="rpms-command-box">
+            <div class="rpms-command-input-wrap">
+                <i class="bi bi-search"></i>
+                <input id="rpms-command-input" class="rpms-command-input" type="text" placeholder="Search pages, projects, actions…" autocomplete="off">
+                <kbd class="rpms-command-kbd">ESC</kbd>
+            </div>
+            <div id="rpms-command-results" class="rpms-command-results"></div>
+            <div class="rpms-command-footer">
+                <span><kbd class="rpms-command-kbd">↑↓</kbd> Navigate</span>
+                <span><kbd class="rpms-command-kbd">↵</kbd> Open</span>
+                <span><kbd class="rpms-command-kbd">ESC</kbd> Close</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- RPMS Pro: Mobile Bottom Navigation -->
+    @auth
+    <nav class="rpms-bottom-nav" aria-label="Mobile Navigation">
+        <div class="rpms-bottom-nav-inner">
+            <a href="{{ route('dashboard') }}" class="rpms-bottom-nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                <i class="bi bi-speedometer2"></i>
+                <span>Home</span>
+            </a>
+            <a href="{{ route('projects.index') }}" class="rpms-bottom-nav-item {{ request()->routeIs('projects.*') ? 'active' : '' }}">
+                <i class="bi bi-folder2-open"></i>
+                <span>Projects</span>
+            </a>
+            <a href="{{ route('notifications.index') }}" class="rpms-bottom-nav-item {{ request()->routeIs('notifications.*') ? 'active' : '' }}">
+                <i class="bi bi-bell"></i>
+                <span>Alerts</span>
+                <span id="rpms-notif-badge-mobile" class="rpms-nav-badge" style="display:none">0</span>
+            </a>
+            <a href="{{ route('profile') }}" class="rpms-bottom-nav-item {{ request()->routeIs('profile') ? 'active' : '' }}">
+                <i class="bi bi-person"></i>
+                <span>Profile</span>
+            </a>
+        </div>
+    </nav>
+    @endauth
+
+    <!-- RPMS Pro: Quick Action FAB -->
+    @auth
+    <div id="rpms-fab-menu" class="rpms-fab-menu">
+        @if(auth()->user()->role === 'pi')
+        <a href="{{ route('projects.create') }}" class="rpms-fab-action"><i class="bi bi-plus-circle"></i> New Project</a>
+        @endif
+        <a href="#" onclick="rpmsOpenCommandPalette(); return false;" class="rpms-fab-action"><i class="bi bi-search"></i> Search <kbd class="rpms-command-kbd" style="margin-left:4px">⌘K</kbd></a>
+        <a href="{{ route('notifications.index') }}" class="rpms-fab-action"><i class="bi bi-bell"></i> Notifications</a>
+    </div>
+    <button id="rpms-fab" class="rpms-fab" aria-label="Quick Actions">
+        <i class="bi bi-lightning-charge-fill"></i>
+    </button>
+    @endauth
+
+    <!-- RPMS Pro JS -->
+    <script src="{{ asset('js/rpms-pro.js') }}"></script>
 </body>
 </html>

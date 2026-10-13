@@ -48,12 +48,33 @@ class AuthController extends Controller
             ])->onlyInput('email');
         }
 
-        if (Auth::attempt($authCredentials, $request->boolean('remember'))) {
+        // Validate user credentials
+        $user = \App\Models\User::where('email', $credentials['email'])->first();
+
+        if ($user && \Illuminate\Support\Facades\Hash::check($credentials['password'], $user->password) && $user->status === 'active') {
             RateLimiter::clear($throttleKey);
+
+            if ($user->two_factor_enabled) {
+                session([
+                    '2fa:user_id'  => $user->id,
+                    '2fa:remember' => $request->boolean('remember'),
+                ]);
+                return redirect()->route('2fa.challenge');
+            }
+
+            Auth::login($user, $request->boolean('remember'));
             $request->session()->regenerate();
 
-            Auth::user()->update(['last_login_at' => now()]);
-            \App\Services\AuditService::log('LOGIN', 'User', Auth::id(), 'User logged in to system');
+            $user->update(['last_login_at' => now()]);
+            \App\Services\AuditService::log('LOGIN', 'User', $user->id, 'User logged in to system');
+
+            if (\App\Services\PasswordPolicy::isExpired($user)) {
+                session()->flash('warning', __('Security Notice: Your password is older than 90 days. Please update it in your profile to maintain institutional compliance.'));
+            }
+
+            if (in_array($user->role, ['admin', 'finance']) && !$user->two_factor_enabled) {
+                session()->flash('info', __('Security Recommendation: As a privileged account holder (:role), please configure Two-Factor Authentication in your profile.', ['role' => strtoupper($user->role)]));
+            }
 
             return redirect()->intended('/dashboard');
         }

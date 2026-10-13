@@ -40,6 +40,11 @@ class Paper extends Model
         return $this->belongsTo(User::class, 'submitter_id');
     }
 
+    public function author()
+    {
+        return $this->submitter();
+    }
+
     public function evaluations()
     {
         return $this->hasMany(PaperEvaluation::class, 'paper_id');

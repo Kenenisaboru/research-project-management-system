@@ -25,7 +25,8 @@ class AccountLocked
     {
         $user = $request->user();
 
-        if ($user && $user->status !== 'active') {
+        $inactiveStatuses = ['inactive', 'suspended', 'locked', 'deactivated'];
+        if ($user && in_array(strtolower((string) $user->status), $inactiveStatuses, true)) {
             if ($request->expectsJson() || $request->is('api/*')) {
                 if ($user->currentAccessToken()) {
                     $user->currentAccessToken()->delete();
