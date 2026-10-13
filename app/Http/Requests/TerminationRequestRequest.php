@@ -2,57 +2,80 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Project;
 use App\Services\RbacService;
+use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * Form request for requesting a project termination with refund calculation.
+ * Class TerminationRequestRequest
  *
- * @author  RPMS Pro Upgrade
+ * Validates premature project termination requests and financial refund calculations.
  */
 class TerminationRequestRequest extends FormRequest
 {
     /**
-     * Only users with the request_termination permission may initiate termination.
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
      */
     public function authorize(): bool
     {
-        $user = Auth::user();
+        $user = $this->user();
+        if (!$user) {
+            return false;
+        }
 
-        return $user && RbacService::userHasPermission($user, 'request_termination');
+        $projectId = $this->route('projectId') ?? $this->route('id') ?? $this->route('project');
+        if ($projectId) {
+            $project = Project::find($projectId);
+            if ($project && (int) $project->pi_id !== (int) $user->id && $user->role !== 'admin') {
+                return false;
+            }
+        }
+
+        return $user->role === 'pi' || $user->role === 'admin'
+            || RbacService::userHasPermission($user, 'request_termination');
     }
 
     /**
+     * Get the validation rules that apply to the request.
+     *
      * @return array<string, mixed>
      */
     public function rules(): array
     {
         return [
-            'reason'          => ['required', 'string', 'min:50', 'max:3000'],
-            'verified_value'  => ['required', 'numeric', 'min:0'],
+            'reason'         => ['required', 'string', 'min:10'],
+            'verified_value' => ['required', 'numeric', 'min:0'],
         ];
     }
 
     /**
-     * @return array<string, string>
-     */
-    public function attributes(): array
-    {
-        return [
-            'reason'         => __('termination reason'),
-            'verified_value' => __('verified expenditure to date (ETB)'),
-        ];
-    }
-
-    /**
+     * Custom validation messages.
+     *
      * @return array<string, string>
      */
     public function messages(): array
     {
         return [
-            'reason.min'           => __('Please provide at least 50 characters explaining the reason for termination.'),
-            'verified_value.min'   => __('Verified expenditure cannot be negative.'),
+            'reason.required'         => __('Reason for project termination is required.'),
+            'reason.min'              => __('Termination justification must be at least 10 characters.'),
+            'verified_value.required' => __('Verified delivered value (ETB) must be provided for refund calculation.'),
+            'verified_value.numeric'  => __('Verified value must be a valid numeric amount.'),
+            'verified_value.min'      => __('Verified delivered value cannot be negative.'),
+        ];
+    }
+
+    /**
+     * Custom attribute names for validation.
+     *
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'reason'         => __('Termination Reason'),
+            'verified_value' => __('Verified Delivered Value'),
         ];
     }
 }
