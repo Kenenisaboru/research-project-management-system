@@ -108,7 +108,8 @@ class ProfileController extends Controller
         }
 
         $user->update([
-            'password' => Hash::make($request->new_password),
+            'password'            => Hash::make($request->new_password),
+            'password_changed_at' => now(),
         ]);
 
         \App\Services\AuditService::log(
