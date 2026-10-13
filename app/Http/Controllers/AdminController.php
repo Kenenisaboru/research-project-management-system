@@ -177,6 +177,47 @@ class AdminController extends Controller
         return view('admin.audit_logs', compact('logs', 'filters'));
     }
 
+    public function exportAuditLogsPdf(Request $request)
+    {
+        $query = AuditLog::with('user');
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        if ($request->filled('action')) {
+            $query->where('action', 'like', '%' . $request->action . '%');
+        }
+
+        if ($request->filled('user_search')) {
+            $search = $request->user_search;
+            $query->whereHas('user', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $logs = $query->latest()->limit(500)->get();
+        $filters = $request->only(['date_from', 'date_to', 'action', 'user_search']);
+
+        if (class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.audit_logs_pdf', [
+                'logs'        => $logs,
+                'filters'     => $filters,
+                'generatedAt' => now(),
+                'generatedBy' => auth()->user(),
+            ])->setPaper('a4', 'landscape');
+
+            return $pdf->download('UNI_Audit_Trail_' . now()->format('Y_m_d_His') . '.pdf');
+        }
+
+        return redirect()->route('admin.audit-logs')->with('error', 'PDF generator is not available.');
+    }
+
     public function thematicAreas()
     {
         $thematics = ThematicArea::all();
