@@ -605,6 +605,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::middleware(['role:admin', 'permission:view_audit_logs'])->group(function () {
         Route::get('/admin/audit-logs', [AdminController::class, 'auditLogs'])->name('admin.audit-logs');
+        Route::get('/admin/audit-logs/pdf', [AdminController::class, 'exportAuditLogsPdf'])->name('admin.audit-logs.pdf');
     });
 
     Route::middleware(['role:admin', 'permission:manage_thematic_areas'])->group(function () {
