@@ -33,6 +33,10 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Two-Factor Authentication Challenge (Login Flow)
+Route::get('/2fa/challenge', [\App\Http\Controllers\TwoFactorController::class, 'showChallenge'])->name('2fa.challenge');
+Route::post('/2fa/challenge', [\App\Http\Controllers\TwoFactorController::class, 'verifyChallenge'])->name('2fa.verify');
+
 // Public research repository (no authentication required)
 Route::get('/research', [ResearchController::class, 'catalog'])->name('research.catalog');
 
@@ -45,6 +49,11 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile/avatar', [ProfileController::class, 'deleteAvatar'])->name('profile.delete-avatar');
     Route::put('/profile/password', [ProfileController::class, 'changePassword'])->name('profile.change-password');
+
+    // Two-Factor Authentication Management
+    Route::get('/2fa/setup', [\App\Http\Controllers\TwoFactorController::class, 'setup'])->name('2fa.setup');
+    Route::post('/2fa/confirm', [\App\Http\Controllers\TwoFactorController::class, 'confirm'])->name('2fa.confirm');
+    Route::post('/2fa/disable', [\App\Http\Controllers\TwoFactorController::class, 'disable'])->name('2fa.disable');
 
     // Demo Role Switcher (PRODUCTION SAFE: only enabled in non-production environments and requires admin)
     Route::get('/switch-role/{role}', function ($role) {
