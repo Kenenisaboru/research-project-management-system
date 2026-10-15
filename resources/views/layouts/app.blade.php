@@ -107,6 +107,16 @@
         .guest-nav a:hover {
             color: #fff;
         }
+        .guest-nav .guest-login-link {
+            color: var(--UNI-primary-dark) !important;
+            background-color: #fff;
+            border-color: #fff;
+        }
+        .guest-nav .guest-login-link:hover {
+            color: var(--UNI-primary) !important;
+            background-color: #f1f5f9;
+            border-color: #f1f5f9;
+        }
         .site-footer {
             background: linear-gradient(135deg, #0d2e26 0%, #102f2c 100%);
             border-top: 1px solid rgba(212, 175, 55, 0.35);
@@ -578,7 +588,7 @@
                 width: 100%;
             }
             /* Add padding below navbar for fixed position */
-            body {
+            body.app-screen {
                 padding-top: 70px !important;
             }
             /* Smaller headings on mobile */
@@ -896,6 +906,11 @@
             margin: 0 !important;
             padding: 0 !important;
         }
+        .guest-screen main.container {
+            max-width: none;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
         .dashboard-heading {
             padding: 1.6rem 1.8rem;
             border: 1px solid #e1ebe5;
@@ -922,7 +937,7 @@
     </style>
     @yield('styles')
 </head>
-<body class="d-flex flex-column min-vh-100 @guest auth-screen @endguest">
+<body class="d-flex flex-column min-vh-100 @auth app-screen @endauth @guest @if(request()->routeIs('login')) auth-screen @else guest-screen @endif @endguest">
 
     <a class="skip-link" href="#main-content">Skip to main content</a>
 
@@ -943,7 +958,7 @@
                     <a href="#features">Features</a>
                     <a href="#research">Research</a>
                     <a href="#contact">Contact</a>
-                    <a class="btn btn-light btn-sm rounded-pill px-3" href="{{ route('login') }}">Login</a>
+                    <a class="btn btn-light btn-sm rounded-pill px-3 guest-login-link" href="{{ route('login') }}">Login</a>
                 </div>
             </div>
         </nav>
@@ -1474,7 +1489,7 @@
     @endguest
 
     <!-- Main Content Container -->
-    <main class="container my-4 flex-grow-1 @guest auth-main @endguest" id="main-content">
+    <main class="container my-4 flex-grow-1 @guest @if(request()->routeIs('login')) auth-main @endif @endguest" id="main-content">
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
                 <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
@@ -1860,7 +1875,7 @@
             z-index: 1060 !important;
             width: 100%;
         }
-        body { padding-top: 70px !important; }
+        body.app-screen { padding-top: 70px !important; }
     }
     </style>
 
