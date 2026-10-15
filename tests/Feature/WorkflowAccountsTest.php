@@ -64,4 +64,16 @@ class WorkflowAccountsTest extends TestCase
             ->assertSee('UNI@Demo1')
             ->assertDontSee('Sign in as demo administrator');
     }
+
+    public function test_public_home_and_login_use_distinct_guest_layouts(): void
+    {
+        $home = $this->get(route('home'))->assertOk();
+        $this->assertMatchesRegularExpression('/<body class="[^"]*guest-screen[^"]*">/', $home->getContent());
+        $home->assertSee('guest-login-link')
+            ->assertSee('site-footer mt-auto');
+
+        $login = $this->get(route('login'))->assertOk();
+        $this->assertMatchesRegularExpression('/<body class="[^"]*auth-screen[^"]*">/', $login->getContent());
+        $this->assertDoesNotMatchRegularExpression('/<body class="[^"]*guest-screen[^"]*">/', $login->getContent());
+    }
 }
