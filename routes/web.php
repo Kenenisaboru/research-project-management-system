@@ -18,6 +18,7 @@ use App\Http\Controllers\BackupController;
 use App\Http\Controllers\DataMigrationController;
 use App\Http\Controllers\ResearchController;
 use App\Http\Controllers\NotificationCenterController;
+use App\Http\Controllers\Api\V1\NotificationController as ApiNotificationController;
 use App\Http\Controllers\ProjectDocumentController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\HealthCheckController;
@@ -32,8 +33,8 @@ use App\Http\Controllers\HealthCheckController;
 Route::get('/health', [HealthCheckController::class, 'check'])->name('health');
 
 Route::get('/', function () {
-    return redirect()->route('login');
-});
+    return view('home');
+})->name('home');
 
 // Authentication
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -61,22 +62,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/2fa/setup', [\App\Http\Controllers\TwoFactorController::class, 'setup'])->name('2fa.setup');
     Route::post('/2fa/confirm', [\App\Http\Controllers\TwoFactorController::class, 'confirm'])->name('2fa.confirm');
     Route::post('/2fa/disable', [\App\Http\Controllers\TwoFactorController::class, 'disable'])->name('2fa.disable');
-
-    // Demo Role Switcher (PRODUCTION SAFE: only enabled in non-production environments and requires admin)
-    Route::get('/switch-role/{role}', function ($role) {
-        if (app()->environment('production')) {
-            abort(404);
-        }
-        if (\Auth::user()->role !== 'admin') {
-            abort(403, 'Only the System Administrator can switch demo roles.');
-        }
-        $user = \App\Models\User::where('role', $role)->first();
-        if ($user) {
-            \Illuminate\Support\Facades\Auth::login($user);
-            return redirect()->route('dashboard')->with('success', 'Switched demo view to role: ' . strtoupper($role));
-        }
-        return back()->with('error', 'Role user not found.');
-    })->name('switch-role');
 
     // PI-only Project Actions (must be declared before wildcard /projects/{id})
     Route::middleware(['role:pi', 'permission:create_project'])->group(function () {
@@ -686,6 +671,7 @@ Route::middleware(['auth'])->group(function () {
     // Module: Notification Centre & In-App Alerts
     // ---------------------------------------------------------------------
     Route::get('/notifications', [NotificationCenterController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/poll', [ApiNotificationController::class, 'poll'])->name('notifications.poll');
     Route::post('/notifications/{id}/read', [NotificationCenterController::class, 'markRead'])->whereNumber('id')->name('notifications.read');
     Route::post('/notifications/read-all', [NotificationCenterController::class, 'markAllRead'])->name('notifications.read-all');
     Route::delete('/notifications/{id}', [NotificationCenterController::class, 'destroy'])->whereNumber('id')->name('notifications.destroy');

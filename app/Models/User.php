@@ -54,6 +54,11 @@ class User extends Authenticatable
         return $this->hasMany(Project::class, 'pi_id', 'id');
     }
 
+    public function projects()
+    {
+        return $this->projectsAsPi();
+    }
+
     public function evaluations()
     {
         return $this->hasMany(Evaluation::class, 'examiner_id', 'id');
