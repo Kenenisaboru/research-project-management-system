@@ -147,6 +147,7 @@ class ReportController extends Controller
     public function researcherPerformance(Request $request): Response
     {
         $researchers = User::whereIn('role', ['pi', 'tm'])
+            ->has('projects')
             ->withCount([
                 'projects as total_proposals',
                 'projects as completed_proposals' => function ($q) {
@@ -157,7 +158,6 @@ class ReportController extends Controller
                 },
             ])
             ->with('department')
-            ->having('total_proposals', '>', 0)
             ->orderByDesc('completed_proposals')
             ->limit(50)
             ->get();
