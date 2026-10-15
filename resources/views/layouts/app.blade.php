@@ -1519,7 +1519,8 @@
         @yield('content')
     </main>
 
-    <!-- System Footer -->
+    @guest
+    <!-- Public Site Footer -->
     <footer class="site-footer mt-auto">
         <div class="container py-4">
             <div class="row g-4 align-items-center">
@@ -1565,6 +1566,8 @@
     </footer>
 
     <!-- Bootstrap 5.3 JS Bundle (local) -->
+    @endguest
+
     <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script>
         // Lock scroll only for modals and offcanvas — dropdowns do NOT lock scroll
