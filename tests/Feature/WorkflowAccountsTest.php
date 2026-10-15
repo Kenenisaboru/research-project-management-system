@@ -37,7 +37,8 @@ class WorkflowAccountsTest extends TestCase
             $this->assertTrue(Hash::check('UNI@Demo1', $user->password));
             $this->actingAs($user)
                 ->get(route('dashboard'))
-                ->assertOk();
+                ->assertOk()
+                ->assertDontSee('site-footer mt-auto');
         }
     }
 
