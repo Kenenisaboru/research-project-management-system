@@ -197,7 +197,7 @@
         var mobileBadge = document.getElementById('rpms-notif-badge-mobile');
         if (!badge) return;
 
-        fetch('/api/v1/notifications/poll', {
+        fetch('/notifications/poll', {
             credentials: 'same-origin',
             headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
         })
