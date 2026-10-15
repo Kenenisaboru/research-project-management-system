@@ -94,15 +94,23 @@
 
             @if(app()->environment('local'))
             <div class="login-demo">
-                <div class="login-divider"><span>Development access</span></div>
-                <form action="{{ route('login') }}" method="POST" autocomplete="off" id="demoLoginForm">
-                    @csrf
-                    <input type="hidden" name="email" value="admin@rpms.local">
-                    <input type="hidden" name="password" value="UNI@Demo1">
-                    <button type="submit" class="btn btn-outline-dark w-100 login-demo-button">
-                        <i class="bi bi-person-gear me-2"></i>Sign in as demo administrator
-                    </button>
-                </form>
+                <div class="login-divider"><span>Workflow test accounts</span></div>
+                <p class="small text-muted mb-2">Sign in with each role separately, then sign out before continuing to the next approval step.</p>
+                <div class="workflow-account-list">
+                    <div><span>Principal Investigator</span><code>pi@rpms.local</code></div>
+                    <div><span>Team Member</span><code>tm@rpms.local</code></div>
+                    <div><span>Department Head</span><code>dh@rpms.local</code></div>
+                    <div><span>Research Coordinator</span><code>coordinator@rpms.local</code></div>
+                    <div><span>Peer Reviewer</span><code>reviewer@rpms.local</code></div>
+                    <div><span>Peer Reviewer 2</span><code>reviewer2@rpms.local</code></div>
+                    <div><span>College Dean</span><code>dean@rpms.local</code></div>
+                    <div><span>IRERC Ethics</span><code>irerc@rpms.local</code></div>
+                    <div><span>Vice President</span><code>vp@rpms.local</code></div>
+                    <div><span>RCSC Chair</span><code>rcsc@rpms.local</code></div>
+                    <div><span>Finance Office</span><code>finance@rpms.local</code></div>
+                    <div><span>System Administrator</span><code>admin@rpms.local</code></div>
+                </div>
+                <p class="small text-muted mt-2 mb-0">Local test password for these seeded accounts: <code>UNI@Demo1</code>. Do not use demo accounts or passwords in production.</p>
             </div>
             @endif
 
@@ -372,6 +380,28 @@
     .login-demo {
         margin-top: 1.55rem;
     }
+    .workflow-account-list {
+        display: grid;
+        gap: 0.35rem;
+        max-height: 190px;
+        overflow-y: auto;
+        padding: 0.65rem;
+        border: 1px solid #e5ebe8;
+        border-radius: 0.75rem;
+        background: #f8faf9;
+    }
+    .workflow-account-list > div {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.5rem;
+        color: #435a4f;
+        font-size: 0.72rem;
+    }
+    .workflow-account-list code {
+        color: #17624b;
+        font-size: 0.7rem;
+        white-space: nowrap;
+    }
     .login-divider {
         display: flex;
         align-items: center;
@@ -386,13 +416,6 @@
         flex: 1;
         background: #e8eeeb;
         content: "";
-    }
-    .login-demo-button {
-        min-height: 44px;
-        border-color: #dfe7e3 !important;
-        border-radius: 0.75rem;
-        color: #435a4f !important;
-        font-size: 0.8rem;
     }
     .login-legal {
         margin: 1.6rem 0 0;
