@@ -74,6 +74,89 @@
             box-shadow: 0 4px 20px -2px rgba(15, 62, 46, 0.35);
             border-bottom: 2px solid var(--UNI-gold);
         }
+        .guest-header {
+            background: linear-gradient(135deg, #0f3e2e 0%, #103b32 45%, #0c302b 100%);
+            border-bottom: 2px solid rgba(212, 175, 55, 0.7);
+            box-shadow: 0 12px 30px rgba(15, 62, 46, 0.18);
+        }
+        .guest-navbar {
+            padding: 0.9rem 0;
+        }
+        .guest-brand-mark {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: rgba(212, 175, 55, 0.18);
+            border: 1px solid rgba(212, 175, 55, 0.42);
+            color: #f6d677;
+            font-size: 1.3rem;
+        }
+        .guest-nav {
+            gap: 1.15rem;
+        }
+        .guest-nav a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+        .guest-nav a:hover {
+            color: #fff;
+        }
+        .guest-nav .guest-login-link {
+            color: var(--UNI-primary-dark) !important;
+            background-color: #fff;
+            border-color: #fff;
+        }
+        .guest-nav .guest-login-link:hover {
+            color: var(--UNI-primary) !important;
+            background-color: #f1f5f9;
+            border-color: #f1f5f9;
+        }
+        .site-footer {
+            background: linear-gradient(135deg, #0d2e26 0%, #102f2c 100%);
+            border-top: 1px solid rgba(212, 175, 55, 0.35);
+            color: rgba(255,255,255,0.9);
+        }
+        .site-footer-brand {
+            display: inline-flex;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            align-items: center;
+            justify-content: center;
+            background: rgba(212, 175, 55, 0.16);
+            color: #f6d677;
+            font-size: 1.25rem;
+        }
+        .footer-title {
+            color: #fef3c7;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 0.7rem;
+        }
+        .footer-links {
+            display: grid;
+            gap: 0.45rem;
+        }
+        .footer-links a,
+        .footer-links span {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 0.92rem;
+        }
+        .footer-links a:hover {
+            color: #fff;
+        }
+        .footer-bottom {
+            font-size: 0.8rem;
+        }
         /* Fixed navbar on desktop */
 
         .brand-text {
@@ -505,7 +588,7 @@
                 width: 100%;
             }
             /* Add padding below navbar for fixed position */
-            body {
+            body.app-screen {
                 padding-top: 70px !important;
             }
             /* Smaller headings on mobile */
@@ -823,6 +906,11 @@
             margin: 0 !important;
             padding: 0 !important;
         }
+        .guest-screen main.container {
+            max-width: none;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
         .dashboard-heading {
             padding: 1.6rem 1.8rem;
             border: 1px solid #e1ebe5;
@@ -849,10 +937,33 @@
     </style>
     @yield('styles')
 </head>
-<body class="d-flex flex-column min-vh-100 @guest auth-screen @endguest">
+<body class="d-flex flex-column min-vh-100 @auth app-screen @endauth @guest @if(request()->routeIs('login')) auth-screen @else guest-screen @endif @endguest">
 
     <a class="skip-link" href="#main-content">Skip to main content</a>
 
+    @guest
+    <header class="guest-header">
+        <nav class="navbar navbar-expand-lg guest-navbar">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center gap-2" href="{{ route('home') }}">
+                    <span class="guest-brand-mark"><i class="bi bi-journal-bookmark-fill"></i></span>
+                    <div>
+                        <div class="brand-text fs-6 mb-0">RPMS</div>
+                        <div class="brand-sub">Research Project Management System</div>
+                    </div>
+                </a>
+
+                <div class="guest-nav d-flex align-items-center gap-3 ms-auto">
+                    <a href="{{ route('home') }}">Home</a>
+                    <a href="#features">Features</a>
+                    <a href="#research">Research</a>
+                    <a href="#contact">Contact</a>
+                    <a class="btn btn-light btn-sm rounded-pill px-3 guest-login-link" href="{{ route('login') }}">Login</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+    @else
     <!-- Navigation Header -->
     <nav class="navbar navbar-expand-lg navbar-UNI py-2 sticky-lg-top @yield('navbar-class')" style="z-index: 1050;">
         <div class="container @yield('navbar-container-class')">
@@ -865,7 +976,6 @@
                 </div>
             </a>
 
-            @auth
             <!-- Mobile Right Hamburger Toggler -->
             <div class="d-flex align-items-center gap-2 d-lg-none ms-auto">
                 <button id="mobileNavToggler" class="btn text-white p-1 border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#navbarOffcanvas" aria-controls="navbarOffcanvas" aria-label="Toggle navigation">
@@ -1116,7 +1226,7 @@
                         <i class="bi bi-calendar2-check me-2 text-info"></i> <span class="text-white fw-semibold">AY 2026/2027</span>
                     </div>
 
-                    {{-- User Profile & Demo Role Switcher Dropdown --}}
+                    {{-- User Profile Dropdown --}}
                     <div class="dropdown border-start border-secondary ps-3">
                         <a href="#" class="text-white text-decoration-none d-flex align-items-center gap-2 dropdown-toggle-custom" id="userProfileMenuBtn" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <div class="text-end">
@@ -1150,41 +1260,6 @@
                                 </a>
                             </li>
 
-                            <li class="dropdown-header fw-bold text-dark px-1 py-1 d-flex justify-content-between align-items-center">
-                                <span><i class="bi bi-arrow-repeat me-1 text-primary"></i> Switch Demo Role</span>
-                                @if(app()->environment('local', 'staging'))
-                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle" style="font-size: 0.6rem;">DEMO</span>
-                                @endif
-                            </li>
-
-                            @php
-                                $demoRoles = [
-                                    'pi'          => ['name' => 'Principal Investigator', 'icon' => 'bi-person'],
-                                    'tm'          => ['name' => 'Team Member',           'icon' => 'bi-people'],
-                                    'dh'          => ['name' => 'Department Head',       'icon' => 'bi-person-workspace'],
-                                    'coordinator' => ['name' => 'Coordinator',           'icon' => 'bi-person-badge'],
-                                    'reviewer'    => ['name' => 'Peer Reviewer',         'icon' => 'bi-eye'],
-                                    'dean'        => ['name' => 'College Dean',          'icon' => 'bi-bank'],
-                                    'irerc'       => ['name' => 'IRERC Ethics',          'icon' => 'bi-shield-exclamation'],
-                                    'vparttcs'    => ['name' => 'Vice President',        'icon' => 'bi-person-badge'],
-                                    'rcsc'        => ['name' => 'RCSC Chair',            'icon' => 'bi-shield-lock'],
-                                    'finance'     => ['name' => 'Finance Office',        'icon' => 'bi-cash'],
-                                    'admin'       => ['name' => 'System Admin',          'icon' => 'bi-gear'],
-                                ];
-                            @endphp
-
-                            @foreach($demoRoles as $rKey => $rMeta)
-                                @php $isActiveRole = (Auth::user()->role === $rKey); @endphp
-                                <li>
-                                    <a class="dropdown-item small d-flex align-items-center justify-content-between py-1 px-2 my-1 rounded {{ $isActiveRole ? 'bg-success text-white fw-bold' : '' }}" href="{{ route('switch-role', $rKey) }}">
-                                        <span><i class="bi {{ $rMeta['icon'] }} me-2 {{ $isActiveRole ? 'text-white' : 'text-muted' }}"></i>{{ $rMeta['name'] }}</span>
-                                        @if($isActiveRole)
-                                            <i class="bi bi-check-circle-fill text-white"></i>
-                                        @endif
-                                    </a>
-                                </li>
-                            @endforeach
-
                             <li><hr class="dropdown-divider my-2"></li>
                             <li>
                                 <form action="{{ route('logout') }}" method="POST" class="d-inline m-0">
@@ -1204,7 +1279,6 @@
                     </div>
                 </div>
             </div>
-            @endauth
         </div>
     </nav>
 
@@ -1392,44 +1466,6 @@
                 @endif
             </ul>
 
-            {{-- Demo Role Switcher (Compact 2-Column Grid) --}}
-            <div class="mb-3">
-                <a class="w-100 fw-semibold py-2 d-flex justify-content-between align-items-center text-decoration-none rounded px-2" data-bs-toggle="collapse" href="#demoRoleCollapse" role="button" aria-expanded="false" style="font-size: 0.8rem; background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.85); border: 1px solid rgba(255,255,255,0.12);">
-                    <span><i class="bi bi-arrow-repeat me-2 text-white-50"></i>Switch Demo Role</span>
-                    <i class="bi bi-chevron-down text-white-50" style="font-size: 0.75rem;"></i>
-                </a>
-                <div class="collapse mt-2" id="demoRoleCollapse">
-                    @php
-                        $mobileRoles = [
-                            'pi'          => ['name' => 'PI (Lead)',          'icon' => 'bi-person'],
-                            'tm'          => ['name' => 'Team Member',        'icon' => 'bi-people'],
-                            'dh'          => ['name' => 'Dept. Head',         'icon' => 'bi-person-workspace'],
-                            'coordinator' => ['name' => 'Coordinator',        'icon' => 'bi-person-badge'],
-                            'reviewer'    => ['name' => 'Peer Reviewer',      'icon' => 'bi-eye'],
-                            'dean'        => ['name' => 'College Dean',       'icon' => 'bi-bank'],
-                            'irerc'       => ['name' => 'IRERC Ethics',       'icon' => 'bi-shield-exclamation'],
-                            'vparttcs'    => ['name' => 'Vice President',     'icon' => 'bi-person-badge'],
-                            'rcsc'        => ['name' => 'RCSC Chair',         'icon' => 'bi-shield-lock'],
-                            'finance'     => ['name' => 'Finance Office',     'icon' => 'bi-cash'],
-                            'admin'       => ['name' => 'System Admin',       'icon' => 'bi-gear'],
-                        ];
-                    @endphp
-                    <div class="row g-1">
-                        @foreach($mobileRoles as $rKey => $rMeta)
-                            @php $isActiveRole = (Auth::user()->role === $rKey); @endphp
-                            <div class="col-6">
-                                <a href="{{ route('switch-role', $rKey) }}"
-                                   class="d-block w-100 text-truncate text-start py-1 px-2 rounded text-decoration-none {{ $isActiveRole ? 'fw-bold' : '' }}"
-                                   style="font-size: 0.72rem; {{ $isActiveRole ? 'background: #1a7a4a; color: #fff; border: 1px solid #28a465;' : 'background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.78); border: 1px solid rgba(255,255,255,0.1);' }}" title="{{ $rMeta['name'] }}">
-                                    <i class="bi {{ $rMeta['icon'] }} me-1 {{ $isActiveRole ? 'text-white' : 'text-white-50' }}"></i>
-                                    <span>{{ $rMeta['name'] }}</span>
-                                </a>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-
             <hr class="border-secondary my-2 opacity-25">
 
             {{-- Sign out --}}
@@ -1450,9 +1486,10 @@
         </div>
     </div>
     @endauth
+    @endguest
 
     <!-- Main Content Container -->
-    <main class="container my-4 flex-grow-1 @guest auth-main @endguest" id="main-content">
+    <main class="container my-4 flex-grow-1 @guest @if(request()->routeIs('login')) auth-main @endif @endguest" id="main-content">
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
                 <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
@@ -1482,14 +1519,55 @@
         @yield('content')
     </main>
 
-    <!-- System Footer -->
-    <footer class="bg-white border-top py-3 text-center text-muted small mt-auto">
-        <div class="container">
-            &copy; {{ date('Y') }} Research Project Management System (RPMS).
+    @guest
+    <!-- Public Site Footer -->
+    <footer class="site-footer mt-auto">
+        <div class="container py-4">
+            <div class="row g-4 align-items-center">
+                <div class="col-lg-4">
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                        <span class="site-footer-brand"><i class="bi bi-journal-bookmark-fill"></i></span>
+                        <div>
+                            <div class="fw-bold text-white">RPMS</div>
+                            <small class="text-white-50">Research Project Management System</small>
+                        </div>
+                    </div>
+                    <p class="text-white-50 mb-0">Collaboration, review, funding, compliance, and reporting in one secure platform for Gambella University research teams.</p>
+                </div>
+                <div class="col-sm-6 col-lg-2">
+                    <h6 class="footer-title">Explore</h6>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="{{ route('home') }}">Home</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#research">Research</a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <h6 class="footer-title">Quick Access</h6>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="{{ route('login') }}">Login</a></li>
+                        <li><a href="{{ route('dashboard') }}">Dashboard</a></li>
+                        <li><a href="{{ route('projects.index') }}">Projects</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3">
+                    <h6 class="footer-title">Contact</h6>
+                    <ul class="list-unstyled footer-links">
+                        <li><span class="text-white-50">research@institution.edu</span></li>
+                        <li><span class="text-white-50">+251 00 000 0000</span></li>
+                        <li><span class="text-white-50">Gambella University</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom border-top border-white-10 mt-3 pt-3 text-center text-white-50 small">
+                &copy; {{ date('Y') }} Research Project Management System (RPMS).
+            </div>
         </div>
     </footer>
 
     <!-- Bootstrap 5.3 JS Bundle (local) -->
+    @endguest
+
     <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script>
         // Lock scroll only for modals and offcanvas — dropdowns do NOT lock scroll
@@ -1800,7 +1878,7 @@
             z-index: 1060 !important;
             width: 100%;
         }
-        body { padding-top: 70px !important; }
+        body.app-screen { padding-top: 70px !important; }
     }
     </style>
 

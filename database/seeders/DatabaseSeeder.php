@@ -56,6 +56,7 @@ class DatabaseSeeder extends Seeder
         $pi = User::firstOrCreate(['email' => 'pi@rpms.local'], ['staff_id' => 'UNI-STAFF-101', 'name' => 'Dr. Abebe Bikila', 'password' => $pass, 'role' => 'pi', 'dept_id' => $d1->id]);
         $tm = User::firstOrCreate(['email' => 'tm@rpms.local'], ['staff_id' => 'UNI-STAFF-102', 'name' => 'Tigist Assefa', 'password' => $pass, 'role' => 'tm', 'dept_id' => $d1->id]);
         $reviewer = User::firstOrCreate(['email' => 'reviewer@rpms.local'], ['staff_id' => 'UNI-EXAM-201', 'name' => 'Prof. Kebede Tassew', 'password' => $pass, 'role' => 'reviewer', 'dept_id' => $d2->id]);
+        User::firstOrCreate(['email' => 'reviewer2@rpms.local'], ['staff_id' => 'UNI-EXAM-202', 'name' => 'Dr. Berhanu Nega (Reviewer 2)', 'password' => $pass, 'role' => 'reviewer', 'dept_id' => $d3->id]);
         $dh = User::firstOrCreate(['email' => 'dh@rpms.local'], ['staff_id' => 'UNI-DH-301', 'name' => 'Dr. Chala Gemechu', 'password' => $pass, 'role' => 'dh', 'dept_id' => $d1->id]);
         $coordinator = User::firstOrCreate(['email' => 'coordinator@rpms.local'], ['staff_id' => 'UNI-COORD-401', 'name' => 'Alemayehu Worku', 'password' => $pass, 'role' => 'coordinator', 'dept_id' => $d1->id]);
         $dean = User::firstOrCreate(['email' => 'dean@rpms.local'], ['staff_id' => 'UNI-DEAN-501', 'name' => 'Dr. Mesfin Haile', 'password' => $pass, 'role' => 'dean', 'dept_id' => $d1->id]);
