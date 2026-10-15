@@ -63,6 +63,24 @@ class AdvancedFeaturesTest extends TestCase
         $this->assertNotNull($notification->read_at);
     }
 
+    public function test_notification_poll_uses_authenticated_web_session()
+    {
+        $user = User::where('role', 'admin')->first();
+        NotificationService::notifyUser($user->id, 'WEB_POLL_TEST', 'Web session notification poll.');
+
+        $response = $this->actingAs($user)->getJson(route('notifications.poll'));
+
+        $response->assertOk()
+            ->assertJsonStructure([
+                'success',
+                'data' => [
+                    'unread_count',
+                    'recent',
+                ],
+            ])
+            ->assertJsonFragment(['message' => 'Web session notification poll.']);
+    }
+
     public function test_api_notification_poll_endpoint()
     {
         $user = User::where('role', 'admin')->first();
