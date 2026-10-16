@@ -37,7 +37,7 @@ class AuditService
             $url = null;
         }
 
-        return AuditLog::create([
+        $data = [
             'user_id'        => $userId ?: Auth::id(),
             'action'         => strtoupper($action),
             'entity_type'    => $entityType,
@@ -48,7 +48,33 @@ class AuditService
             'request_method' => Request::method() ?: 'CLI',
             'request_url'    => $url,
             'diff_json'      => $diffJson,
-        ]);
+        ];
+
+        try {
+            return AuditLog::create($data);
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Graceful fallback if database schema lacks metadata columns (user_agent, diff_json)
+            if (strpos($e->getMessage(), 'has no column named') !== false) {
+                try {
+                    return AuditLog::create([
+                        'user_id'     => $data['user_id'],
+                        'action'      => $data['action'],
+                        'entity_type' => $data['entity_type'],
+                        'entity_id'   => $data['entity_id'],
+                        'details'     => $data['details'],
+                        'ip_address'  => $data['ip_address'],
+                    ]);
+                } catch (\Throwable $ex) {
+                    \Illuminate\Support\Facades\Log::warning('AuditLog baseline fallback failed: ' . $ex->getMessage());
+                    return new AuditLog($data);
+                }
+            }
+            \Illuminate\Support\Facades\Log::warning('AuditLog creation failed: ' . $e->getMessage());
+            return new AuditLog($data);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('AuditLog creation unexpected error: ' . $e->getMessage());
+            return new AuditLog($data);
+        }
     }
 
     /**

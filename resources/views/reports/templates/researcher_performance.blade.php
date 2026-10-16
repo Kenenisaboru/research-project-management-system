@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Gambella University RPMS - Researcher Performance Summary</title>
+<title>RPMS - Researcher Performance Summary</title>
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10px; color: #1e293b; padding: 25px; }
@@ -29,7 +29,7 @@
 <body>
 
 <div class="header">
-    <h1>Gambella University &bull; Directorate of Research &amp; Community Service</h1>
+    <h1>Directorate of Research &amp; Community Service</h1>
     <h3>Research Project Management System (RPMS) &bull; Academic Staff Performance</h3>
     <div class="doc-title">Principal Investigator &amp; Researcher Performance Summary</div>
 </div>
@@ -77,17 +77,17 @@
     <tr>
         <td>
             <div class="sig-line">Director of Academic Affairs</div>
-            <div style="font-size: 8px; color: #64748b; margin-top: 2px;">Gambella University</div>
+            <div style="font-size: 8px; color: #64748b; margin-top: 2px;">Academic Directorate</div>
         </td>
         <td>
-            <div class="sig-line">Vice President, ARTTCS</div>
-            <div style="font-size: 8px; color: #64748b; margin-top: 2px;">Gambella University</div>
+            <div class="sig-line">Vice President, Academic Affairs</div>
+            <div style="font-size: 8px; color: #64748b; margin-top: 2px;">Executive Office</div>
         </td>
     </tr>
 </table>
 
 <div class="footer">
-    Gambella University RPMS &bull; Academic Performance Directorate &bull; Report by {{ $generatedBy }}
+    RPMS &bull; Academic Performance Directorate &bull; Report by {{ $generatedBy }}
 </div>
 
 </body>

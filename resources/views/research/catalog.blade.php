@@ -2,56 +2,87 @@
 
 @section('navbar-class', 'justify-content-center')
 
+@section('styles')
+<style>
+    .catalog-page {
+        max-width: 1180px;
+        margin: 0 auto;
+    }
+
+    .catalog-heading {
+        padding: 0.75rem 0 1.25rem;
+    }
+
+    .catalog-heading h1 {
+        font-size: 1.75rem;
+    }
+
+    .catalog-filter {
+        border: 1px solid var(--UNI-card-border);
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    }
+
+    .catalog-project-card {
+        min-height: 190px;
+    }
+
+    .catalog-project-title {
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+
+    .catalog-project-summary {
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+
+    .catalog-area-badge {
+        max-width: 44%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    @media (max-width: 767.98px) {
+        .catalog-heading {
+            padding-top: 0;
+        }
+
+        .catalog-heading h1 {
+            font-size: 1.45rem;
+        }
+    }
+</style>
+@endsection
+
 @section('content')
-<div class="text-center mb-4">
-    <h2 class="fw-bold mb-1"><i class="bi bi-globe2 me-2 text-dark"></i>GMU Research Repository</h2>
-    <p class="text-muted mb-0">Open catalogue of ongoing, completed, terminated and rejected research projects at Gambella University</p>
+<div class="catalog-page">
+<div class="catalog-heading text-center">
+    <h1 class="fw-bold mb-1"><i class="bi bi-globe2 me-2 text-dark"></i>Research Catalog</h1>
+    <p class="text-muted small mb-0">Browse university research projects.</p>
 </div>
 
-<div class="row g-3 mb-4">
-    <div class="col-6 col-md-3">
-        <div class="card card-custom p-3 text-center h-100">
-            <div class="fs-3 fw-bold text-success">{{ $stats['completed'] }}</div>
-            <div class="small text-muted text-uppercase fw-bold">Completed</div>
-        </div>
-    </div>
-    <div class="col-6 col-md-3">
-        <div class="card card-custom p-3 text-center h-100">
-            <div class="fs-3 fw-bold text-primary">{{ $stats['ongoing'] }}</div>
-            <div class="small text-muted text-uppercase fw-bold">Ongoing</div>
-        </div>
-    </div>
-    <div class="col-6 col-md-3">
-        <div class="card card-custom p-3 text-center h-100">
-            <div class="fs-3 fw-bold text-warning">{{ $stats['terminated'] }}</div>
-            <div class="small text-muted text-uppercase fw-bold">Terminated</div>
-        </div>
-    </div>
-    <div class="col-6 col-md-3">
-        <div class="card card-custom p-3 text-center h-100">
-            <div class="fs-3 fw-bold text-danger">{{ $stats['rejected'] }}</div>
-            <div class="small text-muted text-uppercase fw-bold">Rejected</div>
-        </div>
-    </div>
-</div>
-
-<div class="card card-custom p-3 mb-4">
+<div class="card catalog-filter p-3 mb-3">
     <form method="GET" class="row g-2 align-items-end">
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-md-5">
             <label class="form-label small fw-bold mb-1">Search</label>
-            <input type="text" name="q" class="form-control form-control-sm" placeholder="Title or abstract..." value="{{ request('q') }}">
+            <input type="text" name="q" class="form-control form-control-sm" placeholder="Search projects..." value="{{ request('q') }}">
         </div>
         <div class="col-6 col-md-2">
             <label class="form-label small fw-bold mb-1">Status</label>
             <select name="status" class="form-select form-select-sm">
                 <option value="">All</option>
-                @foreach(['Active','Completed','Terminated','Rejected'] as $st)
+                @foreach(['Draft','Active','Completed','Terminated','Rejected'] as $st)
                     <option value="{{ $st }}" {{ request('status') === $st ? 'selected' : '' }}>{{ $st }}</option>
                 @endforeach
             </select>
         </div>
-        <div class="col-6 col-md-3">
-            <label class="form-label small fw-bold mb-1">Thematic Area</label>
+        <div class="col-6 col-md-2">
+            <label class="form-label small fw-bold mb-1">Research Area</label>
             <select name="thematic_id" class="form-select form-select-sm">
                 <option value="">All</option>
                 @foreach($thematicAreas as $ta)
@@ -68,8 +99,8 @@
                 @endforeach
             </select>
         </div>
-        <div class="col-6 col-md-auto">
-            <button class="btn btn-dark btn-sm fw-bold w-100"><i class="bi bi-search me-1"></i> Search</button>
+        <div class="col-12 col-md-1">
+            <button class="btn btn-success btn-sm fw-bold w-100"><i class="bi bi-search me-1"></i> Go</button>
         </div>
     </form>
 </div>
@@ -77,15 +108,17 @@
 <div class="row row-cols-1 row-cols-lg-2 g-3">
     @forelse($projects as $project)
     <div class="col">
-        <div class="card card-custom h-100 p-3">
+        <div class="card card-custom catalog-project-card h-100 p-3">
             <div class="d-flex justify-content-between align-items-start mb-2">
-                <span class="badge {{ $project->status === 'Completed' ? 'bg-success' : ($project->status === 'Rejected' ? 'bg-danger' : ($project->status === 'Terminated' ? 'bg-warning text-dark' : 'bg-primary')) }}">{{ $project->status }}</span>
+                <span class="badge {{ $project->status === 'Completed' ? 'bg-success' : ($project->status === 'Draft' ? 'bg-secondary' : ($project->status === 'Rejected' ? 'bg-danger' : ($project->status === 'Terminated' ? 'bg-warning text-dark' : 'bg-primary'))) }}">
+                    {{ $project->status === 'Draft' ? 'Draft / Intake' : $project->status }}
+                </span>
                 @if($project->thematicArea)
-                    <span class="badge bg-light text-dark border">{{ \Illuminate\Support\Str::limit($project->thematicArea->title, 40) }}</span>
+                    <span class="badge catalog-area-badge bg-light text-dark border">{{ \Illuminate\Support\Str::limit($project->thematicArea->title, 40) }}</span>
                 @endif
             </div>
-            <h6 class="fw-bold mb-1">{{ $project->title }}</h6>
-            <p class="text-muted small mb-2">{{ \Illuminate\Support\Str::limit($project->abstract_text, 220) }}</p>
+            <h2 class="catalog-project-title h6 fw-bold mb-1">{{ $project->title }}</h2>
+            <p class="catalog-project-summary text-muted small mb-2">{{ \Illuminate\Support\Str::limit($project->abstract_text, 150) }}</p>
             <div class="mt-auto pt-2 border-top small text-muted">
                 <i class="bi bi-building me-1"></i>{{ $project->department->name ?? 'GMU' }}
                 @if($project->department && $project->department->college)
@@ -106,5 +139,6 @@
 
 <div class="d-flex justify-content-center mt-4">
     {{ $projects->links() }}
+</div>
 </div>
 @endsection
