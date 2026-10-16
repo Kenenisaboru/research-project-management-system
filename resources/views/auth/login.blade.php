@@ -92,7 +92,7 @@
                 </button>
             </form>
 
-            @if(app()->environment('local'))
+            @if(config('rpms.show_demo_accounts'))
             <div class="login-demo mt-2 pt-2 border-top">
                 <div class="d-flex align-items-center justify-content-between mb-1">
                     <span class="text-muted fw-bold" style="font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em;">

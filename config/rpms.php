@@ -29,6 +29,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Demo Account Buttons
+    |--------------------------------------------------------------------------
+    |
+    | Set to true only on a private demo deployment. This displays the
+    | pre-seeded role account buttons on the login page.
+    |
+    */
+    'show_demo_accounts' => env('RPMS_SHOW_DEMO_ACCOUNTS', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Overdue Project Threshold (Months)
     |--------------------------------------------------------------------------
     |
