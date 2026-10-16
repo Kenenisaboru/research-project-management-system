@@ -33,7 +33,15 @@ use App\Http\Controllers\HealthCheckController;
 Route::get('/health', [HealthCheckController::class, 'check'])->name('health');
 
 Route::get('/', function () {
-    return view('home');
+    $thematicAreas = \App\Models\ThematicArea::where('is_active', true)->get();
+    $stats = [
+        'projects'   => \App\Models\Project::count(),
+        'thematics'  => \App\Models\ThematicArea::where('is_active', true)->count(),
+        'papers'     => \App\Models\Paper::count(),
+        'colleges'   => \App\Models\College::count(),
+    ];
+    $activeCalls = \App\Models\ResearchCall::where('status', 'Open')->take(3)->get();
+    return view('home', compact('thematicAreas', 'stats', 'activeCalls'));
 })->name('home');
 
 // Authentication
@@ -47,6 +55,16 @@ Route::post('/2fa/challenge', [\App\Http\Controllers\TwoFactorController::class,
 
 // Public research repository (no authentication required)
 Route::get('/research', [ResearchController::class, 'catalog'])->name('research.catalog');
+
+// Public Research Lifecycle Guide (no authentication required)
+Route::get('/lifecycle', function () {
+    return view('lifecycle');
+})->name('lifecycle');
+
+// Public Support & Directorate Office (no authentication required)
+Route::get('/support', function () {
+    return view('support');
+})->name('support');
 
 // Authenticated System Routes
 Route::middleware(['auth'])->group(function () {

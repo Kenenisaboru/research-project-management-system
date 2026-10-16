@@ -16,15 +16,17 @@ class ResearchController extends Controller
      */
     public function catalog(Request $request)
     {
-        $publicStatuses = ['Active', 'Ongoing', 'Completed', 'Terminated', 'Rejected'];
+        $hasActive = Project::whereIn('status', ['Active', 'Ongoing', 'Completed'])->exists();
 
-        $query = Project::with(['thematicArea', 'department.college'])
-            ->whereIn('status', $publicStatuses);
+        $query = Project::with(['thematicArea', 'department.college']);
 
         if ($request->filled('status')) {
             $query->where('status', $request->input('status'));
-        } else {
+        } elseif ($hasActive) {
             $query->whereIn('status', ['Completed', 'Active', 'Ongoing']);
+        } else {
+            // When call is in proposal intake/draft, display active cycle proposals
+            $query->whereIn('status', ['Draft', 'Submitted', 'DH_Screened', 'UnderReview', 'Dean_Review', 'RCSC_Review', 'Approved', 'Active', 'Completed']);
         }
 
         if ($request->filled('thematic_id')) {
@@ -43,18 +45,20 @@ class ResearchController extends Controller
             });
         }
 
-        $projects = $query->latest('approved_at')->paginate(10)->withQueryString();
+        $projects = $query->latest('updated_at')->paginate(10)->withQueryString();
 
         $thematicAreas = ThematicArea::where('is_active', true)->orderBy('title')->get();
         $colleges = College::orderBy('name')->get();
 
         $stats = [
+            'total'      => Project::count(),
+            'draft'      => Project::where('status', 'Draft')->count(),
             'completed'  => Project::where('status', 'Completed')->count(),
             'ongoing'    => Project::whereIn('status', ['Active', 'Ongoing'])->count(),
             'terminated' => Project::where('status', 'Terminated')->count(),
             'rejected'   => Project::where('status', 'Rejected')->count(),
         ];
 
-        return view('research.catalog', compact('projects', 'thematicAreas', 'colleges', 'stats'));
+        return view('research.catalog', compact('projects', 'thematicAreas', 'colleges', 'stats', 'hasActive'));
     }
 }

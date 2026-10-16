@@ -17,37 +17,13 @@
        ========================================================================= */
     const THEME_KEY = 'rpms-theme';
 
-    function getPreferredTheme() {
-        const stored = localStorage.getItem(THEME_KEY);
-        if (stored) return stored;
-        return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    function applyTheme() {
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.removeItem(THEME_KEY);
     }
 
-    function applyTheme(theme) {
-        document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem(THEME_KEY, theme);
-        // Update toggle button icon
-        const toggleBtn = document.getElementById('rpms-theme-btn');
-        if (toggleBtn) {
-            const icon = toggleBtn.querySelector('.bi');
-            if (icon) {
-                icon.className = theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
-            }
-        }
-    }
-
-    function toggleTheme() {
-        const current = document.documentElement.getAttribute('data-theme') || 'dark';
-        applyTheme(current === 'dark' ? 'light' : 'dark');
-    }
-
-    // Apply on load
-    applyTheme(getPreferredTheme());
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const btn = document.getElementById('rpms-theme-btn');
-        if (btn) btn.addEventListener('click', toggleTheme);
-    });
+    // Always ensure standard clean light theme
+    applyTheme();
 
     /* =========================================================================
        COMMAND PALETTE  (Ctrl+K)

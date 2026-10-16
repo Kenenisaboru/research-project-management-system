@@ -3,7 +3,7 @@
 @section('content')
 <div class="page-heading mb-4">
     <h3 class="fw-bold mb-1"><i class="bi bi-file-earmark-pdf me-2 text-dark"></i>Institutional Reports Generator</h3>
-    <p class="text-muted small mb-0">Generate and download official Gambella University governance, audit, and output PDF documents.</p>
+    <p class="text-muted small mb-0">Generate and download official university governance, audit, and output PDF documents.</p>
 </div>
 
 <div class="row g-4">
