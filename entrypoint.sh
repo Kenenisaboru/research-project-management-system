@@ -44,7 +44,7 @@ fi
 php /var/www/artisan migrate --force
 php /var/www/artisan db:seed --class=RbacSeeder --force
 
-if [ "${RPMS_SEED_DEMO_DATA:-false}" = "true" ]; then
+if [ "${RPMS_SEED_DEMO_DATA:-false}" = "true" ] || [ "${RPMS_SHOW_DEMO_ACCOUNTS:-false}" = "true" ]; then
     php /var/www/artisan db:seed --force
 fi
 
