@@ -1049,7 +1049,6 @@
                     <div class="guest-nav d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 gap-md-3 ms-auto mt-2 mt-md-0 pt-2 pt-md-0">
                         <a class="nav-link-guest {{ request()->routeIs('home') ? 'active-guest-link' : '' }}" href="{{ route('home') }}">Home</a>
                         <a class="nav-link-guest {{ request()->routeIs('lifecycle') ? 'active-guest-link' : '' }}" href="{{ route('lifecycle') }}">Lifecycle</a>
-                        <a class="nav-link-guest {{ request()->routeIs('research.*') ? 'active-guest-link' : '' }}" href="{{ route('research.catalog') }}">Research Catalog</a>
                         <a class="nav-link-guest {{ request()->routeIs('support') ? 'active-guest-link' : '' }}" href="{{ route('support') }}">Support</a>
                         @auth
                             <a class="btn btn-light btn-sm rounded-pill px-3 guest-login-link text-center fw-bold mt-1 mt-md-0" href="{{ route('dashboard') }}"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a>
@@ -1394,11 +1393,7 @@
                                 </div>
                             </li>
 
-                            <li>
-                                <a class="dropdown-item small py-1" href="{{ route('research.catalog') }}" target="_blank">
-                                    <i class="bi bi-globe2 me-2 text-info"></i> Public Research Repository
-                                </a>
-                            </li>
+
 
                             <li><hr class="dropdown-divider my-2"></li>
                             <li>
@@ -1686,22 +1681,21 @@
 
     @guest
     <!-- Public Site Footer -->
-    <footer class="site-footer mt-auto py-2 py-md-3">
-        <div class="container" style="max-width: 880px;">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 text-center text-md-start small">
+    <footer class="site-footer mt-auto py-3">
+        <div class="container">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 text-center text-md-start">
                 <div class="d-flex align-items-center gap-2">
-                    <span class="guest-brand-mark" style="width:28px;height:28px;font-size:0.9rem;"><i class="bi bi-journal-bookmark-fill"></i></span>
-                    <span class="fw-bold text-white">RPMS</span>
-                    <span class="text-white-50">&mdash; University Research Portal</span>
+                    <span class="guest-brand-mark" style="width:32px;height:32px;font-size:1rem;"><i class="bi bi-journal-bookmark-fill"></i></span>
+                    <span class="fw-bold text-white fs-6">RPMS</span>
+                    <span class="text-white-50 small">&mdash; University Research Management System</span>
                 </div>
-                <div class="d-flex gap-3 text-white-50">
-                    <a href="{{ route('home') }}" class="text-white-50 text-decoration-none">Home</a>
-                    <a href="{{ route('lifecycle') }}" class="text-white-50 text-decoration-none">Lifecycle</a>
-                    <a href="{{ route('research.catalog') }}" class="text-white-50 text-decoration-none">Catalog</a>
-                    <a href="{{ route('support') }}" class="text-white-50 text-decoration-none">Support</a>
+                <div class="d-flex gap-4 small">
+                    <a href="{{ route('home') }}" class="text-white text-decoration-none fw-semibold">Home</a>
+                    <a href="{{ route('lifecycle') }}" class="text-white text-decoration-none fw-semibold">Lifecycle</a>
+                    <a href="{{ route('support') }}" class="text-white text-decoration-none fw-semibold">Support</a>
                 </div>
-                <div class="text-white-50" style="font-size: 0.72rem;">
-                    &copy; {{ date('Y') }} RPMS.
+                <div class="text-white-50 small">
+                    &copy; {{ date('Y') }} RPMS. All rights reserved.
                 </div>
             </div>
         </div>
