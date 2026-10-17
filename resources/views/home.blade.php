@@ -26,10 +26,10 @@
                     </a>
                 @endauth
                 <a href="{{ route('lifecycle') }}" class="btn btn-outline-dark px-4 py-2 fw-semibold">
-                    <i class="bi bi-diagram-3 me-2"></i> 5-Stage Lifecycle Guide
+                    <i class="bi bi-diagram-3 me-2"></i> Lifecycle &amp; Rubric
                 </a>
                 <a href="{{ route('support') }}" class="btn btn-outline-secondary px-4 py-2 fw-semibold">
-                    <i class="bi bi-headset me-2"></i> Directorate Support
+                    <i class="bi bi-headset me-2"></i> Helpdesk &amp; FAQ
                 </a>
             </div>
 
@@ -56,79 +56,83 @@
             </div>
         </section>
 
-        {{-- 2 Balanced Institutional Cards --}}
-        <section class="pt-3 border-top">
-            <div class="row g-4">
-                {{-- Card 1: 5-Stage Lifecycle --}}
-                <div class="col-lg-6">
-                    <div class="card h-100 border rounded-3 p-4 bg-white shadow-xs d-flex flex-column justify-content-between">
-                        <div>
-                            <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
-                                <span class="badge bg-dark rounded-circle p-2 fs-6"><i class="bi bi-diagram-3"></i></span>
-                                <h2 class="h5 fw-bold text-dark mb-0">5-Stage Research Lifecycle</h2>
+        {{-- Unique Section 1: Priority Research Thematic Areas --}}
+        <section class="py-4 border-top">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-3">
+                <div>
+                    <h2 class="h5 fw-bold text-dark mb-1">Priority Research Thematic Areas</h2>
+                    <p class="text-muted small mb-0">Current institutional grant call priorities for academic faculty proposals:</p>
+                </div>
+                <span class="badge bg-light text-dark border px-3 py-2 mt-2 mt-md-0 align-self-start align-self-md-auto" style="font-size: 0.8rem;">
+                    <i class="bi bi-check-circle-fill text-dark me-1"></i> Active Funding Cycle
+                </span>
+            </div>
+
+            <div class="row g-3">
+                @forelse($thematicAreas as $ta)
+                    <div class="col-12 col-md-4">
+                        <div class="card h-100 border rounded-3 p-4 bg-white shadow-xs d-flex flex-column justify-content-between">
+                            <div>
+                                <div class="mb-2">
+                                    <span class="badge bg-dark fw-semibold" style="font-size: 0.72rem;">
+                                        {{ $ta->category ?? 'Research Priority' }}
+                                    </span>
+                                </div>
+                                <h3 class="h6 fw-bold text-dark mb-2" style="font-size: 1rem; line-height: 1.4;">
+                                    {{ $ta->title }}
+                                </h3>
+                                <p class="text-muted mb-3" style="font-size: 0.88rem; line-height: 1.5;">
+                                    {{ $ta->description }}
+                                </p>
                             </div>
-                            <p class="text-muted mb-3" style="font-size: 0.95rem; line-height: 1.6;">
-                                Standardized institutional workflow governing proposal intake, peer review evaluation, and grant completion:
-                            </p>
-                            <div class="d-flex flex-column gap-2 mb-4">
-                                <div class="p-2 px-3 rounded bg-light border-start border-3 border-dark d-flex align-items-center gap-3">
-                                    <span class="badge bg-dark px-2 py-1">1 &ndash; 2</span>
-                                    <span class="text-dark fw-medium" style="font-size: 0.92rem;">Proposal Intake &amp; Departmental Quality Screening</span>
-                                </div>
-                                <div class="p-2 px-3 rounded bg-light border-start border-3 border-dark d-flex align-items-center gap-3">
-                                    <span class="badge bg-dark px-2 py-1">3</span>
-                                    <span class="text-dark fw-medium" style="font-size: 0.92rem;">Double-Blind Peer Review on 100-Point Rubric</span>
-                                </div>
-                                <div class="p-2 px-3 rounded bg-light border-start border-3 border-dark d-flex align-items-center gap-3">
-                                    <span class="badge bg-dark px-2 py-1">4 &ndash; 5</span>
-                                    <span class="text-dark fw-medium" style="font-size: 0.92rem;">Dean / RCSC Approval &amp; 3-Tranche Grant Funding</span>
-                                </div>
+                            <div class="pt-2 border-top text-muted small d-flex align-items-center justify-content-between">
+                                <span><i class="bi bi-tag me-1"></i> Thematic Grant</span>
+                                <span class="fw-bold text-dark">Open for Intake</span>
                             </div>
                         </div>
-                        <a href="{{ route('lifecycle') }}" class="btn btn-outline-dark fw-semibold py-2">
-                            Explore 5-Step Lifecycle &amp; Rubric &rarr;
-                        </a>
+                    </div>
+                @empty
+                    <div class="col-12">
+                        <div class="p-3 rounded bg-light border text-center text-muted small">
+                            Institutional priority areas currently open for faculty submissions.
+                        </div>
+                    </div>
+                @endforelse
+            </div>
+        </section>
+
+        {{-- Unique Section 2: Core Institutional Standards --}}
+        <section class="pt-4 border-top">
+            <h2 class="h5 fw-bold text-dark mb-3">Institutional Research Governance Principles</h2>
+            <div class="row g-3">
+                <div class="col-12 col-md-4">
+                    <div class="card h-100 border rounded-3 p-3 bg-white shadow-xs">
+                        <div class="fw-bold text-dark mb-1 fs-6">
+                            <i class="bi bi-shield-lock text-dark me-2"></i>Double-Blind Integrity
+                        </div>
+                        <p class="text-muted small mb-0 lh-sm">
+                            Author identities and affiliations are masked dynamically throughout academic peer review to guarantee impartial, merit-first evaluation.
+                        </p>
                     </div>
                 </div>
-
-                {{-- Card 2: Directorate & Support --}}
-                <div class="col-lg-6">
-                    <div class="card h-100 border rounded-3 p-4 bg-white shadow-xs d-flex flex-column justify-content-between">
-                        <div>
-                            <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
-                                <span class="badge bg-dark rounded-circle p-2 fs-6"><i class="bi bi-headset"></i></span>
-                                <h2 class="h5 fw-bold text-dark mb-0">Directorate Office &amp; Helpdesk</h2>
-                            </div>
-                            <p class="text-muted mb-3" style="font-size: 0.95rem; line-height: 1.6;">
-                                Direct assistance for research faculty, proposal formatting, staff credentials, and institutional ethics:
-                            </p>
-                            <div class="d-flex flex-column gap-3 mb-4">
-                                <div class="d-flex align-items-start gap-3">
-                                    <i class="bi bi-building fs-5 text-dark mt-1 flex-shrink-0"></i>
-                                    <div>
-                                        <div class="fw-bold text-dark" style="font-size: 0.95rem;">Directorate Office Location</div>
-                                        <div class="text-muted" style="font-size: 0.9rem;">Administration Building, Level 2, Room 204</div>
-                                    </div>
-                                </div>
-                                <div class="d-flex align-items-start gap-3">
-                                    <i class="bi bi-clock fs-5 text-dark mt-1 flex-shrink-0"></i>
-                                    <div>
-                                        <div class="fw-bold text-dark" style="font-size: 0.95rem;">Working Hours</div>
-                                        <div class="text-muted" style="font-size: 0.9rem;">Monday &ndash; Friday, 8:30 AM &ndash; 5:30 PM (Lunch: 12:30 &ndash; 1:30 PM)</div>
-                                    </div>
-                                </div>
-                                <div class="d-flex align-items-start gap-3">
-                                    <i class="bi bi-envelope fs-5 text-dark mt-1 flex-shrink-0"></i>
-                                    <div>
-                                        <div class="fw-bold text-dark" style="font-size: 0.95rem;">Technical Support &amp; Accounts</div>
-                                        <div class="text-muted" style="font-size: 0.9rem;"><a href="mailto:support@rpms.local" class="text-decoration-none text-dark fw-semibold">support@rpms.local</a> &middot; Telephone Ext: +251 (0) 47 111 0022</div>
-                                    </div>
-                                </div>
-                            </div>
+                <div class="col-12 col-md-4">
+                    <div class="card h-100 border rounded-3 p-3 bg-white shadow-xs">
+                        <div class="fw-bold text-dark mb-1 fs-6">
+                            <i class="bi bi-sliders text-dark me-2"></i>Dual-Tier Governance
                         </div>
-                        <a href="{{ route('support') }}" class="btn btn-outline-dark fw-semibold py-2">
-                            View Support &amp; FAQ &rarr;
-                        </a>
+                        <p class="text-muted small mb-0 lh-sm">
+                            Proposals under ETB 500k are expedited through College Deans, while major institutional grants (&ge;500k) receive formal RCSC Council review.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="card h-100 border rounded-3 p-3 bg-white shadow-xs">
+                        <div class="fw-bold text-dark mb-1 fs-6">
+                            <i class="bi bi-cash-stack text-dark me-2"></i>Tranche Disbursements
+                        </div>
+                        <p class="text-muted small mb-0 lh-sm">
+                            Grant funds are disbursed in 3 structured tranches (30% Advance, 40% Mid-Term, 30% Final) strictly tied to verifiable progress milestones.
+                        </p>
                     </div>
                 </div>
             </div>
