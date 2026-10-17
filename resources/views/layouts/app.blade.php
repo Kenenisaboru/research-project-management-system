@@ -1519,8 +1519,7 @@
         @yield('content')
     </main>
 
-    @guest
-    <!-- Public Site Footer -->
+    <!-- Site Footer -->
     <footer class="site-footer mt-auto">
         <div class="container py-4">
             <div class="row g-4 align-items-center">
@@ -1538,14 +1537,18 @@
                     <h6 class="footer-title">Explore</h6>
                     <ul class="list-unstyled footer-links">
                         <li><a href="{{ route('home') }}">Home</a></li>
-                        <li><a href="#features">Features</a></li>
-                        <li><a href="#research">Research</a></li>
+                        <li><a href="{{ route('home') }}#features">Features</a></li>
+                        <li><a href="{{ route('home') }}#research">Research</a></li>
                     </ul>
                 </div>
                 <div class="col-sm-6 col-lg-3">
                     <h6 class="footer-title">Quick Access</h6>
                     <ul class="list-unstyled footer-links">
-                        <li><a href="{{ route('login') }}">Login</a></li>
+                        <li>
+                            @guest
+                                <a href="{{ route('login') }}">Login</a>
+                            @endguest
+                        </li>
                         <li><a href="{{ route('dashboard') }}">Dashboard</a></li>
                         <li><a href="{{ route('projects.index') }}">Projects</a></li>
                     </ul>
@@ -1566,7 +1569,6 @@
     </footer>
 
     <!-- Bootstrap 5.3 JS Bundle (local) -->
-    @endguest
 
     <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script>
