@@ -2047,17 +2047,25 @@ html[data-theme="dark"] .gambella-deadline-sub {
     color: #5c6e90;
 }
 /* =====================================================================
-   PRO TABLES DESIGN SYSTEM (LIGHT & DARK AWARE)
+   PRO RPMS TABLE DESIGN SYSTEM (LIGHT & DARK AWARE)
    ===================================================================== */
-.table {
-    --bs-table-bg: #ffffff;
-    --bs-table-striped-bg: #f8fafc;
-    --bs-table-hover-bg: #f8fafc;
+.table,
+.rpms-table {
+    --bs-table-bg: transparent !important;
+    --bs-table-accent-bg: transparent !important;
+    --bs-table-striped-bg: transparent !important;
+    --bs-table-hover-bg: #f8fafc !important;
     color: #0f172a;
+    width: 100%;
+}
+.table > :not(caption) > * > *,
+.rpms-table > :not(caption) > * > * {
+    box-shadow: none !important;
 }
 .table thead th,
 .table .table-light th,
-.table-light {
+.table-light,
+.rpms-table thead th {
     background-color: #f8fafc !important;
     color: #64748b !important;
     font-size: 0.72rem !important;
@@ -2065,24 +2073,35 @@ html[data-theme="dark"] .gambella-deadline-sub {
     font-weight: 700 !important;
     letter-spacing: 0.05em !important;
     border-bottom: 1px solid #e2e8f0 !important;
-    padding-top: 12px !important;
-    padding-bottom: 12px !important;
+    padding: 12px 14px !important;
+    box-shadow: none !important;
 }
-.table tbody td {
+.table tbody td,
+.rpms-table tbody td {
     color: #334155;
-    border-bottom: 1px solid #f1f5f9;
-    padding-top: 14px;
-    padding-bottom: 14px;
+    background-color: #ffffff !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    padding: 14px 14px !important;
     vertical-align: middle;
+    box-shadow: none !important;
 }
-.table tbody tr:hover td {
-    background-color: #f8fafc;
+.table tbody tr:hover td,
+.rpms-table tbody tr:hover td {
+    background-color: #f8fafc !important;
 }
-.table td .fw-bold.text-dark {
+.project-title-link,
+.table td .fw-bold.text-dark,
+.rpms-table td .fw-bold.text-dark {
     color: #0f172a !important;
+    font-weight: 700 !important;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+.project-title-link:hover {
+    color: #2563eb !important;
 }
 .badge.bg-light.text-dark.border {
-    background: #f1f5f9 !important;
+    background-color: #f1f5f9 !important;
     color: #334155 !important;
     border-color: #e2e8f0 !important;
     font-weight: 600;
@@ -2170,31 +2189,52 @@ html[data-theme="dark"] .card-custom-header {
     border-bottom-color: rgba(99, 122, 180, 0.1) !important;
 }
 
-/* Dark Mode Tables — Full Transparency & High Contrast */
-html[data-theme="dark"] .table {
+/* Dark Mode Tables — Full Transparency, Dark Background & High Contrast */
+html[data-theme="dark"] .table,
+html[data-theme="dark"] .rpms-table {
     --bs-table-bg: transparent !important;
-    --bs-table-hover-bg: rgba(255, 255, 255, 0.03) !important;
+    --bs-table-accent-bg: transparent !important;
+    --bs-table-striped-bg: transparent !important;
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.04) !important;
     color: #cbd5e1 !important;
 }
-html[data-theme="dark"] .table > :not(caption) > * > * {
+html[data-theme="dark"] .table > :not(caption) > * > *,
+html[data-theme="dark"] .rpms-table > :not(caption) > * > * {
     background-color: transparent !important;
+    box-shadow: none !important;
     color: #cbd5e1 !important;
     border-bottom-color: rgba(99, 130, 220, 0.12) !important;
 }
 html[data-theme="dark"] .table thead th,
 html[data-theme="dark"] .table .table-light th,
-html[data-theme="dark"] .table-light {
-    background-color: rgba(15, 23, 42, 0.6) !important;
+html[data-theme="dark"] .table-light,
+html[data-theme="dark"] .rpms-table thead th {
+    background-color: rgba(15, 23, 42, 0.75) !important;
     color: #94a3b8 !important;
     border-bottom-color: rgba(99, 130, 220, 0.18) !important;
+    box-shadow: none !important;
 }
-html[data-theme="dark"] .table tbody tr:hover td {
-    background-color: rgba(255, 255, 255, 0.03) !important;
+html[data-theme="dark"] .table tbody td,
+html[data-theme="dark"] .rpms-table tbody td {
+    background-color: transparent !important;
+    color: #cbd5e1 !important;
+    border-bottom-color: rgba(99, 130, 220, 0.12) !important;
+    box-shadow: none !important;
 }
+html[data-theme="dark"] .table tbody tr:hover td,
+html[data-theme="dark"] .rpms-table tbody tr:hover td {
+    background-color: rgba(255, 255, 255, 0.04) !important;
+}
+html[data-theme="dark"] .project-title-link,
 html[data-theme="dark"] .table td .fw-bold.text-dark,
 html[data-theme="dark"] .table td .text-dark,
+html[data-theme="dark"] .rpms-table td .fw-bold.text-dark,
+html[data-theme="dark"] .rpms-table td .text-dark,
 html[data-theme="dark"] .text-dark {
     color: #f8fafc !important;
+}
+html[data-theme="dark"] .project-title-link:hover {
+    color: #60a5fa !important;
 }
 html[data-theme="dark"] .text-muted {
     color: #94a3b8 !important;
