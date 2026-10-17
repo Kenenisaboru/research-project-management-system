@@ -13,7 +13,7 @@
     <!-- Bootstrap Icons (CDN) -->
     <link href="{{ asset('vendor/bootstrap/css/bootstrap-icons.subset.css') }}" rel="stylesheet">
     <!-- RPMS Design System -->
-    <link href="{{ asset('css/rpms-theme.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/rpms-theme.css') }}?v={{ file_exists(public_path('css/rpms-theme.css')) ? filemtime(public_path('css/rpms-theme.css')) : time() }}" rel="stylesheet">
     <!-- Alpine.js (Reactive UI Engine) -->
     <script defer src="{{ asset('vendor/alpine/alpine.min.js') }}"></script>
     <style>
@@ -1844,6 +1844,6 @@
     </div>
 
     <!-- RPMS Pro JS -->
-    <script src="{{ asset('js/rpms-pro.js') }}"></script>
+    <script src="{{ asset('js/rpms-pro.js') }}?v={{ file_exists(public_path('js/rpms-pro.js')) ? filemtime(public_path('js/rpms-pro.js')) : time() }}"></script>
 </body>
 </html>
