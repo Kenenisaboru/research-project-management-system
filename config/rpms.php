@@ -36,7 +36,7 @@ return [
     | pre-seeded role account buttons on the login page.
     |
     */
-    'show_demo_accounts' => env('RPMS_SHOW_DEMO_ACCOUNTS', false),
+    'show_demo_accounts' => env('RPMS_SHOW_DEMO_ACCOUNTS', env('APP_ENV') === 'local'),
 
     /*
     |--------------------------------------------------------------------------
