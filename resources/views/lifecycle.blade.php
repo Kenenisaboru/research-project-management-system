@@ -1,157 +1,170 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="py-2 py-md-3">
-    <div class="container" style="max-width: 880px;">
+<div class="py-4 py-lg-5">
+    <div class="container">
         {{-- Breadcrumb & Header --}}
-        <nav aria-label="breadcrumb" class="mb-2">
-            <ol class="breadcrumb small mb-1">
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ route('home') }}" class="text-decoration-none text-muted">Home</a></li>
-                <li class="breadcrumb-item active text-dark fw-bold" aria-current="page">Lifecycle</li>
+                <li class="breadcrumb-item active text-dark fw-bold" aria-current="page">Lifecycle &amp; Evaluation</li>
             </ol>
         </nav>
 
-        <header class="mb-3">
-            <h1 class="h4 fw-bold text-dark mb-1">Research Project Lifecycle</h1>
-            <p class="text-muted small mb-0">5-step review workflow and 100-point evaluation rubric.</p>
+        <header class="mb-4">
+            <div class="text-uppercase fw-bold text-muted mb-1" style="font-size: 0.85rem; letter-spacing: 1px;">
+                Institutional Governance &amp; Quality Assurance
+            </div>
+            <h1 class="h2 fw-bold text-dark mb-2">Research Project Lifecycle &amp; Evaluation</h1>
+            <p class="lead text-muted fs-6 mb-0" style="max-width: 720px;">
+                A standardized 5-step workflow and 100-point double-blind scoring rubric governing grant calls from submission to completion.
+            </p>
         </header>
 
         {{-- 1. The 5 Steps --}}
-        <section class="card border rounded p-3 bg-white shadow-xs mb-3">
-            <h2 class="small fw-bold text-dark text-uppercase mb-2" style="font-size: 0.72rem; letter-spacing: 0.5px;">
-                5-Step Workflow
+        <section class="card border rounded-3 p-4 bg-white shadow-xs mb-4">
+            <h2 class="h5 fw-bold text-dark mb-3 pb-2 border-bottom">
+                <i class="bi bi-diagram-3 me-2 text-dark"></i>5-Step Lifecycle Workflow
             </h2>
-            <div class="d-flex flex-column gap-2 small">
-                <div class="p-2 rounded bg-light border-start border-3 border-dark d-flex align-items-start gap-2">
-                    <span class="badge bg-dark rounded-circle px-2 py-1 flex-shrink-0" style="font-size: 0.7rem;">1</span>
+            <div class="d-flex flex-column gap-3">
+                <div class="p-3 rounded bg-light border-start border-4 border-dark d-flex align-items-start gap-3">
+                    <span class="badge bg-dark rounded-circle px-3 py-2 fs-6 flex-shrink-0">1</span>
                     <div>
-                        <strong class="text-dark">Proposal Submission</strong>
-                        <span class="text-muted">(PI) &mdash; Author and submit proposal with budget breakdown.</span>
+                        <div class="fw-bold text-dark fs-6">1. Proposal Intake &amp; Submission</div>
+                        <div class="text-muted" style="font-size: 0.92rem;">
+                            <strong>Principal Investigator (PI)</strong> drafts and submits research proposal mapped to university thematic priority areas with itemized budget breakdowns.
+                        </div>
                     </div>
                 </div>
 
-                <div class="p-2 rounded bg-light border-start border-3 border-dark d-flex align-items-start gap-2">
-                    <span class="badge bg-dark rounded-circle px-2 py-1 flex-shrink-0" style="font-size: 0.7rem;">2</span>
+                <div class="p-3 rounded bg-light border-start border-4 border-dark d-flex align-items-start gap-3">
+                    <span class="badge bg-dark rounded-circle px-3 py-2 fs-6 flex-shrink-0">2</span>
                     <div>
-                        <strong class="text-dark">Department Screening</strong>
-                        <span class="text-muted">(DH) &mdash; Verify departmental relevance, feasibility, and eligibility.</span>
+                        <div class="fw-bold text-dark fs-6">2. Departmental Quality Screening</div>
+                        <div class="text-muted" style="font-size: 0.92rem;">
+                            <strong>Department Head (DH)</strong> evaluates submissions for departmental academic relevance, resource feasibility, and institutional compliance.
+                        </div>
                     </div>
                 </div>
 
-                <div class="p-2 rounded bg-light border-start border-3 border-dark d-flex align-items-start gap-2">
-                    <span class="badge bg-dark rounded-circle px-2 py-1 flex-shrink-0" style="font-size: 0.7rem;">3</span>
+                <div class="p-3 rounded bg-light border-start border-4 border-dark d-flex align-items-start gap-3">
+                    <span class="badge bg-dark rounded-circle px-3 py-2 fs-6 flex-shrink-0">3</span>
                     <div>
-                        <strong class="text-dark">Blind Peer Review</strong>
-                        <span class="text-muted">(Examiner) &mdash; Double-blind 100-point rubric scoring by academic reviewers.</span>
+                        <div class="fw-bold text-dark fs-6">3. Double-Blind Peer Review</div>
+                        <div class="text-muted" style="font-size: 0.92rem;">
+                            <strong>Independent Academic Reviewers</strong> evaluate anonymized manuscripts using a 100-point rubric with identities strictly masked on both sides.
+                        </div>
                     </div>
                 </div>
 
-                <div class="p-2 rounded bg-light border-start border-3 border-dark d-flex align-items-start gap-2">
-                    <span class="badge bg-dark rounded-circle px-2 py-1 flex-shrink-0" style="font-size: 0.7rem;">4</span>
+                <div class="p-3 rounded bg-light border-start border-4 border-dark d-flex align-items-start gap-3">
+                    <span class="badge bg-dark rounded-circle px-3 py-2 fs-6 flex-shrink-0">4</span>
                     <div>
-                        <strong class="text-dark">Governance Approval</strong>
-                        <span class="text-muted">(Dean / RCSC &amp; VP) &mdash; Budget approval (&lt;500k Dean; &ge;500k RCSC) and bilateral contract.</span>
+                        <div class="fw-bold text-dark fs-6">4. Governance Approval &amp; Bilateral Contract</div>
+                        <div class="text-muted" style="font-size: 0.92rem;">
+                            Dual-tier budget routing: proposals under ETB 500k are approved by the <strong>College Dean</strong>; proposals &ge; ETB 500k are defended before the <strong>RCSC Council</strong>. PI and Vice President execute a bilateral research contract.
+                        </div>
                     </div>
                 </div>
 
-                <div class="p-2 rounded bg-light border-start border-3 border-dark d-flex align-items-start gap-2">
-                    <span class="badge bg-dark rounded-circle px-2 py-1 flex-shrink-0" style="font-size: 0.7rem;">5</span>
+                <div class="p-3 rounded bg-light border-start border-4 border-dark d-flex align-items-start gap-3">
+                    <span class="badge bg-dark rounded-circle px-3 py-2 fs-6 flex-shrink-0">5</span>
                     <div>
-                        <strong class="text-dark">Funding &amp; Completion</strong>
-                        <span class="text-muted">(Finance &amp; Coordinator) &mdash; Milestone payments (30%/40%/30%) and certificate.</span>
+                        <div class="fw-bold text-dark fs-6">5. Grant Funding &amp; Project Completion</div>
+                        <div class="text-muted" style="font-size: 0.92rem;">
+                            <strong>Finance Directorate</strong> disburses funds in 3 milestone tranches (30% advance, 40% mid-term, 30% final). Upon audit sign-off, an official PDF completion certificate is issued.
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
         {{-- 2. 100-Point Scoring Rubric --}}
-        <section class="card border rounded p-3 bg-white shadow-xs mb-3">
-            <h2 class="small fw-bold text-dark text-uppercase mb-2" style="font-size: 0.72rem; letter-spacing: 0.5px;">
-                100-Point Evaluation Rubric
+        <section class="card border rounded-3 p-4 bg-white shadow-xs mb-4">
+            <h2 class="h5 fw-bold text-dark mb-3 pb-2 border-bottom">
+                <i class="bi bi-card-checklist me-2 text-dark"></i>100-Point Standardized Evaluation Rubric
             </h2>
 
-            <div class="table-responsive mb-2">
-                <table class="table table-sm table-hover align-middle mb-0 small">
-                    <thead class="bg-light">
+            <div class="table-responsive mb-4">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
                         <tr>
-                            <th class="ps-2">Criteria</th>
-                            <th class="text-center" style="width: 80px;">Weight</th>
-                            <th>Scope</th>
+                            <th class="ps-3 py-2">Evaluation Criteria</th>
+                            <th class="text-center py-2" style="width: 140px;">Max Score</th>
+                            <th class="py-2">Assessment Scope &amp; Rigor</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="ps-2 fw-semibold text-dark">Scientific &amp; Technical Merit</td>
-                            <td class="text-center fw-bold text-dark">25 Pts</td>
-                            <td class="text-muted">Originality, depth, and literature grounding.</td>
+                            <td class="ps-3 fw-semibold text-dark">1. Scientific &amp; Technical Merit</td>
+                            <td class="text-center fw-bold text-dark fs-6">25 Pts</td>
+                            <td class="text-muted" style="font-size: 0.92rem;">Originality, clarity of problem statement, theoretical depth, and literature grounding.</td>
                         </tr>
                         <tr>
-                            <td class="ps-2 fw-semibold text-dark">Methodology &amp; Design</td>
-                            <td class="text-center fw-bold text-dark">25 Pts</td>
-                            <td class="text-muted">Empirical rigor and analytical design.</td>
+                            <td class="ps-3 fw-semibold text-dark">2. Methodology &amp; Experimental Design</td>
+                            <td class="text-center fw-bold text-dark fs-6">25 Pts</td>
+                            <td class="text-muted" style="font-size: 0.92rem;">Empirical soundness, data collection rigor, analytical instrumentation, and sampling validity.</td>
                         </tr>
                         <tr>
-                            <td class="ps-2 fw-semibold text-dark">Feasibility &amp; Timeline</td>
-                            <td class="text-center fw-bold text-dark">20 Pts</td>
-                            <td class="text-muted">Milestone realism and work plan sequencing.</td>
+                            <td class="ps-3 fw-semibold text-dark">3. Feasibility &amp; Work Plan Timeline</td>
+                            <td class="text-center fw-bold text-dark fs-6">20 Pts</td>
+                            <td class="text-muted" style="font-size: 0.92rem;">Milestone realism, risk mitigation strategies, and adequacy of research team expertise.</td>
                         </tr>
                         <tr>
-                            <td class="ps-2 fw-semibold text-dark">Community Impact</td>
-                            <td class="text-center fw-bold text-dark">20 Pts</td>
-                            <td class="text-muted">Tangible socio-economic benefits and relevance.</td>
+                            <td class="ps-3 fw-semibold text-dark">4. Community &amp; Socio-Economic Impact</td>
+                            <td class="text-center fw-bold text-dark fs-6">20 Pts</td>
+                            <td class="text-muted" style="font-size: 0.92rem;">Tangible socio-economic benefits, regional policy relevance, and technology transfer potential.</td>
                         </tr>
                         <tr>
-                            <td class="ps-2 fw-semibold text-dark">Budget &amp; Cost Realism</td>
-                            <td class="text-center fw-bold text-dark">10 Pts</td>
-                            <td class="text-muted">Itemized justification and cost compliance.</td>
+                            <td class="ps-3 fw-semibold text-dark">5. Budget Realism &amp; Cost Justification</td>
+                            <td class="text-center fw-bold text-dark fs-6">10 Pts</td>
+                            <td class="text-muted" style="font-size: 0.92rem;">Itemized cost realism, market price compliance, and adherence to institutional finance policies.</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
             {{-- Verdict Thresholds --}}
-            <div class="row g-1 text-center pt-2 border-top">
-                <div class="col-6 col-sm-3">
-                    <div class="p-2 rounded bg-light border small">
-                        <span class="badge bg-dark font-monospace mb-1">80–100</span>
-                        <div class="fw-semibold text-dark" style="font-size: 0.72rem;">Accepted</div>
+            <div class="row g-3 text-center pt-3 border-top">
+                <div class="col-6 col-md-3">
+                    <div class="p-3 rounded bg-light border">
+                        <span class="badge bg-dark font-monospace fs-6 px-3 py-1 mb-2">80 – 100</span>
+                        <div class="fw-bold text-dark">Accepted</div>
+                        <small class="text-muted d-block" style="font-size: 0.8rem;">Unconditional funding</small>
                     </div>
                 </div>
-                <div class="col-6 col-sm-3">
-                    <div class="p-2 rounded bg-light border small">
-                        <span class="badge bg-dark font-monospace mb-1">70–79</span>
-                        <div class="fw-semibold text-dark" style="font-size: 0.72rem;">Minor Mods</div>
+                <div class="col-6 col-md-3">
+                    <div class="p-3 rounded bg-light border">
+                        <span class="badge bg-dark font-monospace fs-6 px-3 py-1 mb-2">70 – 79</span>
+                        <div class="fw-bold text-dark">Minor Revisions</div>
+                        <small class="text-muted d-block" style="font-size: 0.8rem;">Funding upon minor edits</small>
                     </div>
                 </div>
-                <div class="col-6 col-sm-3">
-                    <div class="p-2 rounded bg-light border small">
-                        <span class="badge bg-dark font-monospace mb-1">50–69</span>
-                        <div class="fw-semibold text-dark" style="font-size: 0.72rem;">Major Mods</div>
+                <div class="col-6 col-md-3">
+                    <div class="p-3 rounded bg-light border">
+                        <span class="badge bg-dark font-monospace fs-6 px-3 py-1 mb-2">50 – 69</span>
+                        <div class="fw-bold text-dark">Major Revisions</div>
+                        <small class="text-muted d-block" style="font-size: 0.8rem;">Resubmission required</small>
                     </div>
                 </div>
-                <div class="col-6 col-sm-3">
-                    <div class="p-2 rounded bg-light border small">
-                        <span class="badge bg-dark font-monospace mb-1">&lt;50</span>
-                        <div class="fw-semibold text-dark" style="font-size: 0.72rem;">Rejected</div>
+                <div class="col-6 col-md-3">
+                    <div class="p-3 rounded bg-light border">
+                        <span class="badge bg-dark font-monospace fs-6 px-3 py-1 mb-2">&lt; 50</span>
+                        <div class="fw-bold text-dark">Rejected</div>
+                        <small class="text-muted d-block" style="font-size: 0.8rem;">Ineligible for current call</small>
                     </div>
                 </div>
             </div>
         </section>
 
         {{-- Bottom Navigation --}}
-        <div class="d-flex justify-content-between align-items-center">
-            <a href="{{ route('home') }}" class="btn btn-sm btn-outline-secondary fw-semibold">
-                &larr; Home
+        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+            <a href="{{ route('home') }}" class="btn btn-outline-secondary fw-semibold px-4 py-2">
+                &larr; Back to Home
             </a>
-            @auth
-                <a href="{{ route('dashboard') }}" class="btn btn-sm btn-dark fw-semibold">
-                    Dashboard &rarr;
-                </a>
-            @else
-                <a href="{{ route('login') }}" class="btn btn-sm btn-dark fw-semibold">
-                    Sign In &rarr;
-                </a>
-            @endauth
+            <a href="{{ route('support') }}" class="btn btn-dark fw-semibold px-4 py-2">
+                Directorate Support &rarr;
+            </a>
         </div>
     </div>
 </div>
