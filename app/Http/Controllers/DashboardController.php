@@ -50,12 +50,12 @@ class DashboardController extends Controller
             $pendingCancellations = $cancellations->latest()->get();
         }
 
-        if ($role === 'admin') {
-            $recentActivity = \App\Models\AuditLog::with('user')
-                ->latest()
-                ->limit(6)
-                ->get();
-        } elseif ($role === 'pi') {
+        $recentActivity = \App\Models\AuditLog::with('user')
+            ->latest()
+            ->limit(5)
+            ->get();
+
+        if ($role === 'pi') {
             $myProjects = Project::where('pi_id', $user->id)->with(['thematicArea', 'irercClearance'])->get();
         } elseif ($role === 'reviewer') {
             $assignedReviews = Evaluation::where('examiner_id', $user->id)
@@ -87,9 +87,28 @@ class DashboardController extends Controller
             $pendingApprovals = Project::where('status', '!=', 'Draft')->where('status', '!=', 'Withdrawn')->with(['pi', 'thematicArea'])->latest()->limit(10)->get();
         }
 
+        $statusDistribution = [
+            'In Progress' => Project::whereIn('status', ['Active', 'Approved'])->count(),
+            'Submitted'   => Project::whereIn('status', ['Submitted', 'DH_Screened'])->count(),
+            'Under Review'=> Project::where('status', 'UnderReview')->count(),
+            'On Hold'     => Project::whereIn('status', ['Returned', 'PendingCancellation'])->count(),
+            'Completed'   => Project::where('status', 'Completed')->count(),
+        ];
+        $totalProjectsCount = array_sum($statusDistribution);
+        if ($totalProjectsCount === 0) {
+            $totalProjectsCount = max(1, Project::count());
+        }
+
+        $recentProjectsList = Project::with(['pi', 'thematicArea'])->latest()->limit(5)->get();
+
         $alerts = \App\Services\AlertsService::all();
 
-        return view('dashboard', compact('user', 'role', 'stats', 'myProjects', 'assignedReviews', 'pendingApprovals', 'teamProjects', 'pendingDisbursements', 'disbursedHistory', 'recentActivity', 'pendingCancellations', 'alerts'));
+        return view('dashboard', compact(
+            'user', 'role', 'stats', 'myProjects', 'assignedReviews', 
+            'pendingApprovals', 'teamProjects', 'pendingDisbursements', 
+            'disbursedHistory', 'recentActivity', 'pendingCancellations', 
+            'alerts', 'statusDistribution', 'totalProjectsCount', 'recentProjectsList'
+        ));
     }
 
     private function getRoleSpecificStats($user, $role)
