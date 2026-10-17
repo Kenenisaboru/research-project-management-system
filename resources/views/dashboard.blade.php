@@ -280,7 +280,7 @@
             <div class="d-flex align-items-center justify-content-between">
                 <div>
                     <div class="text-muted small text-uppercase fw-bold" style="font-size: 0.72rem; letter-spacing: 0.5px;">Total Budget</div>
-                    <div class="fs-2 fw-bold text-dark mt-1">{{ $stats['total_budget'] ?? 0 }}</div>
+                    <div class="fs-2 fw-bold text-dark mt-1">{{ is_numeric($stats['total_budget'] ?? null) ? number_format((float)$stats['total_budget']) : ($stats['total_budget'] ?? 0) }}</div>
                     <div class="small text-muted" style="font-size: 0.75rem;">ETB requested</div>
                 </div>
                 <div class="stat-bubble">
@@ -460,7 +460,7 @@
             <div class="d-flex align-items-center justify-content-between">
                 <div>
                     <div class="text-muted small text-uppercase fw-bold" style="font-size: 0.72rem; letter-spacing: 0.5px;">Total Value</div>
-                    <div class="fs-2 fw-bold text-dark mt-1">{{ $stats['total_value'] ?? 0 }}</div>
+                    <div class="fs-2 fw-bold text-dark mt-1">{{ is_numeric($stats['total_value'] ?? null) ? number_format((float)$stats['total_value']) : ($stats['total_value'] ?? 0) }}</div>
                     <div class="small text-muted" style="font-size: 0.75rem;">ETB managed</div>
                 </div>
                 <div class="stat-bubble">
