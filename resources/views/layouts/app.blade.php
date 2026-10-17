@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,6 +14,8 @@
     <link href="{{ asset('vendor/bootstrap/css/bootstrap-icons.subset.css') }}" rel="stylesheet">
     <!-- RPMS Design System -->
     <link href="{{ asset('css/rpms-theme.css') }}" rel="stylesheet">
+    <!-- Alpine.js (Reactive UI Engine) -->
+    <script defer src="{{ asset('vendor/alpine/alpine.min.js') }}"></script>
     <style>
         :root {
             --UNI-primary: #0f3e2e;
@@ -23,9 +25,9 @@
             --UNI-gold: #d4af37;
             --UNI-gold-dark: #b89324;
             --UNI-gold-light: #fef9e7;
-            --UNI-bg: #f6f8fa;
+            --UNI-bg: #f8fafc;
             --UNI-card-border: #e2e8f0;
-            --UNI-text: #1e293b;
+            --UNI-text: #0f172a;
             --UNI-muted: #64748b;
             --UNI-focus: rgba(46, 139, 87, 0.28);
         }
@@ -34,7 +36,7 @@
             scroll-behavior: smooth;
         }
         body {
-            background-color: #f4f7f5;
+            background-color: #f8fafc;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             color: var(--UNI-text);
             letter-spacing: -0.01em;
@@ -62,8 +64,16 @@
             padding-bottom: 1rem;
         }
         h1, h2, h3, h4, h5, h6 {
-            color: #172b24;
+            color: #0f172a;
             letter-spacing: -0.025em;
+        }
+        html[data-theme="dark"] h1,
+        html[data-theme="dark"] h2,
+        html[data-theme="dark"] h3,
+        html[data-theme="dark"] h4,
+        html[data-theme="dark"] h5,
+        html[data-theme="dark"] h6 {
+            color: #f8fafc;
         }
         .text-muted {
             color: var(--UNI-muted) !important;
@@ -963,533 +973,7 @@
             </div>
         </nav>
     </header>
-    @else
-    <!-- Navigation Header -->
-    <nav class="navbar navbar-expand-lg navbar-UNI py-2 sticky-lg-top @yield('navbar-class')" style="z-index: 1050;">
-        <div class="container @yield('navbar-container-class')">
-            <!-- Brand Identity -->
-            <a class="navbar-brand d-flex align-items-center me-4" href="{{ route('dashboard') }}">
-                <i class="bi bi-journal-bookmark-fill fs-2 text-warning me-2"></i>
-                <div>
-                    <div class="brand-text fs-6">RPMS</div>
-                    <div class="brand-sub">Research Project Management System</div>
-                </div>
-            </a>
-
-            <!-- Mobile Right Hamburger Toggler -->
-            <div class="d-flex align-items-center gap-2 d-lg-none ms-auto">
-                <button id="mobileNavToggler" class="btn text-white p-1 border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#navbarOffcanvas" aria-controls="navbarOffcanvas" aria-label="Toggle navigation">
-                    <i id="mobileNavIcon" class="bi bi-list fs-1 text-white"></i>
-                </button>
-            </div>
-
-            <!-- Desktop Navigation Menu (Large screens) -->
-            <div class="collapse navbar-collapse d-none d-lg-flex" id="navbarNav">
-                <!-- Clean Role-Based Navigation Items -->
-                <ul class="navbar-nav me-auto ms-2 gap-1">
-
-                    {{-- 1. Dashboard --}}
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('dashboard') ? 'active-link' : '' }}" href="{{ route('dashboard') }}">
-                            <i class="bi bi-speedometer2 me-1"></i> Dashboard
-                        </a>
-                    </li>
-
-                    {{-- 1a. Admin Console Links (Exact 4-Item Layout) --}}
-                    @if(Auth::user()->role === 'admin')
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('admin.users') ? 'active-link' : '' }}" href="{{ route('admin.users') }}">
-                            <i class="bi bi-people me-1"></i> Users
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('admin.thematic-areas') ? 'active-link' : '' }}" href="{{ route('admin.thematic-areas') }}">
-                            <i class="bi bi-diagram-3 me-1"></i> Thematics
-                        </a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle {{ request()->routeIs('admin.colleges', 'admin.departments') ? 'active-link' : '' }}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-bank me-1"></i> Academic Units
-                        </a>
-                        <ul class="dropdown-menu shadow-sm">
-                            <li><a class="dropdown-item small" href="{{ route('admin.colleges') }}"><i class="bi bi-bank me-2 text-dark"></i>Colleges</a></li>
-                            <li><a class="dropdown-item small" href="{{ route('admin.departments') }}"><i class="bi bi-building me-2 text-dark"></i>Departments</a></li>
-                        </ul>
-                    </li>
-                    @endif
-
-                    {{-- 2. Research Projects (simple link) — not for TM, Reviewer, or Admin --}}
-                    @if(Auth::user()->hasPermission('view_projects') && !in_array(Auth::user()->role, ['tm', 'reviewer', 'admin']))
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('projects.*') ? 'active-link' : '' }}" href="{{ route('projects.index') }}">
-                            <i class="bi bi-folder2-open me-1"></i> Projects
-                        </a>
-                    </li>
-                    @endif
-
-                    {{-- 2a. My Projects (TM) --}}
-                    @if(Auth::user()->role === 'tm')
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('projects.*') ? 'active-link' : '' }}" href="{{ route('projects.index') }}">
-                            <i class="bi bi-folder2-open me-1"></i> My Projects
-                        </a>
-                    </li>
-                    @endif
-
-                    {{-- 2b. My Evaluations (Reviewer) --}}
-                    @if(Auth::user()->role === 'reviewer')
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('evaluations.*') ? 'active-link' : '' }}" href="{{ route('evaluations.index') }}">
-                            <i class="bi bi-clipboard-check me-1"></i> My Evaluations
-                        </a>
-                    </li>
-                    @endif
-
-                    {{-- 2c. Progress Reports (PI and TM) --}}
-                    @if(Auth::user()->hasPermission('submit_progress_report'))
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('progress.*') ? 'active-link' : '' }}" href="{{ route('progress.index') }}">
-                            <i class="bi bi-graph-up me-1"></i> Progress Reports
-                        </a>
-                    </li>
-                    @endif
-
-                    {{-- 2d. Extensions & Amendments (PI Requestor) --}}
-                    @if(Auth::user()->hasAnyPermission(['request_extension', 'request_amendment']) && !Auth::user()->hasAnyPermission(['approve_extensions', 'approve_amendments']))
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('extensions.*') ? 'active-link' : '' }}" href="{{ route('extensions.index') }}">
-                            <i class="bi bi-clock-history me-1"></i> Extensions
-                        </a>
-                    </li>
-                    @endif
-
-                    {{-- 3. Department Head Screening --}}
-                    @if(Auth::user()->hasPermission('screen_proposals'))
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('dh.screening') ? 'active-link' : '' }}" href="{{ route('dh.screening') }}">
-                            <i class="bi bi-ui-checks me-1"></i> DH Screening
-                        </a>
-                    </li>
-                    @endif
-
-                    {{-- 4. Coordinator Hub (simple link) --}}
-                    @if(Auth::user()->hasPermission('assign_reviewer'))
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('coordinator.*') ? 'active-link' : '' }}" href="{{ route('coordinator.hub') }}">
-                            <i class="bi bi-briefcase me-1"></i> Coordinator Hub
-                        </a>
-                    </li>
-                    @endif
-
-                    {{-- 5. Dean Approvals --}}
-                    @if(Auth::user()->role === 'dean')
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('dean.approvals') ? 'active-link' : '' }}" href="{{ route('dean.approvals') }}">
-                            <i class="bi bi-bank me-1"></i> Dean Approvals (&lt;500k)
-                        </a>
-                    </li>
-                    @endif
-
-                    {{-- 6. IRERC Ethics Panel --}}
-                    @if(Auth::user()->hasPermission('ethics_review'))
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('irerc.panel') ? 'active-link' : '' }}" href="{{ route('irerc.panel') }}">
-                            <i class="bi bi-shield-exclamation me-1"></i> IRERC Ethics Panel
-                        </a>
-                    </li>
-                    @endif
-
-                    {{-- 7. RCSC Portal (simple link) --}}
-                    @if(Auth::user()->hasPermission('view_rcsc_portal'))
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('rcsc.*') ? 'active-link' : '' }}" href="{{ route('rcsc.portal') }}">
-                            <i class="bi bi-shield-lock me-1"></i> RCSC Portal
-                        </a>
-                    </li>
-                    @endif
-
-
-
-                    {{-- 8. Extensions --}}
-                    @if(Auth::user()->hasAnyPermission(['approve_extensions', 'approve_amendments']))
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('extensions.*') ? 'active-link' : '' }}" href="{{ route('extensions.index') }}">
-                            <i class="bi bi-clock-history me-1"></i> Extensions
-                        </a>
-                    </li>
-                    @endif
-
-                    {{-- 9. Finance Disbursement --}}
-                    @if(Auth::user()->hasPermission('process_disbursement'))
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('finance.*') ? 'active-link' : '' }}" href="{{ route('finance.disbursement') }}">
-                            <i class="bi bi-cash-stack me-1"></i> Finance Disbursement
-                        </a>
-                    </li>
-                    @endif
-
-                    {{-- 10. Calls for Proposals --}}
-                    @if(Auth::user()->hasPermission('view_calls'))
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('calls.*') ? 'active-link' : '' }}" href="{{ route('calls.index') }}">
-                            <i class="bi bi-megaphone me-1"></i> Calls
-                        </a>
-                    </li>
-                    @endif
-
-                    {{-- 11. Publication & Award --}}
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('papers.*') ? 'active-link' : '' }}" href="{{ route('papers.index') }}">
-                            <i class="bi bi-journal-richtext me-1"></i> Publications
-                        </a>
-                    </li>
-
-                    {{-- 12. Admin: Backups & Migration --}}
-                    @if(Auth::user()->role === 'admin')
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle {{ request()->routeIs('admin.backups', 'admin.data-migration') ? 'active-link' : '' }}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-hdd-stack me-1"></i> System
-                        </a>
-                        <ul class="dropdown-menu shadow-sm">
-                            <li><a class="dropdown-item small" href="{{ route('admin.backups') }}"><i class="bi bi-hdd-stack me-2 text-dark"></i>Backup &amp; Recovery</a></li>
-                            <li><a class="dropdown-item small" href="{{ route('admin.data-migration') }}"><i class="bi bi-box-arrow-in-down me-2 text-dark"></i>Data Migration</a></li>
-                        </ul>
-                    </li>
-                    @endif
-
-                </ul>
-
-                <!-- User Profile & Action Controls -->
-                <div class="d-flex align-items-center text-white ms-auto gap-3">
-                    {{-- Command Palette Trigger --}}
-                    <button id="rpms-search-trigger" type="button" class="btn btn-link p-0 border-0 d-none d-md-flex align-items-center text-decoration-none text-white-50 gap-1" title="Search (Ctrl+K)" style="font-size:0.8rem;">
-                        <i class="bi bi-search fs-5"></i>
-                        <kbd style="font-size:0.65rem; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); padding:1px 5px; border-radius:4px; color:rgba(255,255,255,0.6);">Ctrl K</kbd>
-                    </button>
-
-                    {{-- Theme Toggle --}}
-                    <button id="rpms-theme-btn" type="button" class="btn btn-link p-0 border-0 d-flex align-items-center text-decoration-none text-white-50" title="Toggle Light/Dark Mode">
-                        <i class="bi bi-sun-fill fs-5"></i>
-                    </button>
-
-                    {{-- Notifications Bell Dropdown (SCR-17) --}}
-                    {{-- Notifications loaded via LoadNotifications middleware --}}
-
-                    <div class="dropdown me-3">
-                        <button class="btn btn-link p-0 border-0 position-relative d-flex align-items-center text-decoration-none" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
-                            <i class="bi bi-bell-fill fs-5 text-warning"></i>
-                            @if($notifCount > 0)
-                                <span id="rpms-notif-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.65rem; margin-top: -2px;">
-                                    {{ $notifCount > 99 ? '99+' : $notifCount }}
-                                </span>
-                            @else
-                                <span id="rpms-notif-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.65rem; margin-top: -2px; display:none;">0</span>
-                            @endif
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end p-2 shadow-lg" style="width: 320px; max-height: 380px; overflow-y: auto;">
-                            <li class="dropdown-header fw-bold d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
-                                <span><i class="bi bi-bell me-1 text-warning"></i> Notifications Center</span>
-                                <span class="d-flex align-items-center gap-1">
-                                    <span class="badge bg-dark rounded-pill">{{ $notifCount }}</span>
-                                    @if($notifCount > 0)
-                                    <form action="{{ route('notifications.read-all') }}" method="POST" class="d-inline m-0">
-                                        @csrf
-                                        <button type="submit" class="btn btn-sm btn-link p-0 text-decoration-none" style="font-size:0.7rem;" title="Mark all as read">Mark all read</button>
-                                    </form>
-                                    @endif
-                                </span>
-                            </li>
-                            @forelse($notifItems as $item)
-                                <li class="mb-2">
-                                    <a class="dropdown-item rounded p-2 text-wrap bg-light border-start border-3 border-warning" href="#">
-                                        <div class="d-flex align-items-start gap-2">
-                                            <i class="bi {{ $item['icon'] }} fs-6 mt-1"></i>
-                                            <div>
-                                                <div class="fw-bold small text-dark">{{ $item['title'] }}</div>
-                                                <div class="small text-muted" style="font-size: 0.78rem;">{{ $item['desc'] }}</div>
-                                                <div class="text-muted" style="font-size: 0.68rem;"><i class="bi bi-clock me-1"></i>{{ $item['time'] }}</div>
-                                            </div>
-                                        </div>
-                                    </a>
-                                </li>
-                            @empty
-                                <li class="text-center py-3 text-muted small">
-                                    <i class="bi bi-check-all fs-4 d-block text-success"></i>
-                                    No pending notification alerts.
-                                </li>
-                            @endforelse
-                        </ul>
-                    </div>
-
-                    {{-- Academic Call Cycle Badge --}}
-                    <div class="d-none d-xl-flex align-items-center rounded-pill px-3 py-2 me-3" style="font-size:0.85rem; fw-semibold; cursor:pointer; transition: transform 0.2s; background: linear-gradient(135deg, #0d1b2a 0%, #1b2838 100%); border: 1px solid #1ecbff33;" data-bs-toggle="modal" data-bs-target="#calendarModal" title="View Academic Calendar">
-                        <i class="bi bi-calendar2-check me-2 text-info"></i> <span class="text-white fw-semibold">AY 2026/2027</span>
-                    </div>
-
-                    {{-- User Profile Dropdown --}}
-                    <div class="dropdown border-start border-secondary ps-3">
-                        <a href="#" class="text-white text-decoration-none d-flex align-items-center gap-2 dropdown-toggle-custom" id="userProfileMenuBtn" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <div class="text-end">
-                                <div class="fw-bold small lh-1 text-white" style="white-space: nowrap;">{{ preg_replace('/\s*\([^)]*\)/', '', Auth::user()->name) }}</div>
-                                <span class="badge badge-role mt-1" style="font-size: 0.65rem; padding: 2px 6px; cursor: pointer;">{{ strtoupper(Auth::user()->role) }} ▾</span>
-                            </div>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end p-2 shadow-lg profile-dropdown-menu" aria-labelledby="userProfileMenuBtn" style="min-width: 290px; max-height: 480px; overflow-y: auto; z-index: 1050;">
-                            {{-- Account Mini Card --}}
-                            <li class="p-2 mb-2 rounded bg-light border">
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 0.85rem;">
-                                        {{ collect(explode(' ', preg_replace('/\s*\([^)]*\)/', '', Auth::user()->name)))->map(fn($p) => substr($p, 0, 1))->take(2)->join('') ?: 'UNI' }}
-                                    </div>
-                                    <div class="flex-grow-1 text-truncate">
-                                        <div class="fw-bold text-dark small text-truncate">{{ preg_replace('/\s*\([^)]*\)/', '', Auth::user()->name) }}</div>
-                                        <div class="text-muted" style="font-size: 0.72rem;">{{ Auth::user()->email }}</div>
-                                    </div>
-                                </div>
-                                <div class="mt-2 pt-2 border-top d-flex justify-content-between align-items-center">
-                                    <span class="badge bg-dark font-monospace" style="font-size: 0.65rem;">{{ Auth::user()->staff_id ?? 'UNI-STAFF' }}</span>
-                                    <a href="{{ route('profile') }}" class="btn btn-sm d-flex align-items-center gap-1 fw-semibold text-white" style="font-size: 0.75rem; background: var(--UNI-secondary); border: 1px solid rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 6px;">
-                                        <i class="bi bi-person-circle"></i> View Profile
-                                    </a>
-                                </div>
-                            </li>
-
-                            <li>
-                                <a class="dropdown-item small py-1" href="{{ route('research.catalog') }}" target="_blank">
-                                    <i class="bi bi-globe2 me-2 text-info"></i> Public Research Repository
-                                </a>
-                            </li>
-
-                            <li><hr class="dropdown-divider my-2"></li>
-                            <li>
-                                <form action="{{ route('logout') }}" method="POST" class="d-inline m-0">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item text-danger small fw-bold confirm-btn"
-                                            data-confirm-title="Sign Out"
-                                            data-confirm-message="Are you sure you want to sign out of your account?"
-                                            data-confirm-icon="bi-box-arrow-right"
-                                            data-confirm-color="text-danger"
-                                            data-confirm-btn-text="Yes, Sign Out"
-                                            data-confirm-btn-class="btn-danger">
-                                        <i class="bi bi-box-arrow-right me-2"></i> Sign Out
-                                    </button>
-                                </form>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    @auth
-    <!-- Mobile Offcanvas Right Sidebar -->
-    <div class="offcanvas offcanvas-end text-white d-lg-none" tabindex="-1" id="navbarOffcanvas" aria-labelledby="navbarOffcanvasLabel" style="background-color: var(--UNI-primary-dark); max-width: 320px; width: 78vw;">
-        <div class="offcanvas-header border-bottom border-secondary pb-2 pt-3 px-3">
-            <div class="d-flex align-items-center">
-                <i class="bi bi-journal-bookmark-fill fs-3 text-warning me-2"></i>
-                <div>
-                    <div class="fw-bold text-white small lh-1">RPMS</div>
-                    <div class="text-warning" style="font-size: 0.68rem;">RPMS Mobile Portal</div>
-                </div>
-            </div>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        
-        <div class="offcanvas-body p-3 d-flex flex-column" style="overflow-y: auto;">
-            {{-- User info card — dark theme matching sidebar --}}
-            <div class="p-2 mb-3 rounded-3 border" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15) !important;">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center fw-bold flex-shrink-0" style="width: 42px; height: 42px; font-size: 0.9rem;">
-                        {{ collect(explode(' ', preg_replace('/\s*\([^)]*\)/', '', Auth::user()->name)))->map(fn($p) => substr($p, 0, 1))->take(2)->join('') ?: 'UNI' }}
-                    </div>
-                    <div class="flex-grow-1 text-truncate">
-                        <div class="fw-bold text-white small text-truncate">{{ preg_replace('/\s*\([^)]*\)/', '', Auth::user()->name) }}</div>
-                        <div class="text-white-50 text-truncate" style="font-size: 0.72rem;">{{ Auth::user()->email }}</div>
-                    </div>
-                </div>
-                <div class="mt-2 pt-2 d-flex justify-content-between align-items-center" style="border-top: 1px solid rgba(255,255,255,0.15);">
-                    <span class="badge bg-dark font-monospace" style="font-size: 0.65rem;">{{ Auth::user()->staff_id ?? 'UNI-STAFF' }}</span>
-                    <a href="{{ route('profile') }}" class="btn btn-sm d-flex align-items-center gap-1 fw-semibold text-white" style="font-size: 0.75rem; background: var(--UNI-secondary); border: 1px solid rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 6px;">
-                        <i class="bi bi-person-circle"></i> View Profile
-                    </a>
-                </div>
-            </div>
-
-            {{-- Mobile Academic Call Badge --}}
-            <div class="mb-3 py-2 px-3 rounded-pill d-flex align-items-center justify-content-center shadow-sm mx-2" style="background: linear-gradient(135deg, #0d1b2a 0%, #1b2838 100%); border: 1px solid #1ecbff33; font-size: 0.8rem; font-weight: 600; cursor:pointer;" data-bs-toggle="modal" data-bs-target="#calendarModal" data-bs-dismiss="offcanvas">
-                <i class="bi bi-calendar2-check me-2 text-info"></i> <span class="text-white">AY 2026/2027</span>
-            </div>
-
-            {{-- Main Navigation Links --}}
-            <ul class="nav nav-pills flex-column gap-1 mb-3">
-                <li class="nav-item">
-                    <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('dashboard') ? 'active-link' : '' }}" href="{{ route('dashboard') }}" style="font-size: 0.85rem;">
-                        <i class="bi bi-speedometer2 me-2 text-white-50"></i> Dashboard
-                    </a>
-                </li>
-                @if(Auth::user()->hasPermission('view_projects'))
-                <li class="nav-item">
-                    <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('projects.*') ? 'active-link' : '' }}" href="{{ route('projects.index') }}" style="font-size: 0.85rem;">
-                        <i class="bi bi-folder2-open me-2 text-white-50"></i> Projects
-                    </a>
-                </li>
-                @endif
-                @if(Auth::user()->role === 'reviewer')
-                <li class="nav-item">
-                    <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('evaluations.*') ? 'active-link' : '' }}" href="{{ route('evaluations.index') }}" style="font-size: 0.85rem;">
-                        <i class="bi bi-clipboard-check me-2 text-white-50"></i> My Evaluations
-                    </a>
-                </li>
-                @endif
-                @if(Auth::user()->hasPermission('submit_progress_report'))
-                <li class="nav-item">
-                    <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('progress.*') ? 'active-link' : '' }}" href="{{ route('progress.index') }}" style="font-size: 0.85rem;">
-                        <i class="bi bi-graph-up me-2 text-white-50"></i> Progress Reports
-                    </a>
-                </li>
-                @endif
-                @if(Auth::user()->hasAnyPermission(['request_extension', 'request_amendment']) && !Auth::user()->hasAnyPermission(['approve_extensions', 'approve_amendments']))
-                <li class="nav-item">
-                    <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('extensions.*') ? 'active-link' : '' }}" href="{{ route('extensions.index') }}" style="font-size: 0.85rem;">
-                        <i class="bi bi-clock-history me-2 text-white-50"></i> Extensions
-                    </a>
-                </li>
-                @endif
-                @if(Auth::user()->hasPermission('screen_proposals'))
-                <li class="nav-item">
-                    <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('dh.screening') ? 'active-link' : '' }}" href="{{ route('dh.screening') }}" style="font-size: 0.85rem;">
-                        <i class="bi bi-ui-checks me-2 text-white-50"></i> DH Screening
-                    </a>
-                </li>
-                @endif
-                @if(Auth::user()->hasPermission('assign_reviewer'))
-                <li class="nav-item">
-                    <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('coordinator.*') ? 'active-link' : '' }}" href="{{ route('coordinator.hub') }}" style="font-size: 0.85rem;">
-                        <i class="bi bi-briefcase me-2 text-white-50"></i> Coordinator Hub
-                    </a>
-                </li>
-                @endif
-
-                @if(Auth::user()->role === 'dean')
-                <li class="nav-item">
-                    <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('dean.approvals') ? 'active-link' : '' }}" href="{{ route('dean.approvals') }}" style="font-size: 0.85rem;">
-                        <i class="bi bi-bank me-2 text-white-50"></i> Dean Approvals
-                    </a>
-                </li>
-                @endif
-                @if(Auth::user()->hasPermission('ethics_review'))
-                <li class="nav-item">
-                    <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('irerc.panel') ? 'active-link' : '' }}" href="{{ route('irerc.panel') }}" style="font-size: 0.85rem;">
-                        <i class="bi bi-shield-exclamation me-2 text-white-50"></i> IRERC Panel
-                    </a>
-                </li>
-                @endif
-                @if(Auth::user()->hasPermission('view_rcsc_portal'))
-                <li class="nav-item">
-                    <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('rcsc.*') ? 'active-link' : '' }}" href="{{ route('rcsc.portal') }}" style="font-size: 0.85rem;">
-                        <i class="bi bi-shield-lock me-2 text-white-50"></i> RCSC Portal
-                    </a>
-                </li>
-                @endif
-                @if(Auth::user()->hasPermission('view_analytics') && Auth::user()->role !== 'admin')
-                <li class="nav-item">
-                    <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('analytics') ? 'active-link' : '' }}" href="{{ route('analytics') }}" style="font-size: 0.85rem;">
-                        <i class="bi bi-bar-chart-line me-2 text-white-50"></i> Analytics
-                    </a>
-                </li>
-                @endif
-                @if(Auth::user()->hasPermission('process_disbursement'))
-                <li class="nav-item">
-                    <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('finance.*') ? 'active-link' : '' }}" href="{{ route('finance.disbursement') }}" style="font-size: 0.85rem;">
-                        <i class="bi bi-cash-stack me-2 text-white-50"></i> Finance
-                    </a>
-                </li>
-                @endif
-                @if(Auth::user()->hasPermission('view_calls'))
-                <li class="nav-item">
-                    <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('calls.*') ? 'active-link' : '' }}" href="{{ route('calls.index') }}" style="font-size: 0.85rem;">
-                        <i class="bi bi-megaphone me-2 text-white-50"></i> Calls
-                    </a>
-                </li>
-                @endif
-                <li class="nav-item">
-                    <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('papers.*') ? 'active-link' : '' }}" href="{{ route('papers.index') }}" style="font-size: 0.85rem;">
-                        <i class="bi bi-journal-richtext me-2 text-white-50"></i> Publications
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white py-2 px-2" href="{{ route('research.catalog') }}" target="_blank" style="font-size: 0.85rem;">
-                        <i class="bi bi-globe2 me-2 text-white-50"></i> Research Repository
-                    </a>
-                </li>
-                @if(Auth::user()->hasAnyPermission(['approve_extensions', 'approve_amendments']))
-                <li class="nav-item">
-                    <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('extensions.*') ? 'active-link' : '' }}" href="{{ route('extensions.index') }}" style="font-size: 0.85rem;">
-                        <i class="bi bi-clock-history me-2 text-white-50"></i> Extensions
-                    </a>
-                </li>
-                @endif
-                @if(Auth::user()->hasPermission('manage_users'))
-                <li class="nav-item">
-                    <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('admin.users') ? 'active-link' : '' }}" href="{{ route('admin.users') }}" style="font-size: 0.85rem;">
-                        <i class="bi bi-people me-2 text-white-50"></i> Users
-                    </a>
-                </li>
-                @endif
-                @if(Auth::user()->role === 'admin')
-                <li class="nav-item">
-                    <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('admin.thematic-areas') ? 'active-link' : '' }}" href="{{ route('admin.thematic-areas') }}" style="font-size: 0.85rem;">
-                        <i class="bi bi-diagram-3 me-2 text-white-50"></i> Thematics
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('admin.colleges') ? 'active-link' : '' }}" href="{{ route('admin.colleges') }}" style="font-size: 0.85rem;">
-                        <i class="bi bi-bank me-2 text-white-50"></i> Colleges
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('admin.departments') ? 'active-link' : '' }}" href="{{ route('admin.departments') }}" style="font-size: 0.85rem;">
-                        <i class="bi bi-building me-2 text-white-50"></i> Departments
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('admin.backups') ? 'active-link' : '' }}" href="{{ route('admin.backups') }}" style="font-size: 0.85rem;">
-                        <i class="bi bi-hdd-stack me-2 text-white-50"></i> Backup &amp; Recovery
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('admin.data-migration') ? 'active-link' : '' }}" href="{{ route('admin.data-migration') }}" style="font-size: 0.85rem;">
-                        <i class="bi bi-box-arrow-in-down me-2 text-white-50"></i> Data Migration
-                    </a>
-                </li>
-                @endif
-            </ul>
-
-            <hr class="border-secondary my-2 opacity-25">
-
-            {{-- Sign out --}}
-            <div class="mt-auto pt-2 flex-shrink-0">
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="btn btn-outline-danger w-100 fw-bold py-2 confirm-btn" style="font-size: 0.85rem;"
-                            data-confirm-title="Sign Out"
-                            data-confirm-message="Are you sure you want to sign out of your account?"
-                            data-confirm-icon="bi-box-arrow-right"
-                            data-confirm-color="text-danger"
-                            data-confirm-btn-text="Yes, Sign Out"
-                            data-confirm-btn-class="btn-danger">
-                        <i class="bi bi-box-arrow-right me-2"></i> Sign Out
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-    @endauth
-    @endguest
-
-    <!-- Main Content Container -->
-    <main class="container my-4 flex-grow-1 @guest @if(request()->routeIs('login')) auth-main @endif @endguest" id="main-content">
+    <main class="container my-4 flex-grow-1 @if(request()->routeIs('login')) auth-main @endif" id="main-content">
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
                 <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
@@ -1519,7 +1003,6 @@
         @yield('content')
     </main>
 
-    <!-- Site Footer -->
     <footer class="site-footer mt-auto">
         <div class="container py-4">
             <div class="row g-4 align-items-center">
@@ -1544,11 +1027,7 @@
                 <div class="col-sm-6 col-lg-3">
                     <h6 class="footer-title">Quick Access</h6>
                     <ul class="list-unstyled footer-links">
-                        <li>
-                            @guest
-                                <a href="{{ route('login') }}">Login</a>
-                            @endguest
-                        </li>
+                        <li><a href="{{ route('login') }}">Login</a></li>
                         <li><a href="{{ route('dashboard') }}">Dashboard</a></li>
                         <li><a href="{{ route('projects.index') }}">Projects</a></li>
                     </ul>
@@ -1567,6 +1046,423 @@
             </div>
         </div>
     </footer>
+    @else
+    {{-- Authenticated Pro Sidebar Layout --}}
+    <div class="rpms-layout-wrapper">
+        {{-- Pro Desktop Sidebar (Fixed Left) --}}
+        <aside class="rpms-sidebar">
+            {{-- Brand header --}}
+            <div class="p-3 border-bottom d-flex align-items-center gap-2" style="border-color: rgba(99, 140, 220, 0.12) !important;">
+                <div style="width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(99, 102, 241, 0.15) 100%); border: 1px solid rgba(99, 140, 220, 0.2); display: flex; align-items: center; justify-content: center; color: #60a5fa; font-size: 1.25rem;">
+                    <i class="bi bi-journal-bookmark-fill"></i>
+                </div>
+                <div>
+                    <div class="fw-bold text-white small lh-1">Gambella University</div>
+                    <div style="font-size: 0.68rem; color: #7b8db0;">Research Project Management</div>
+                </div>
+            </div>
+
+            {{-- Navigation links --}}
+            <div class="p-3 flex-grow-1" style="overflow-y: auto;">
+                <ul class="nav flex-column gap-1">
+                    <li class="nav-item">
+                        <a href="{{ route('dashboard') }}" class="rpms-side-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                            <i class="bi bi-speedometer2"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    @if(Auth::user()->hasPermission('view_projects') && !in_array(Auth::user()->role, ['tm', 'reviewer', 'admin']))
+                    <li class="nav-item">
+                        <a href="{{ route('projects.index') }}" class="rpms-side-link {{ request()->routeIs('projects.*') ? 'active' : '' }}">
+                            <i class="bi bi-folder2-open"></i>
+                            <span>Projects</span>
+                        </a>
+                    </li>
+                    @endif
+                    @if(Auth::user()->role === 'tm')
+                    <li class="nav-item">
+                        <a href="{{ route('projects.index') }}" class="rpms-side-link {{ request()->routeIs('projects.*') ? 'active' : '' }}">
+                            <i class="bi bi-folder2-open"></i>
+                            <span>My Projects</span>
+                        </a>
+                    </li>
+                    @endif
+                    @if(Auth::user()->role === 'reviewer')
+                    <li class="nav-item">
+                        <a href="{{ route('evaluations.index') }}" class="rpms-side-link {{ request()->routeIs('evaluations.*') ? 'active' : '' }}">
+                            <i class="bi bi-clipboard-check"></i>
+                            <span>My Evaluations</span>
+                        </a>
+                    </li>
+                    @endif
+                    @if(Auth::user()->hasPermission('submit_progress_report'))
+                    <li class="nav-item">
+                        <a href="{{ route('progress.index') }}" class="rpms-side-link {{ request()->routeIs('progress.*') ? 'active' : '' }}">
+                            <i class="bi bi-graph-up"></i>
+                            <span>Progress Reports</span>
+                        </a>
+                    </li>
+                    @endif
+                    @if(Auth::user()->hasAnyPermission(['request_extension', 'request_amendment']) || Auth::user()->hasAnyPermission(['approve_extensions', 'approve_amendments']))
+                    <li class="nav-item">
+                        <a href="{{ route('extensions.index') }}" class="rpms-side-link {{ request()->routeIs('extensions.*') ? 'active' : '' }}">
+                            <i class="bi bi-clock-history"></i>
+                            <span>Extensions</span>
+                        </a>
+                    </li>
+                    @endif
+                    @if(Auth::user()->hasPermission('screen_proposals'))
+                    <li class="nav-item">
+                        <a href="{{ route('dh.screening') }}" class="rpms-side-link {{ request()->routeIs('dh.screening') ? 'active' : '' }}">
+                            <i class="bi bi-ui-checks"></i>
+                            <span>DH Screening</span>
+                        </a>
+                    </li>
+                    @endif
+                    @if(Auth::user()->hasPermission('assign_reviewer'))
+                    <li class="nav-item">
+                        <a href="{{ route('coordinator.hub') }}" class="rpms-side-link {{ request()->routeIs('coordinator.*') ? 'active' : '' }}">
+                            <i class="bi bi-briefcase"></i>
+                            <span>Coordinator Hub</span>
+                        </a>
+                    </li>
+                    @endif
+                    @if(Auth::user()->role === 'dean')
+                    <li class="nav-item">
+                        <a href="{{ route('dean.approvals') }}" class="rpms-side-link {{ request()->routeIs('dean.approvals') ? 'active' : '' }}">
+                            <i class="bi bi-bank"></i>
+                            <span>Dean Approvals</span>
+                        </a>
+                    </li>
+                    @endif
+                    @if(Auth::user()->hasPermission('ethics_review'))
+                    <li class="nav-item">
+                        <a href="{{ route('irerc.panel') }}" class="rpms-side-link {{ request()->routeIs('irerc.panel') ? 'active' : '' }}">
+                            <i class="bi bi-shield-exclamation"></i>
+                            <span>IRERC Ethics Panel</span>
+                        </a>
+                    </li>
+                    @endif
+                    @if(Auth::user()->hasPermission('view_rcsc_portal'))
+                    <li class="nav-item">
+                        <a href="{{ route('rcsc.portal') }}" class="rpms-side-link {{ request()->routeIs('rcsc.*') ? 'active' : '' }}">
+                            <i class="bi bi-shield-lock"></i>
+                            <span>RCSC Portal</span>
+                        </a>
+                    </li>
+                    @endif
+                    @if(Auth::user()->hasPermission('process_disbursement'))
+                    <li class="nav-item">
+                        <a href="{{ route('finance.disbursement') }}" class="rpms-side-link {{ request()->routeIs('finance.*') ? 'active' : '' }}">
+                            <i class="bi bi-cash-stack"></i>
+                            <span>Disbursements</span>
+                        </a>
+                    </li>
+                    @endif
+                    @if(Auth::user()->hasPermission('view_analytics') && Auth::user()->role !== 'admin')
+                    <li class="nav-item">
+                        <a href="{{ route('analytics') }}" class="rpms-side-link {{ request()->routeIs('analytics') ? 'active' : '' }}">
+                            <i class="bi bi-bar-chart-line"></i>
+                            <span>Reports &amp; Analytics</span>
+                        </a>
+                    </li>
+                    @endif
+                    @if(Auth::user()->hasPermission('view_calls'))
+                    <li class="nav-item">
+                        <a href="{{ route('calls.index') }}" class="rpms-side-link {{ request()->routeIs('calls.*') ? 'active' : '' }}">
+                            <i class="bi bi-megaphone"></i>
+                            <span>Calls for Proposals</span>
+                        </a>
+                    </li>
+                    @endif
+                    <li class="nav-item">
+                        <a href="{{ route('papers.index') }}" class="rpms-side-link {{ request()->routeIs('papers.*') ? 'active' : '' }}">
+                            <i class="bi bi-journal-richtext"></i>
+                            <span>Publications</span>
+                        </a>
+                    </li>
+                    @if(Auth::user()->role === 'admin')
+                    <li class="nav-item">
+                        <a href="{{ route('admin.users') }}" class="rpms-side-link {{ request()->routeIs('admin.users') ? 'active' : '' }}">
+                            <i class="bi bi-people"></i>
+                            <span>User Management</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('admin.thematic-areas') }}" class="rpms-side-link {{ request()->routeIs('admin.thematic-areas') ? 'active' : '' }}">
+                            <i class="bi bi-diagram-3"></i>
+                            <span>Thematic Areas</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('admin.departments') }}" class="rpms-side-link {{ request()->routeIs('admin.departments', 'admin.colleges') ? 'active' : '' }}">
+                            <i class="bi bi-building"></i>
+                            <span>Academic Units</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('analytics') }}" class="rpms-side-link {{ request()->routeIs('analytics') ? 'active' : '' }}">
+                            <i class="bi bi-bar-chart-line"></i>
+                            <span>Analytics &amp; Reports</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('admin.audit-logs') }}" class="rpms-side-link {{ request()->routeIs('admin.audit-logs') ? 'active' : '' }}">
+                            <i class="bi bi-shield-check"></i>
+                            <span>Audit Trail</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('admin.backups') }}" class="rpms-side-link {{ request()->routeIs('admin.backups', 'admin.data-migration') ? 'active' : '' }}">
+                            <i class="bi bi-hdd-stack"></i>
+                            <span>System &amp; Backups</span>
+                        </a>
+                    </li>
+                    @endif
+                </ul>
+            </div>
+
+            {{-- Sidebar Bottom Promo Card --}}
+            <div class="p-3 mt-auto">
+                <div class="p-3 rounded-3" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(99, 102, 241, 0.12) 50%, rgba(52, 211, 153, 0.1) 100%); border: 1px solid rgba(99, 140, 220, 0.15);">
+                    <div class="fw-bold text-white small mb-1">Better Research<br>A Brighter Future</div>
+                    <div style="font-size: 0.72rem; color: #7b8db0;">&mdash; Gambella University</div>
+                </div>
+            </div>
+        </aside>
+
+        {{-- Mobile Offcanvas Drawer (for screens < 992px) --}}
+        <div class="offcanvas offcanvas-start text-white d-lg-none" tabindex="-1" id="navbarOffcanvas" aria-labelledby="navbarOffcanvasLabel" style="background: linear-gradient(180deg, #0c1528 0%, #0f1a32 40%, #101e38 100%); max-width: 300px; width: 80vw;">
+            <div class="offcanvas-header pb-2 pt-3 px-3" style="border-bottom: 1px solid rgba(99, 140, 220, 0.12);">
+                <div class="d-flex align-items-center gap-2">
+                    <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(99, 102, 241, 0.15) 100%); display: flex; align-items: center; justify-content: center; color: #60a5fa;">
+                        <i class="bi bi-journal-bookmark-fill"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-white small lh-1">Gambella University</div>
+                        <div style="font-size: 0.68rem; color: #7b8db0;">RPMS Mobile Portal</div>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            
+            <div class="offcanvas-body p-3 d-flex flex-column" style="overflow-y: auto;">
+                <ul class="nav flex-column gap-1 mb-3">
+                    <li class="nav-item">
+                        <a class="rpms-side-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    @if(Auth::user()->hasPermission('view_projects'))
+                    <li class="nav-item">
+                        <a class="rpms-side-link {{ request()->routeIs('projects.*') ? 'active' : '' }}" href="{{ route('projects.index') }}">
+                            <i class="bi bi-folder2-open"></i> Projects
+                        </a>
+                    </li>
+                    @endif
+                    @if(Auth::user()->role === 'reviewer')
+                    <li class="nav-item">
+                        <a class="rpms-side-link {{ request()->routeIs('evaluations.*') ? 'active' : '' }}" href="{{ route('evaluations.index') }}">
+                            <i class="bi bi-clipboard-check"></i> Evaluations
+                        </a>
+                    </li>
+                    @endif
+                    @if(Auth::user()->hasPermission('submit_progress_report'))
+                    <li class="nav-item">
+                        <a class="rpms-side-link {{ request()->routeIs('progress.*') ? 'active' : '' }}" href="{{ route('progress.index') }}">
+                            <i class="bi bi-graph-up"></i> Progress Reports
+                        </a>
+                    </li>
+                    @endif
+                    @if(Auth::user()->hasPermission('screen_proposals'))
+                    <li class="nav-item">
+                        <a class="rpms-side-link {{ request()->routeIs('dh.screening') ? 'active' : '' }}" href="{{ route('dh.screening') }}">
+                            <i class="bi bi-ui-checks"></i> DH Screening
+                        </a>
+                    </li>
+                    @endif
+                    @if(Auth::user()->hasPermission('assign_reviewer'))
+                    <li class="nav-item">
+                        <a class="rpms-side-link {{ request()->routeIs('coordinator.*') ? 'active' : '' }}" href="{{ route('coordinator.hub') }}">
+                            <i class="bi bi-briefcase"></i> Coordinator Hub
+                        </a>
+                    </li>
+                    @endif
+                    @if(Auth::user()->hasPermission('view_analytics'))
+                    <li class="nav-item">
+                        <a class="rpms-side-link {{ request()->routeIs('analytics') ? 'active' : '' }}" href="{{ route('analytics') }}">
+                            <i class="bi bi-bar-chart-line"></i> Analytics
+                        </a>
+                    </li>
+                    @endif
+                    @if(Auth::user()->hasPermission('process_disbursement'))
+                    <li class="nav-item">
+                        <a class="rpms-side-link {{ request()->routeIs('finance.*') ? 'active' : '' }}" href="{{ route('finance.disbursement') }}">
+                            <i class="bi bi-cash-stack"></i> Finance
+                        </a>
+                    </li>
+                    @endif
+                    @if(Auth::user()->hasPermission('view_calls'))
+                    <li class="nav-item">
+                        <a class="rpms-side-link {{ request()->routeIs('calls.*') ? 'active' : '' }}" href="{{ route('calls.index') }}">
+                            <i class="bi bi-megaphone"></i> Calls
+                        </a>
+                    </li>
+                    @endif
+                    <li class="nav-item">
+                        <a class="rpms-side-link {{ request()->routeIs('papers.*') ? 'active' : '' }}" href="{{ route('papers.index') }}">
+                            <i class="bi bi-journal-richtext"></i> Publications
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="mt-auto pt-2" style="border-top: 1px solid rgba(99, 140, 220, 0.12);">
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-outline-danger w-100 fw-bold py-2 confirm-btn" style="font-size: 0.85rem;"
+                                data-confirm-title="Sign Out" data-confirm-message="Are you sure you want to sign out?" data-confirm-btn-text="Yes, Sign Out">
+                            <i class="bi bi-box-arrow-right me-2"></i> Sign Out
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {{-- Main Wrapper: Topbar + Content Container + Footer --}}
+        <div class="rpms-main-wrapper">
+            {{-- Pro Topbar --}}
+            <header class="rpms-topbar">
+                <div class="d-flex align-items-center gap-3 flex-grow-1">
+                    <button class="btn btn-sm btn-outline-secondary d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#navbarOffcanvas" aria-label="Toggle navigation">
+                        <i class="bi bi-list fs-5"></i>
+                    </button>
+                    <div class="rpms-top-search d-none d-sm-flex" id="rpms-search-trigger">
+                        <i class="bi bi-search text-muted me-2"></i>
+                        <span class="text-muted small">Search projects, researchers, or students...</span>
+                        <kbd class="ms-auto">Ctrl K</kbd>
+                    </div>
+                </div>
+
+                {{-- Right Controls: Notifications, Theme, Call Badge, User Profile --}}
+                <div class="d-flex align-items-center gap-3">
+                    {{-- Notifications --}}
+                    <div class="dropdown">
+                        <button class="btn btn-link p-0 border-0 position-relative d-flex align-items-center text-dark" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
+                            <i class="bi bi-bell fs-5 text-muted"></i>
+                            @if($notifCount > 0)
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.62rem;">
+                                    {{ $notifCount }}
+                                </span>
+                            @endif
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end p-2 shadow-lg" style="width: 320px; max-height: 380px; overflow-y: auto;">
+                            <li class="dropdown-header fw-bold d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+                                <span><i class="bi bi-bell me-1 text-warning"></i> Notifications</span>
+                                <span class="badge bg-dark rounded-pill">{{ $notifCount }}</span>
+                            </li>
+                            @forelse($notifItems as $item)
+                                <li class="mb-2">
+                                    <div class="dropdown-item rounded p-2 text-wrap bg-light border-start border-3 border-warning">
+                                        <div class="fw-bold small text-dark">{{ $item['title'] }}</div>
+                                        <div class="small text-muted" style="font-size: 0.76rem;">{{ $item['desc'] }}</div>
+                                        <div class="text-muted" style="font-size: 0.68rem;">{{ $item['time'] }}</div>
+                                    </div>
+                                </li>
+                            @empty
+                                <li class="text-center py-3 text-muted small">No pending alerts.</li>
+                            @endforelse
+                        </ul>
+                    </div>
+
+                    {{-- Theme Toggle --}}
+                    <button id="rpms-theme-btn" type="button" class="btn btn-link p-0 border-0 text-muted" title="Toggle Light/Dark Mode">
+                        <i class="bi bi-sun fs-5"></i>
+                    </button>
+
+                    {{-- Academic Call Cycle --}}
+                    <div class="d-none d-xl-flex align-items-center rounded-pill px-3 py-1 bg-light border text-dark" style="font-size:0.8rem; font-weight:600; cursor:pointer;" data-bs-toggle="modal" data-bs-target="#calendarModal">
+                        <i class="bi bi-calendar2-check me-2 text-primary"></i> <span>AY 2026/2027</span>
+                    </div>
+
+                    {{-- User Profile Avatar & Dropdown --}}
+                    <div class="dropdown border-start ps-3">
+                        <a href="#" class="d-flex align-items-center gap-2 text-decoration-none text-dark dropdown-toggle-custom" data-bs-toggle="dropdown">
+                            <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; background: #0f172a; font-size: 0.85rem;">
+                                {{ collect(explode(' ', preg_replace('/\s*\([^)]*\)/', '', Auth::user()->name)))->map(fn($p) => substr($p, 0, 1))->take(2)->join('') ?: 'KM' }}
+                            </div>
+                            <div class="d-none d-md-block text-start lh-sm">
+                                <div class="fw-bold small text-dark">{{ preg_replace('/\s*\([^)]*\)/', '', Auth::user()->name) }}</div>
+                                <div class="text-muted" style="font-size: 0.72rem;">{{ ucfirst(Auth::user()->role) }}</div>
+                            </div>
+                            <i class="bi bi-chevron-down text-muted small ms-1"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg" style="min-width: 250px;">
+                            <li class="p-2 border-bottom">
+                                <div class="fw-bold small text-dark">{{ preg_replace('/\s*\([^)]*\)/', '', Auth::user()->name) }}</div>
+                                <div class="text-muted" style="font-size: 0.75rem;">{{ Auth::user()->email }}</div>
+                            </li>
+                            <li><a class="dropdown-item small py-2" href="{{ route('profile') }}"><i class="bi bi-person me-2"></i>My Profile</a></li>
+                            <li><a class="dropdown-item small py-2" href="{{ route('research.catalog') }}" target="_blank"><i class="bi bi-globe me-2"></i>Public Repository</a></li>
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <li>
+                                <form action="{{ route('logout') }}" method="POST" class="m-0">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item small text-danger fw-bold py-2 confirm-btn"
+                                            data-confirm-title="Sign Out" data-confirm-message="Sign out of your account?" data-confirm-btn-text="Yes, Sign Out">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Sign Out
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </header>
+
+            {{-- Main Content Container --}}
+            <main class="container-fluid px-3 px-md-4 py-4 flex-grow-1" id="main-content">
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                        <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
+                @if($errors->any() && !request()->routeIs('login', 'password.*', 'register'))
+                    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                        <div class="fw-bold mb-1"><i class="bi bi-exclamation-triangle-fill me-2"></i>Please correct the following errors:</div>
+                        <ul class="mb-0 ps-3">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
+                @yield('content')
+            </main>
+
+            {{-- Site Footer --}}
+            <footer class="site-footer mt-auto">
+                <div class="container-fluid px-4 py-3 border-top d-flex justify-content-between align-items-center flex-wrap" style="font-size: 0.82rem; color: #64748b;">
+                    <span>&copy; {{ date('Y') }} Gambella University &middot; Research Project Management System (RPMS).</span>
+                    <div class="d-flex gap-3">
+                        <a href="{{ route('home') }}" class="text-muted text-decoration-none">Home</a>
+                        <a href="{{ route('research.catalog') }}" class="text-muted text-decoration-none">Repository</a>
+                        <a href="#" class="text-muted text-decoration-none">Support</a>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+    @endguest
 
     <!-- Bootstrap 5.3 JS Bundle (local) -->
 
@@ -1941,6 +1837,11 @@
         <i class="bi bi-lightning-charge-fill"></i>
     </button>
     @endauth
+
+    <!-- RPMS Real-Time Toast Notification Container -->
+    <div id="rpms-toast-container" class="position-fixed top-0 end-0 p-3" style="z-index: 2100; max-width: 420px; pointer-events: none;" aria-live="polite" aria-atomic="true">
+        <!-- Dynamic Toast Items will be injected here by real-time notification engine -->
+    </div>
 
     <!-- RPMS Pro JS -->
     <script src="{{ asset('js/rpms-pro.js') }}"></script>
