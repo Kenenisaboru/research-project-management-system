@@ -428,7 +428,7 @@
                 </div>
 
                 <div class="table-responsive">
-                    <table class="table align-middle table-borderless mb-0">
+                    <table class="table rpms-table align-middle mb-0">
                         <thead>
                             <tr style="border-bottom: 1px solid #f1f5f9; font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">
                                 <th class="pb-2">Title</th>
@@ -631,22 +631,26 @@
             </a>
         </div>
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
+            <table class="table rpms-table align-middle mb-0">
+                <thead>
                     <tr>
-                        <th>ID</th>
+                        <th style="width: 75px;">ID</th>
                         <th>Project Title</th>
                         <th>Thematic Area</th>
                         <th>Budget</th>
                         <th>Status</th>
-                        <th class="text-end">Action</th>
+                        <th class="text-end" style="width: 140px;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($myProjects as $p)
                     <tr>
                         <td class="font-monospace text-muted">#{{ $p->project_id }}</td>
-                        <td class="fw-bold text-dark">{{ $p->title }}</td>
+                        <td>
+                            <a href="{{ route('projects.show', $p->project_id) }}" class="project-title-link">
+                                {{ $p->title }}
+                            </a>
+                        </td>
                         <td><span class="badge bg-light text-dark border">{{ $p->thematicArea ? $p->thematicArea->title : 'General' }}</span></td>
                         <td class="fw-semibold text-dark">{{ number_format($p->requested_budget, 2) }} ETB</td>
                         <td>
@@ -686,21 +690,25 @@
             </div>
         </div>
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
+            <table class="table rpms-table align-middle mb-0">
+                <thead>
                     <tr>
-                        <th>Eval ID</th>
+                        <th style="width: 90px;">Eval ID</th>
                         <th>Proposal Title</th>
                         <th>Status</th>
                         <th>Score</th>
-                        <th class="text-end">Action</th>
+                        <th class="text-end" style="width: 150px;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($assignedReviews as $rev)
                     <tr>
                         <td class="font-monospace text-muted">#EV-{{ $rev->eval_id }}</td>
-                        <td class="fw-bold text-dark">{{ $rev->project->title }}</td>
+                        <td>
+                            <a href="{{ route('evaluations.show', $rev->eval_id) }}" class="project-title-link">
+                                {{ $rev->project->title }}
+                            </a>
+                        </td>
                         <td><span class="badge bg-light text-dark border px-2 py-1">{{ $rev->decision }}</span></td>
                         <td><span class="fw-bold">{{ $rev->score }}</span> <span class="text-muted small">/ 100</span></td>
                         <td class="text-end">
@@ -727,22 +735,26 @@
             </div>
         </div>
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
+            <table class="table rpms-table align-middle mb-0">
+                <thead>
                     <tr>
-                        <th>ID</th>
+                        <th style="width: 75px;">ID</th>
                         <th>Title</th>
                         <th>PI Name</th>
                         <th>Requested Budget</th>
                         <th>Status</th>
-                        <th class="text-end">Action</th>
+                        <th class="text-end" style="width: 150px;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($pendingApprovals as $p)
                     <tr>
                         <td class="font-monospace text-muted">#{{ $p->project_id }}</td>
-                        <td class="fw-bold text-dark">{{ $p->title }}</td>
+                        <td>
+                            <a href="{{ route('projects.show', $p->project_id) }}" class="project-title-link">
+                                {{ $p->title }}
+                            </a>
+                        </td>
                         <td>{{ preg_replace('/\s*\([^)]*\)/', '', $p->pi->name ?? 'N/A') }}</td>
                         <td>
                             <div class="fw-bold text-dark">{{ number_format($p->requested_budget, 2) }} ETB</div>
@@ -781,22 +793,26 @@
             <a href="{{ route('finance.disbursement') }}" class="btn btn-sm btn-outline-dark fw-semibold">Finance Portal &rarr;</a>
         </div>
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
+            <table class="table rpms-table align-middle mb-0">
+                <thead>
                     <tr>
-                        <th>Request ID</th>
+                        <th style="width: 100px;">Request ID</th>
                         <th>Project</th>
                         <th>PI Name</th>
                         <th>Phase</th>
                         <th>Amount</th>
-                        <th class="text-end">Action</th>
+                        <th class="text-end" style="width: 130px;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($pendingDisbursements as $req)
                     <tr>
                         <td class="font-monospace text-muted">#REQ-{{ $req->request_id }}</td>
-                        <td class="fw-bold text-dark">{{ $req->project->title ?? 'N/A' }}</td>
+                        <td>
+                            <a href="{{ route('projects.show', $req->project_id) }}" class="project-title-link">
+                                {{ $req->project->title ?? 'N/A' }}
+                            </a>
+                        </td>
                         <td>{{ preg_replace('/\s*\([^)]*\)/', '', $req->project->pi->name ?? 'N/A') }}</td>
                         <td><span class="badge bg-dark text-white px-2 py-1">{{ $req->milestone_phase }}</span></td>
                         <td class="fw-bold text-dark">{{ number_format($req->approved_amount ?? 0, 2) }} ETB</td>
