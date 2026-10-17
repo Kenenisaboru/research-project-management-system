@@ -1,170 +1,155 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="py-3 py-md-4">
-    <div class="container" style="max-width: 1140px;">
+<div class="py-2 py-md-3">
+    <div class="container" style="max-width: 880px;">
         {{-- Breadcrumb & Header --}}
-        <nav aria-label="breadcrumb" class="mb-3">
-            <ol class="breadcrumb small">
+        <nav aria-label="breadcrumb" class="mb-2">
+            <ol class="breadcrumb small mb-1">
                 <li class="breadcrumb-item"><a href="{{ route('home') }}" class="text-decoration-none text-muted">Home</a></li>
                 <li class="breadcrumb-item active text-dark fw-bold" aria-current="page">Support</li>
             </ol>
         </nav>
 
-        <header class="mb-4 mb-md-5">
-            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 mb-2 rounded-pill bg-white border shadow-xs">
-                <i class="bi bi-headset text-success"></i>
-                <span class="small fw-bold text-dark text-uppercase" style="letter-spacing: 0.5px; font-size: 0.72rem;">Helpdesk</span>
-            </div>
-            <h1 class="h2 fw-bold text-dark mb-2">Research Support</h1>
-            <p class="text-muted mb-0" style="max-width: 760px;">
-                Find contacts and answers for research grants, system access, and funding.
-            </p>
+        <header class="mb-3">
+            <h1 class="h4 fw-bold text-dark mb-1">Research Support &amp; Helpdesk</h1>
+            <p class="text-muted small mb-0">Directorate contacts and guidance for research grants and inquiries.</p>
         </header>
 
-        <div class="row g-4">
-            {{-- Left Column: Directorate Office & Key Contacts --}}
-            <div class="col-lg-5">
-                <div class="card border rounded-3 p-3 p-md-4 bg-white shadow-xs mb-3">
-                    <h2 class="h6 fw-bold text-dark mb-3 pb-2 border-bottom">
-                        <i class="bi bi-geo-alt-fill me-2 text-success"></i>Visit the Office
+        <div class="row g-2 mb-3">
+            {{-- Left Column: Office & Contacts --}}
+            <div class="col-md-5">
+                <div class="card border rounded p-3 bg-white shadow-xs mb-2">
+                    <h2 class="small fw-bold text-dark text-uppercase mb-2 pb-1 border-bottom" style="font-size: 0.72rem; letter-spacing: 0.5px;">
+                        <i class="bi bi-geo-alt me-1 text-dark"></i> Office Information
                     </h2>
                     <ul class="list-unstyled small text-muted mb-0 d-flex flex-column gap-2">
                         <li class="d-flex align-items-start gap-2">
-                            <i class="bi bi-building text-dark mt-1"></i>
+                            <i class="bi bi-building text-dark mt-1 flex-shrink-0"></i>
                             <div>
-                                <strong class="text-dark">Office:</strong> Research &amp; Technology Transfer Directorate
+                                <strong class="text-dark">Office:</strong> Research Directorate
                             </div>
                         </li>
                         <li class="d-flex align-items-start gap-2">
-                            <i class="bi bi-pin-map text-dark mt-1"></i>
+                            <i class="bi bi-pin-map text-dark mt-1 flex-shrink-0"></i>
                             <div>
-                                <strong class="text-dark">Location:</strong> Main Campus, Administration Building, Level 2, Room 204
+                                <strong class="text-dark">Location:</strong> Admin Bldg, Room 204
                             </div>
                         </li>
                         <li class="d-flex align-items-start gap-2">
-                            <i class="bi bi-clock text-dark mt-1"></i>
+                            <i class="bi bi-clock text-dark mt-1 flex-shrink-0"></i>
                             <div>
-                                <strong class="text-dark">Working Hours:</strong> Mon – Fri, 8:30 AM – 5:30 PM (Lunch: 12:30 – 1:30 PM)
+                                <strong class="text-dark">Hours:</strong> Mon – Fri, 8:30 AM – 5:30 PM
                             </div>
                         </li>
                     </ul>
                 </div>
 
-                <div class="card border rounded-3 p-3 p-md-4 bg-white shadow-xs mb-3">
-                    <h2 class="h6 fw-bold text-dark mb-3 pb-2 border-bottom">
-                        <i class="bi bi-envelope-at-fill me-2 text-success"></i>Contact Us
+                <div class="card border rounded p-3 bg-white shadow-xs">
+                    <h2 class="small fw-bold text-dark text-uppercase mb-2 pb-1 border-bottom" style="font-size: 0.72rem; letter-spacing: 0.5px;">
+                        <i class="bi bi-envelope me-1 text-dark"></i> Contact Points
                     </h2>
-                    <div class="d-flex flex-column gap-3 small">
+                    <div class="d-flex flex-column gap-2 small">
                         <div>
-                            <div class="fw-bold text-dark">Directorate General Inquiries</div>
-                            <a href="mailto:research-office@rpms.local" class="text-success text-decoration-none">research-office@rpms.local</a>
+                            <div class="fw-semibold text-dark">Research Office</div>
+                            <a href="mailto:research-office@rpms.local" class="text-muted text-decoration-none">research-office@rpms.local</a>
                         </div>
                         <div>
-                            <div class="fw-bold text-dark">Portal Technical Support (IT)</div>
-                            <a href="mailto:support@rpms.local" class="text-success text-decoration-none">support@rpms.local</a>
-                        </div>
-                        <div>
-                            <div class="fw-bold text-dark">Institutional Ethics Review Board (IRERC)</div>
-                            <a href="mailto:irerc@rpms.local" class="text-success text-decoration-none">irerc@rpms.local</a>
-                        </div>
-                        <div>
-                            <div class="fw-bold text-dark">Finance &amp; Disbursement Office</div>
-                            <a href="mailto:finance@rpms.local" class="text-success text-decoration-none">finance@rpms.local</a>
+                            <div class="fw-semibold text-dark">Technical Support</div>
+                            <a href="mailto:support@rpms.local" class="text-muted text-decoration-none">support@rpms.local</a>
                         </div>
                         <div class="pt-2 border-top">
-                            <div class="fw-bold text-dark">Telephone Extension</div>
+                            <div class="fw-semibold text-dark">Phone Extension</div>
                             <span class="text-muted font-monospace">+251 (0) 47 111 0022</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {{-- Right Column: Frequently Asked Questions (FAQ) --}}
-            <div class="col-lg-7">
-                <div class="card border rounded-3 p-3 p-md-4 bg-white shadow-xs">
-                    <h2 class="h6 fw-bold text-dark mb-3 pb-2 border-bottom">
-                        <i class="bi bi-question-circle-fill me-2 text-success"></i>Common Questions
+            {{-- Right Column: Compact FAQs --}}
+            <div class="col-md-7">
+                <div class="card border rounded p-3 bg-white shadow-xs h-100">
+                    <h2 class="small fw-bold text-dark text-uppercase mb-2 pb-1 border-bottom" style="font-size: 0.72rem; letter-spacing: 0.5px;">
+                        <i class="bi bi-question-circle me-1 text-dark"></i> Frequently Asked Questions
                     </h2>
-
-                    <div class="accordion accordion-flush" id="rpmsFaqAccordion">
-                        {{-- FAQ 1 --}}
+                    <div class="accordion accordion-flush" id="supportFaq">
                         <div class="accordion-item border-bottom">
-                            <h3 class="accordion-header" id="faqHeadingOne">
-                                <button class="accordion-button collapsed px-0 fw-bold text-dark small" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseOne" aria-expanded="false" aria-controls="faqCollapseOne">
-                                    Who can submit a proposal?
+                            <h3 class="accordion-header" id="faq1">
+                                <button class="accordion-button collapsed px-0 py-2 fw-semibold text-dark small" type="button" data-bs-toggle="collapse" data-bs-target="#c1">
+                                    Who can submit research proposals?
                                 </button>
                             </h3>
-                            <div id="faqCollapseOne" class="accordion-collapse collapse" aria-labelledby="faqHeadingOne" data-bs-parent="#rpmsFaqAccordion">
-                                <div class="accordion-body px-0 text-muted small">
-                                    Active faculty, researchers, and technical staff with a university appointment can submit proposals.
+                            <div id="c1" class="accordion-collapse collapse" data-bs-parent="#supportFaq">
+                                <div class="accordion-body px-0 py-2 text-muted small lh-sm">
+                                    Active university faculty, researchers, and technical staff can submit proposals mapped to priority areas.
                                 </div>
                             </div>
                         </div>
 
-                        {{-- FAQ 2 --}}
                         <div class="accordion-item border-bottom">
-                            <h3 class="accordion-header" id="faqHeadingTwo">
-                                <button class="accordion-button collapsed px-0 fw-bold text-dark small" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseTwo" aria-expanded="false" aria-controls="faqCollapseTwo">
-                                    When is Dean or RCSC approval needed?
+                            <h3 class="accordion-header" id="faq2">
+                                <button class="accordion-button collapsed px-0 py-2 fw-semibold text-dark small" type="button" data-bs-toggle="collapse" data-bs-target="#c2">
+                                    When is Dean vs. RCSC approval required?
                                 </button>
                             </h3>
-                            <div id="faqCollapseTwo" class="accordion-collapse collapse" aria-labelledby="faqHeadingTwo" data-bs-parent="#rpmsFaqAccordion">
-                                <div class="accordion-body px-0 text-muted small">
-                                    Proposals with requested budgets under ETB 500,000 are approved directly by the respective College Dean. Proposals with requested budgets of ETB 500,000 or greater require formal institutional defense and council approval through the Research and Community Service Council (RCSC).
+                            <div id="c2" class="accordion-collapse collapse" data-bs-parent="#supportFaq">
+                                <div class="accordion-body px-0 py-2 text-muted small lh-sm">
+                                    Budgets under ETB 500,000 are approved by the College Dean. Budgets of ETB 500,000 or more require RCSC Council approval.
                                 </div>
                             </div>
                         </div>
 
-                        {{-- FAQ 3 --}}
                         <div class="accordion-item border-bottom">
-                            <h3 class="accordion-header" id="faqHeadingThree">
-                                <button class="accordion-button collapsed px-0 fw-bold text-dark small" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseThree" aria-expanded="false" aria-controls="faqCollapseThree">
-                                    How does peer review work?
+                            <h3 class="accordion-header" id="faq3">
+                                <button class="accordion-button collapsed px-0 py-2 fw-semibold text-dark small" type="button" data-bs-toggle="collapse" data-bs-target="#c3">
+                                    How are peer reviews scored?
                                 </button>
                             </h3>
-                            <div id="faqCollapseThree" class="accordion-collapse collapse" aria-labelledby="faqHeadingThree" data-bs-parent="#rpmsFaqAccordion">
-                                <div class="accordion-body px-0 text-muted small">
-                                    Under double-blind protocols, the identity and departmental affiliation of the Principal Investigator are anonymized before proposals reach reviewers. Likewise, the identity and remarks of the reviewer remain confidential from the PI.
+                            <div id="c3" class="accordion-collapse collapse" data-bs-parent="#supportFaq">
+                                <div class="accordion-body px-0 py-2 text-muted small lh-sm">
+                                    Double-blind scoring on a 100-point rubric. Scores of 80+ are accepted; 70-79 require minor revisions.
                                 </div>
                             </div>
                         </div>
 
-                        {{-- FAQ 4 --}}
                         <div class="accordion-item border-bottom">
-                            <h3 class="accordion-header" id="faqHeadingFour">
-                                <button class="accordion-button collapsed px-0 fw-bold text-dark small" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseFour" aria-expanded="false" aria-controls="faqCollapseFour">
-                                    When is funding released?
+                            <h3 class="accordion-header" id="faq4">
+                                <button class="accordion-button collapsed px-0 py-2 fw-semibold text-dark small" type="button" data-bs-toggle="collapse" data-bs-target="#c4">
+                                    How are grant tranches disbursed?
                                 </button>
                             </h3>
-                            <div id="faqCollapseFour" class="accordion-collapse collapse" aria-labelledby="faqHeadingFour" data-bs-parent="#rpmsFaqAccordion">
-                                <div class="accordion-body px-0 text-muted small">
-                                    Grant funds are mobilized in three structured tranches:
-                                    <ul class="mb-0 mt-2 ps-3">
-                                        <li><strong>Tranche 1 (30% Advance):</strong> Auto-queued upon bilateral contract execution by PI and VP.</li>
-                                        <li><strong>Tranche 2 (40% Mid-Term):</strong> Released upon verification of the mid-term progress report.</li>
-                                        <li><strong>Tranche 3 (30% Final):</strong> Released upon full project completion and publication submission.</li>
-                                    </ul>
+                            <div id="c4" class="accordion-collapse collapse" data-bs-parent="#supportFaq">
+                                <div class="accordion-body px-0 py-2 text-muted small lh-sm">
+                                    Funding is released in 3 tranches: 30% advance on contract, 40% on mid-term report, and 30% on final completion.
                                 </div>
                             </div>
                         </div>
 
-                        {{-- FAQ 5 --}}
                         <div class="accordion-item">
-                            <h3 class="accordion-header" id="faqHeadingFive">
-                                <button class="accordion-button collapsed px-0 fw-bold text-dark small" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseFive" aria-expanded="false" aria-controls="faqCollapseFive">
-                                    How do I reset my password?
+                            <h3 class="accordion-header" id="faq5">
+                                <button class="accordion-button collapsed px-0 py-2 fw-semibold text-dark small" type="button" data-bs-toggle="collapse" data-bs-target="#c5">
+                                    How do I obtain account access or reset passwords?
                                 </button>
                             </h3>
-                            <div id="faqCollapseFive" class="accordion-collapse collapse" aria-labelledby="faqHeadingFive" data-bs-parent="#rpmsFaqAccordion">
-                                <div class="accordion-body px-0 text-muted small">
-                                    RPMS user accounts are provisioned by the ICT Directorate and mapped to your institutional staff ID. If you forgot your password or need an account created, contact <code>support@rpms.local</code> or visit the ICT office.
+                            <div id="c5" class="accordion-collapse collapse" data-bs-parent="#supportFaq">
+                                <div class="accordion-body px-0 py-2 text-muted small lh-sm">
+                                    Accounts are provisioned with staff credentials. Contact ICT at <code>support@rpms.local</code> for credentials or resets.
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+
+        {{-- Bottom Navigation --}}
+        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+            <a href="{{ route('home') }}" class="btn btn-sm btn-outline-secondary fw-semibold">
+                &larr; Home
+            </a>
+            <a href="{{ route('lifecycle') }}" class="btn btn-sm btn-outline-dark fw-semibold">
+                Lifecycle &rarr;
+            </a>
         </div>
     </div>
 </div>
