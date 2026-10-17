@@ -1686,47 +1686,23 @@
 
     @guest
     <!-- Public Site Footer -->
-    <footer class="site-footer mt-auto">
-        <div class="container py-4">
-            <div class="row g-4 align-items-center">
-                <div class="col-lg-4">
-                    <div class="d-flex align-items-center gap-3 mb-2">
-                        <span class="site-footer-brand"><i class="bi bi-journal-bookmark-fill"></i></span>
-                        <div>
-                            <div class="fw-bold text-white">RPMS</div>
-                            <small class="text-white-50">Research Project Management System</small>
-                        </div>
-                    </div>
-                    <p class="text-white-50 mb-0">Collaboration, review, funding, compliance, and reporting in one secure platform for university research teams.</p>
+    <footer class="site-footer mt-auto py-2 py-md-3">
+        <div class="container" style="max-width: 880px;">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 text-center text-md-start small">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="guest-brand-mark" style="width:28px;height:28px;font-size:0.9rem;"><i class="bi bi-journal-bookmark-fill"></i></span>
+                    <span class="fw-bold text-white">RPMS</span>
+                    <span class="text-white-50">&mdash; University Research Portal</span>
                 </div>
-                <div class="col-sm-6 col-lg-2">
-                    <h6 class="footer-title">Explore</h6>
-                    <ul class="list-unstyled footer-links">
-                        <li><a href="{{ route('home') }}">Home</a></li>
-                        <li><a href="{{ route('lifecycle') }}">Research Lifecycle</a></li>
-                        <li><a href="{{ route('research.catalog') }}">Research Catalog</a></li>
-                        <li><a href="{{ route('support') }}">Support &amp; Office</a></li>
-                    </ul>
+                <div class="d-flex gap-3 text-white-50">
+                    <a href="{{ route('home') }}" class="text-white-50 text-decoration-none">Home</a>
+                    <a href="{{ route('lifecycle') }}" class="text-white-50 text-decoration-none">Lifecycle</a>
+                    <a href="{{ route('research.catalog') }}" class="text-white-50 text-decoration-none">Catalog</a>
+                    <a href="{{ route('support') }}" class="text-white-50 text-decoration-none">Support</a>
                 </div>
-                <div class="col-sm-6 col-lg-3">
-                    <h6 class="footer-title">Quick Access</h6>
-                    <ul class="list-unstyled footer-links">
-                        <li><a href="{{ route('login') }}">Login</a></li>
-                        <li><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                        <li><a href="{{ route('projects.index') }}">Projects</a></li>
-                    </ul>
+                <div class="text-white-50" style="font-size: 0.72rem;">
+                    &copy; {{ date('Y') }} RPMS.
                 </div>
-                <div class="col-lg-3">
-                    <h6 class="footer-title">Contact</h6>
-                    <ul class="list-unstyled footer-links">
-                        <li><span class="text-white-50">research@rpms.local</span></li>
-                        <li><span class="text-white-50">Research &amp; Community Service</span></li>
-                        <li><span class="text-white-50">Academic Affairs Directorate</span></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom border-top border-white-10 mt-3 pt-3 text-center text-white-50 small">
-                &copy; {{ date('Y') }} Research Project Management System (RPMS).
             </div>
         </div>
     </footer>
