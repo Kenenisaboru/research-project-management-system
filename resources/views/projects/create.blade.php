@@ -46,11 +46,135 @@
                             @error('thematic_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
 
-                        <div class="mb-3">
-                            <label for="budgetInput" class="form-label fw-bold small">Requested Budget (ETB) <span class="text-danger">*</span></label>
-                            <input type="number" step="0.01" min="0" name="requested_budget" class="form-control form-control-sm @error('requested_budget') is-invalid @enderror" required placeholder="e.g. 450000" value="{{ old('requested_budget') }}" id="budgetInput">
-                            @error('requested_budget')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            <div id="budgetAlert" class="alert alert-warning small py-1 mb-0 mt-1 d-none"><i class="bi bi-exclamation-triangle me-1"></i>RCSC & VP approval required (>= 500k ETB)</div>
+                        {{-- Dynamic Itemized Budget Calculator & Dual-Threshold Engine --}}
+                        <div class="mb-4" x-data="dynamicBudgetCalculator({{ old('requested_budget', 'null') }})" x-init="init()">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label for="budgetInput" class="form-label fw-bold small mb-0">
+                                    <i class="bi bi-calculator me-1 text-success"></i>Requested Grant Budget (ETB) <span class="text-danger">*</span>
+                                </label>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button type="button" @click="mode = 'itemized'" :class="mode === 'itemized' ? 'btn-dark' : 'btn-outline-secondary'" class="btn btn-sm py-0 px-2" style="font-size:0.75rem;">Itemized Calculator</button>
+                                    <button type="button" @click="mode = 'simple'" :class="mode === 'simple' ? 'btn-dark' : 'btn-outline-secondary'" class="btn btn-sm py-0 px-2" style="font-size:0.75rem;">Direct Total</button>
+                                </div>
+                            </div>
+
+                            {{-- Direct Total Input Mode --}}
+                            <div x-show="mode === 'simple'" class="mb-2">
+                                <input type="number" step="0.01" min="0" name="requested_budget"
+                                    x-model="totalBudget"
+                                    @input="syncFromDirectInput()"
+                                    class="form-control form-control-sm @error('requested_budget') is-invalid @enderror"
+                                    required placeholder="e.g. 450000"
+                                    value="{{ old('requested_budget') }}"
+                                    id="budgetInput">
+                                @error('requested_budget')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+
+                            {{-- Itemized Calculator Mode --}}
+                            <div x-show="mode === 'itemized'" class="border rounded-3 p-3 bg-light mb-2">
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered align-middle rpms-budget-table bg-white mb-2">
+                                        <thead class="table-light small">
+                                            <tr>
+                                                <th style="width: 25%;">Category</th>
+                                                <th style="width: 32%;">Item Description</th>
+                                                <th style="width: 13%;">Qty</th>
+                                                <th style="width: 15%;">Unit Cost (ETB)</th>
+                                                <th style="width: 15%;">Subtotal (ETB)</th>
+                                                <th style="width: 50px;"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <template x-for="(item, index) in items" :key="index">
+                                                <tr>
+                                                    <td>
+                                                        <select class="form-select form-select-sm" x-model="item.category">
+                                                            <option value="Personnel">Personnel / Allowances</option>
+                                                            <option value="Equipment">Equipment &amp; Hardware</option>
+                                                            <option value="Consumables">Reagents &amp; Consumables</option>
+                                                            <option value="Fieldwork">Fieldwork &amp; Travel</option>
+                                                            <option value="Data">Data Collection &amp; Survey</option>
+                                                            <option value="Dissemination">Publication / Dissemination</option>
+                                                            <option value="Contingency">Contingency / Indirect</option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control form-control-sm" placeholder="Line item description..." x-model="item.description">
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" min="1" step="1" class="form-control form-control-sm text-center" x-model.number="item.qty" @input="recalcTotal()">
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" min="0" step="0.01" class="form-control form-control-sm text-end" placeholder="0.00" x-model.number="item.unitCost" @input="recalcTotal()">
+                                                    </td>
+                                                    <td class="text-end fw-bold text-dark rpms-budget-subtotal">
+                                                        <span x-text="formatCurrency((item.qty || 0) * (item.unitCost || 0))"></span>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <button type="button" @click="removeItem(index)" class="btn btn-sm btn-link text-danger p-0" title="Remove line item" :disabled="items.length <= 1">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr class="table-light">
+                                                <td colspan="4" class="fw-bold text-end">Grand Total Calculated:</td>
+                                                <td class="text-end fw-bold fs-6 text-success rpms-budget-subtotal">
+                                                    <span x-text="formatCurrency(totalBudget) + ' ETB'"></span>
+                                                </td>
+                                                <td></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <button type="button" @click="addItem()" class="btn btn-sm btn-outline-dark">
+                                        <i class="bi bi-plus-circle me-1"></i>Add Line Item
+                                    </button>
+                                    <small class="text-muted">Total auto-syncs with proposal submission</small>
+                                </div>
+                            </div>
+
+                            {{-- Dual-Threshold Dynamic Badge --}}
+                            <div class="p-2 rounded-2 border d-flex align-items-center justify-content-between flex-wrap gap-2 rpms-tier-indicator"
+                                :class="totalBudget >= 500000 ? 'bg-danger-subtle border-danger text-danger' : 'bg-success-subtle border-success text-success'">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi me-2 fs-5" :class="totalBudget >= 500000 ? 'bi-shield-exclamation text-danger' : 'bi-check-circle text-success'"></i>
+                                    <div>
+                                        <div class="fw-bold small" x-text="totalBudget >= 500000 ? 'RCSC & VP Tier Threshold (>= 500,000 ETB)' : 'College Dean Tier Threshold (< 500,000 ETB)'"></div>
+                                        <div class="small opacity-75" x-text="totalBudget >= 500000 ? 'Requires Research & Council Steering Committee & Vice President ratification.' : 'Evaluated and approved at College Dean level.'"></div>
+                                    </div>
+                                </div>
+                                <div class="fw-bold fs-6" x-text="formatCurrency(totalBudget) + ' ETB'"></div>
+                            </div>
+
+                            {{-- Real-time 30-40-30 Tranche Preview --}}
+                            <div class="row g-2 mt-2">
+                                <div class="col-4">
+                                    <div class="border rounded p-2 text-center bg-light">
+                                        <div class="text-muted small" style="font-size:0.7rem;">Tranche 1 (Advance 30%)</div>
+                                        <div class="fw-bold text-dark small" x-text="formatCurrency(totalBudget * 0.30) + ' ETB'"></div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="border rounded p-2 text-center bg-light">
+                                        <div class="text-muted small" style="font-size:0.7rem;">Tranche 2 (Mid-Term 40%)</div>
+                                        <div class="fw-bold text-dark small" x-text="formatCurrency(totalBudget * 0.40) + ' ETB'"></div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="border rounded p-2 text-center bg-light">
+                                        <div class="text-muted small" style="font-size:0.7rem;">Tranche 3 (Final 30%)</div>
+                                        <div class="fw-bold text-dark small" x-text="formatCurrency(totalBudget * 0.30) + ' ETB'"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="budgetAlert" class="alert alert-warning small py-1 mb-0 mt-2 d-none">
+                                <i class="bi bi-exclamation-triangle me-1"></i>RCSC & VP approval required (>= 500k ETB)
+                            </div>
                         </div>
 
                         <div class="mb-3">
@@ -160,6 +284,63 @@ if(uz&&fi){
     uz.addEventListener('drop',function(e){e.preventDefault();this.style.borderColor='#dee2e6';if(e.dataTransfer.files.length){fi.files=e.dataTransfer.files;showFN(e.dataTransfer.files[0]);}});
     fi.addEventListener('change',function(){if(this.files.length)showFN(this.files[0]);});
     function showFN(f){var ext=f.name.split('.').pop().toLowerCase();if(['pdf','doc','docx'].indexOf(ext)!==-1){fn.classList.remove('d-none');fn.querySelector('span').textContent=f.name;}else{alert('PDF, DOC, or DOCX only');fi.value='';}}
+function dynamicBudgetCalculator(initialValue) {
+    return {
+        mode: 'itemized',
+        totalBudget: initialValue || 150000,
+        items: [
+            { category: 'Personnel', description: 'Lead Investigator & Research Fellows Allowances', qty: 1, unitCost: 45000 },
+            { category: 'Consumables', description: 'Specialized Lab Consumables & Reagents', qty: 1, unitCost: 35000 },
+            { category: 'Fieldwork', description: 'Regional Field Data Collection & Transportation', qty: 1, unitCost: 40000 },
+            { category: 'Dissemination', description: 'Peer-reviewed Journal Open-Access Fee', qty: 1, unitCost: 30000 }
+        ],
+        init() {
+            if (initialValue && initialValue > 0) {
+                this.totalBudget = initialValue;
+            } else {
+                this.recalcTotal();
+            }
+        },
+        addItem() {
+            this.items.push({
+                category: 'Personnel',
+                description: '',
+                qty: 1,
+                unitCost: 0
+            });
+        },
+        removeItem(index) {
+            if (this.items.length > 1) {
+                this.items.splice(index, 1);
+                this.recalcTotal();
+            }
+        },
+        recalcTotal() {
+            var sum = 0;
+            this.items.forEach(function (item) {
+                var q = parseFloat(item.qty) || 0;
+                var c = parseFloat(item.unitCost) || 0;
+                sum += (q * c);
+            });
+            this.totalBudget = Math.round(sum * 100) / 100;
+            var bi = document.getElementById('budgetInput');
+            if (bi) {
+                bi.value = this.totalBudget;
+                bi.dispatchEvent(new Event('input'));
+            }
+        },
+        syncFromDirectInput() {
+            var val = parseFloat(this.totalBudget) || 0;
+            var bi = document.getElementById('budgetInput');
+            if (bi) {
+                bi.value = val;
+            }
+        },
+        formatCurrency(num) {
+            var n = parseFloat(num) || 0;
+            return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+    };
 }
 </script>
 @endsection
