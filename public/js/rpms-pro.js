@@ -34,8 +34,6 @@
         { label: 'Create Project',      icon: 'bi-plus-circle',       url: '/projects/create',    roles: 'pi' },
         { label: 'Progress Reports',    icon: 'bi-bar-chart-line',    url: '/progress',           roles: 'all' },
         { label: 'Notifications',       icon: 'bi-bell',              url: '/notifications',      roles: 'all' },
-        { label: 'Research Calls',      icon: 'bi-megaphone',         url: '/calls',              roles: 'all' },
-        { label: 'Publications',        icon: 'bi-journal-richtext',  url: '/papers',             roles: 'all' },
         { label: 'Certificates',        icon: 'bi-award',             url: '/certificates',       roles: 'coordinator,vparttcs,rcsc,admin' },
         { label: 'Analytics',           icon: 'bi-graph-up-arrow',    url: '/analytics',          roles: 'rcsc,vparttcs,admin' },
         { label: 'Reports Hub',         icon: 'bi-file-earmark-pdf',  url: '/reports',            roles: 'coordinator,dean,rcsc,vparttcs,admin' },

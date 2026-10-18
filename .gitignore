@@ -16,5 +16,12 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
-
 .env*.backup
+
+# Reports and temporary screenshots
+*.docx
+*.pptx
+Screenshot*.png
+clean_*.png
+crop_*.png
+verify_*.png

@@ -23,7 +23,7 @@
     <div class="col-12">
         @php
             $overallProgress = $reports->count() > 0 ? (int) $reports->max('progress_percentage') : 0;
-            $approvedCount = $reports->where('status', 'Approved')->count();
+            $approvedCount = $reports->whereIn('status', ['Approved', 'Coordinator_Audited'])->count();
             $pendingCount = $reports->where('status', 'Submitted')->count();
             $revisionCount = $reports->where('status', 'Needs_Revision')->count();
         @endphp
@@ -80,6 +80,41 @@
         </div>
     </div>
 
+    @if($project->status === 'Active' && $overallProgress >= 100 && in_array(Auth::user()->role, ['coordinator', 'admin']))
+    <div class="col-12">
+        <div class="alert alert-success d-flex align-items-center justify-content-between p-3 shadow-sm mb-3 flex-wrap gap-2">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-trophy-fill fs-3 text-success me-3"></i>
+                <div>
+                    <h6 class="fw-bold mb-1">All Research Milestones Completed (100%)</h6>
+                    <p class="small mb-0 text-muted">The project milestones are 100% finished. You can now officially mark this project as Completed and issue the final certificate.</p>
+                </div>
+            </div>
+            <form action="{{ route('projects.complete', $project->project_id) }}" method="POST" class="ms-auto">
+                @csrf
+                <button type="button" class="btn btn-success fw-bold confirm-btn text-nowrap" data-confirm-title="Mark Project Complete" data-confirm-message="Are you sure you want to mark this project as Completed? A completion certificate can then be issued." data-confirm-icon="bi-trophy" data-confirm-color="text-success" data-confirm-btn-text="Yes, Mark Complete" data-confirm-btn-class="btn-success">
+                    <i class="bi bi-check-circle-fill me-1"></i>Mark Project Complete
+                </button>
+            </form>
+        </div>
+    </div>
+    @elseif($project->status === 'Completed')
+    <div class="col-12">
+        <div class="alert alert-light border-start border-success border-4 d-flex align-items-center justify-content-between p-3 mb-3 flex-wrap gap-2">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-award-fill fs-3 text-success me-3"></i>
+                <div>
+                    <h6 class="fw-bold mb-1">Project Status: Completed</h6>
+                    <p class="small mb-0 text-muted">This project has concluded successfully. Certificates can be reviewed and downloaded.</p>
+                </div>
+            </div>
+            <a href="{{ route('certificates.index') }}" class="btn btn-outline-success btn-sm fw-bold">
+                <i class="bi bi-patch-check me-1"></i>View Certificates
+            </a>
+        </div>
+    </div>
+    @endif
+
     {{-- Financial Disbursement & Tranche Status (Visible to PI, TM, Coordinator, DH) --}}
     @php
         $ratifiedTotal = $project->approved_budget ?: $project->requested_budget;
@@ -98,18 +133,25 @@
                         </div>
                     </div>
                     <div class="d-flex gap-2 align-items-center flex-wrap">
-                        @foreach(['Tranche 1' => '30% Advance', 'Tranche 2' => '40% Mid-Term', 'Tranche 3' => '30% Final'] as $trancheName => $trancheDesc)
+                        @foreach([
+                            'Tranche 1' => ['label' => '30% Advance', 'req' => 'Contract Signed'],
+                            'Tranche 2' => ['label' => '40% Mid-Term', 'req' => 'Requires ≥ 40%'],
+                            'Tranche 3' => ['label' => '30% Final', 'req' => 'Requires 100%']
+                        ] as $trancheName => $meta)
                             @php
                                 $foundReq = $tranches->firstWhere('milestone_phase', $trancheName);
                             @endphp
                             <div class="border rounded px-2 py-1 bg-light d-flex align-items-center gap-1" style="font-size: 0.78rem;">
-                                <strong>{{ $trancheName }}:</strong>
+                                <strong>{{ $trancheName }} ({{ $meta['label'] }}):</strong>
                                 @if($foundReq && $foundReq->status === 'Released')
                                     <span class="badge bg-success text-white"><i class="bi bi-check-all me-1"></i>Disbursed ({{ number_format($foundReq->approved_amount, 0) }} ETB)</span>
                                 @elseif($foundReq && $foundReq->status === 'Approved')
                                     <span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i>Queued in Finance ({{ number_format($foundReq->approved_amount, 0) }} ETB)</span>
+                                    @if(in_array(Auth::user()->role, ['finance', 'admin', 'coordinator']))
+                                        <a href="{{ route('finance.disbursement') }}" class="btn btn-xs btn-outline-success py-0 px-1 ms-1 text-decoration-none" style="font-size: 0.7rem;" title="Go to Finance Disbursement">Open Finance &rarr;</a>
+                                    @endif
                                 @else
-                                    <span class="badge bg-secondary text-white">Pending Milestone</span>
+                                    <span class="badge bg-secondary text-white" title="{{ $meta['req'] }}"><i class="bi bi-lock me-1"></i>{{ $meta['req'] }}</span>
                                 @endif
                             </div>
                         @endforeach
@@ -150,6 +192,7 @@
                             <div id="progressBarPreview" class="progress-bar bg-dark" style="width: 0%"></div>
                         </div>
                         <div class="form-text small">Drag the slider to indicate milestone completion (0-100%)</div>
+                        <div class="form-text small text-muted"><i class="bi bi-info-circle me-1 text-primary"></i><strong>Funding Milestones:</strong> Tranche 2 (40% Mid-Term) unlocks at <strong>&ge; 40%</strong>. Tranche 3 (30% Final) unlocks at <strong>100%</strong>.</div>
                         @error('progress_percentage') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                     </div>
 
@@ -223,8 +266,8 @@
                                                     <i class="bi bi-calendar me-1"></i>{{ $report->created_at ? $report->created_at->diffForHumans() : 'N/A' }}
                                                 </small>
                                             </div>
-                                            @if($report->status === 'Approved')
-                                                <span class="badge bg-success text-white"><i class="bi bi-check-circle me-1"></i>Approved</span>
+                                            @if(in_array($report->status, ['Approved', 'Coordinator_Audited']))
+                                                <span class="badge bg-success text-white"><i class="bi bi-check-circle me-1"></i>{{ $report->status === 'Coordinator_Audited' ? 'Audited' : 'Approved' }}</span>
                                             @elseif($report->status === 'Needs_Revision')
                                                 <span class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i>Revision</span>
                                             @else
@@ -271,10 +314,10 @@
                                             </div>
                                             <div class="d-flex align-items-center gap-2">
                                                 <span class="badge bg-dark rounded-pill">{{ $report->progress_percentage }}%</span>
-                                                @if($report->status === 'Approved')
-                                                    <span class="badge bg-success text-white"><i class="bi bi-check-circle me-1"></i>Approved</span>
+                                                @if(in_array($report->status, ['Approved', 'Coordinator_Audited']))
+                                                    <span class="badge bg-success text-white"><i class="bi bi-check-circle me-1"></i>{{ $report->status === 'Coordinator_Audited' ? 'Audited' : 'Approved' }}</span>
                                                 @elseif($report->status === 'Needs_Revision')
-                                                    <span class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i>Revision</span>
+                                                    <span class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i>Needs Revision</span>
                                                 @else
                                                     <span class="badge bg-secondary text-white">{{ str_replace('_', ' ', $report->status) }}</span>
                                                 @endif

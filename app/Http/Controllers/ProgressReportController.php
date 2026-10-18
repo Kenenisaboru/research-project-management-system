@@ -134,6 +134,8 @@ class ProgressReportController extends Controller
             'status'               => $request->status,
         ]);
 
+        $newTranches = [];
+
         // Auto-generate Tranche 2 and Tranche 3 Budget Requests on Progress Approval based on milestone thresholds
         if (in_array($request->status, ['Approved', 'Coordinator_Audited'])) {
             $approvedBudget = $project->approved_budget ?: $project->requested_budget;
@@ -156,6 +158,7 @@ class ProgressReportController extends Controller
                         'status'           => 'Approved',
                         'approved_by'      => $user->id,
                     ]);
+                    $newTranches[] = 'Tranche 2 (40% Mid-Term: ETB ' . number_format($tranche2Amount, 2) . ')';
                 }
             }
 
@@ -176,10 +179,23 @@ class ProgressReportController extends Controller
                         'status'           => 'Approved',
                         'approved_by'      => $user->id,
                     ]);
+                    $newTranches[] = 'Tranche 3 (30% Final: ETB ' . number_format($tranche3Amount, 2) . ')';
                 }
             }
         }
 
-        return back()->with('success', 'Progress report status updated successfully. Tranche disbursement has been queued in Finance.');
+        if (!empty($newTranches)) {
+            $successMsg = 'Progress report ratified. ' . implode(' and ', $newTranches) . ' has been approved and queued in Finance for disbursement.';
+        } elseif (in_array($request->status, ['Approved', 'Coordinator_Audited'])) {
+            if ($report->progress_percentage < 40) {
+                $successMsg = 'Progress report ratified at ' . $report->progress_percentage . '%. (Note: Tranche 2 disbursement unlocks when milestone progress reaches at least 40%).';
+            } else {
+                $successMsg = 'Progress report ratified successfully.';
+            }
+        } else {
+            $successMsg = 'Progress report status marked as ' . $request->status . '.';
+        }
+
+        return back()->with('success', $successMsg);
     }
 }

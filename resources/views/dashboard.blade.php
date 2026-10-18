@@ -209,7 +209,10 @@
     <h5 class="fw-bold mb-3"><i class="bi bi-lightning me-2 text-dark"></i>Quick Actions</h5>
     <div class="d-flex flex-wrap gap-2">
         <a href="{{ route('analytics') }}" class="btn btn-dark fw-bold">
-            <i class="bi bi-bar-chart-line me-1"></i> Analytics &amp; Reports
+            <i class="bi bi-bar-chart-line me-1"></i> Analytics
+        </a>
+        <a href="{{ route('reports.index') }}" class="btn btn-outline-dark fw-bold">
+            <i class="bi bi-file-earmark-pdf me-1"></i> Institutional Reports
         </a>
         <a href="{{ route('admin.audit-logs') }}" class="btn btn-outline-dark fw-bold">
             <i class="bi bi-shield-check me-1"></i> Audit Logs

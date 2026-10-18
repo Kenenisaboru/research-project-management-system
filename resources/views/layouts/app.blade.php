@@ -58,8 +58,10 @@
         }
         main.container {
             width: 100%;
-            max-width: 1440px;
-            padding-bottom: 1rem;
+            max-width: 1320px;
+            padding-left: clamp(1rem, 2vw, 1.75rem);
+            padding-right: clamp(1rem, 2vw, 1.75rem);
+            padding-bottom: 1.5rem;
         }
         h1, h2, h3, h4, h5, h6 {
             color: #172b24;
@@ -827,14 +829,16 @@
             backdrop-filter: blur(14px);
         }
         .navbar-UNI > .container {
-            max-width: 1560px;
+            max-width: 1320px;
+            padding-left: clamp(1rem, 2vw, 1.75rem);
+            padding-right: clamp(1rem, 2vw, 1.75rem);
         }
         .navbar-UNI .navbar-nav {
             flex-wrap: nowrap;
         }
         .navbar-UNI .nav-link {
-            font-size: 0.8rem;
-            padding: 0.48rem 0.58rem !important;
+            font-size: 0.82rem;
+            padding: 0.48rem 0.65rem !important;
             border-radius: 0.65rem;
         }
         .navbar-UNI .nav-link.active-link {
@@ -846,7 +850,7 @@
             letter-spacing: 0.06em;
         }
         main.container {
-            max-width: 1500px;
+            max-width: 1320px;
             padding-bottom: 2rem;
         }
         .card-custom {
@@ -1270,24 +1274,6 @@
                     </li>
                     @endif
 
-                    {{-- 10. Calls for Proposals --}}
-                    @if(Auth::user()->hasPermission('view_calls') && in_array(Auth::user()->role, ['pi', 'coordinator', 'dean', 'vp']))
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('calls.*') ? 'active-link' : '' }}" href="{{ route('calls.index') }}">
-                            <i class="bi bi-megaphone me-1"></i> Calls
-                        </a>
-                    </li>
-                    @endif
-
-                    {{-- 11. Publications (Researchers: PI & TM) --}}
-                    @if(Auth::user()->hasPermission('submit_paper') || in_array(Auth::user()->role, ['pi', 'tm']))
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('papers.*') ? 'active-link' : '' }}" href="{{ route('papers.index') }}">
-                            <i class="bi bi-journal-richtext me-1"></i> Publications
-                        </a>
-                    </li>
-                    @endif
-
                     {{-- 12. Admin: Backups & Migration --}}
                     @if(Auth::user()->role === 'admin')
                     <li class="nav-item dropdown">
@@ -1297,6 +1283,7 @@
                         <ul class="dropdown-menu shadow-sm">
                             <li><a class="dropdown-item small" href="{{ route('admin.backups') }}"><i class="bi bi-hdd-stack me-2 text-dark"></i>Backup &amp; Recovery</a></li>
                             <li><a class="dropdown-item small" href="{{ route('admin.data-migration') }}"><i class="bi bi-box-arrow-in-down me-2 text-dark"></i>Data Migration</a></li>
+                            <li><a class="dropdown-item small" href="{{ route('reports.index') }}"><i class="bi bi-file-earmark-pdf me-2 text-dark"></i>Institutional Reports</a></li>
                         </ul>
                     </li>
                     @endif
@@ -1304,7 +1291,7 @@
                 </ul>
 
                 <!-- User Profile & Action Controls -->
-                <div class="d-flex align-items-center text-white ms-auto gap-3">
+                <div class="d-flex align-items-center text-white ms-auto gap-2 gap-xl-3">
                     {{-- Command Palette Trigger --}}
                     <button id="rpms-search-trigger" type="button" class="btn btn-link p-0 border-0 d-none d-md-flex align-items-center text-decoration-none text-white-50 gap-1" title="Search (Ctrl+K)" style="font-size:0.8rem;">
                         <i class="bi bi-search fs-5"></i>
@@ -1313,8 +1300,7 @@
 
                     {{-- Notifications Bell Dropdown (SCR-17) --}}
                     {{-- Notifications loaded via LoadNotifications middleware --}}
-
-                    <div class="dropdown me-3">
+                    <div class="dropdown">
                         <button class="btn btn-link p-0 border-0 position-relative d-flex align-items-center text-decoration-none" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
                             <i class="bi bi-bell-fill fs-5 text-warning"></i>
                             @if(($notifCount ?? 0) > 0)
@@ -1361,7 +1347,7 @@
                     </div>
 
                     {{-- Academic Call Cycle Badge --}}
-                    <div class="d-none d-xl-flex align-items-center fw-semibold rounded-pill px-3 py-1 me-3 text-white" style="font-size:0.82rem; cursor:pointer; transition: transform 0.2s; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.22);" data-bs-toggle="modal" data-bs-target="#calendarModal" title="View Academic Calendar">
+                    <div class="d-none d-xl-flex align-items-center fw-semibold rounded-pill px-3 py-1 text-white" style="font-size:0.82rem; cursor:pointer; transition: transform 0.2s; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.22);" data-bs-toggle="modal" data-bs-target="#calendarModal" title="View Academic Calendar">
                         <i class="bi bi-calendar2-check me-2 text-warning"></i> <span class="text-white">AY 2026/2027</span>
                     </div>
 
@@ -1602,24 +1588,6 @@
                     <li class="nav-item">
                         <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('finance.*') ? 'active-link' : '' }}" href="{{ route('finance.disbursement') }}" style="font-size: 0.85rem;">
                             <i class="bi bi-cash-stack me-2 text-white-50"></i> Finance Disbursement
-                        </a>
-                    </li>
-                    @endif
-
-                    {{-- 13. Calls (Relevant roles: PI, Coordinator, Dean, VP) --}}
-                    @if(Auth::user()->hasPermission('view_calls') && in_array(Auth::user()->role, ['pi', 'coordinator', 'dean', 'vp']))
-                    <li class="nav-item">
-                        <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('calls.*') ? 'active-link' : '' }}" href="{{ route('calls.index') }}" style="font-size: 0.85rem;">
-                            <i class="bi bi-megaphone me-2 text-white-50"></i> Calls
-                        </a>
-                    </li>
-                    @endif
-
-                    {{-- 14. Publications (Researchers: PI & TM) --}}
-                    @if(Auth::user()->hasPermission('submit_paper') || in_array(Auth::user()->role, ['pi', 'tm']))
-                    <li class="nav-item">
-                        <a class="nav-link text-white py-2 px-2 {{ request()->routeIs('papers.*') ? 'active-link' : '' }}" href="{{ route('papers.index') }}" style="font-size: 0.85rem;">
-                            <i class="bi bi-journal-richtext me-2 text-white-50"></i> Publications
                         </a>
                     </li>
                     @endif
