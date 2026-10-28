@@ -278,47 +278,71 @@ class ProjectController extends Controller
         return view('projects.show', compact('project', 'anonymized', 'reviewers', 'workflowGuidance', 'pendingReviewCount'));
     }
 
-    public function assignReviewer(Request $request, $id)
+    public function coordinatorAssess(Request $request, $id)
     {
         $request->validate([
-            'examiner_id' => 'required|exists:users,id',
+            'coordinator_assessment' => 'required|string|min:10',
         ]);
 
         $project = Project::findOrFail($id);
+        $project->update([
+            'coordinator_assessment'  => $request->coordinator_assessment,
+            'coordinator_assessed_at' => now(),
+        ]);
 
-        if (!in_array($project->status, ['DH_Screened', 'UnderReview'])) {
+        \App\Services\AuditService::log('COORDINATOR_ASSESSMENT', 'Project', $project->project_id,
+            "Coordinator submitted preliminary assessment for Project #{$project->project_id}");
+
+        return back()->with('success', 'Coordinator preliminary assessment saved. You may now assign peer examiners.');
+    }
+
+    public function assignReviewer(Request $request, $id)
+    {
+        $request->validate([
+            'examiner_id'     => 'required|exists:users,id',
+            'evaluation_type' => 'nullable|in:Proposal,Progress,FinalDefence',
+        ]);
+
+        $project = Project::findOrFail($id);
+        $evalType = $request->input('evaluation_type', 'Proposal') ?: 'Proposal';
+
+        if ($evalType === 'Proposal' && !in_array($project->status, ['DH_Screened', 'UnderReview'])) {
             return back()->with('error', 'This project has not been screened by the Department Head yet.');
         }
 
         $existing = Evaluation::where('project_id', $project->project_id)
             ->where('examiner_id', $request->examiner_id)
+            ->where('evaluation_type', $evalType)
             ->first();
 
         if ($existing) {
             if ($existing->decision === 'Pending') {
-                return back()->with('error', 'This reviewer is already assigned and has a pending evaluation.');
+                return back()->with('error', 'This reviewer is already assigned for this evaluation type with a pending review.');
             }
             $existing->update([
-                'score' => 0.00,
-                'decision' => 'Pending',
-                'comments' => null,
-                'evaluated_at' => null,
+                'score'             => null,
+                'decision'          => 'Pending',
+                'final_decision'    => null,
+                'revision_comments' => null,
+                'comments'          => null,
+                'evaluated_at'      => null,
             ]);
         } else {
             Evaluation::create([
-                'project_id' => $project->project_id,
-                'examiner_id' => $request->examiner_id,
-                'score' => 0.00,
-                'decision' => 'Pending',
+                'project_id'      => $project->project_id,
+                'examiner_id'     => $request->examiner_id,
+                'evaluation_type' => $evalType,
+                'score'           => null,
+                'decision'        => 'Pending',
                 'is_blind_masked' => true,
             ]);
         }
 
-        if ($project->status === 'DH_Screened') {
+        if ($evalType === 'Proposal' && $project->status === 'DH_Screened') {
             $project->update(['status' => 'UnderReview', 'current_stage' => 2, 'under_review_at' => now()]);
         }
 
-        return back()->with('success', 'Blind peer examiner assigned successfully.');
+        return back()->with('success', "Examiner assigned successfully for {$evalType} evaluation.");
     }
 
     public function cancel($id)
