@@ -16,17 +16,5 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
-<<<<<<< HEAD
 
 .env*.backup
-=======
-.env*.backup
-
-# Reports and temporary screenshots
-*.docx
-*.pptx
-Screenshot*.png
-clean_*.png
-crop_*.png
-verify_*.png
->>>>>>> upstream/main

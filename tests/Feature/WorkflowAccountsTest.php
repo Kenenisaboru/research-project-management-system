@@ -38,11 +38,7 @@ class WorkflowAccountsTest extends TestCase
             $this->actingAs($user)
                 ->get(route('dashboard'))
                 ->assertOk()
-<<<<<<< HEAD
                 ->assertSee('site-footer mt-auto');
-=======
-                ->assertDontSee('site-footer mt-auto');
->>>>>>> upstream/main
         }
     }
 

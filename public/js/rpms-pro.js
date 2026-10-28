@@ -16,7 +16,6 @@
        THEME TOGGLE
        ========================================================================= */
     const THEME_KEY = 'rpms-theme';
-<<<<<<< HEAD
     const THEME_VERSION_KEY = 'rpms-theme-ver-2';
 
     function getPreferredTheme() {
@@ -65,16 +64,6 @@
             }
         }
     });
-=======
-
-    function applyTheme() {
-        document.documentElement.setAttribute('data-theme', 'light');
-        localStorage.removeItem(THEME_KEY);
-    }
-
-    // Always ensure standard clean light theme
-    applyTheme();
->>>>>>> upstream/main
 
     /* =========================================================================
        COMMAND PALETTE  (Ctrl+K)
@@ -85,11 +74,8 @@
         { label: 'Create Project',      icon: 'bi-plus-circle',       url: '/projects/create',    roles: 'pi' },
         { label: 'Progress Reports',    icon: 'bi-bar-chart-line',    url: '/progress',           roles: 'all' },
         { label: 'Notifications',       icon: 'bi-bell',              url: '/notifications',      roles: 'all' },
-<<<<<<< HEAD
         { label: 'Research Calls',      icon: 'bi-megaphone',         url: '/calls',              roles: 'all' },
         { label: 'Publications',        icon: 'bi-journal-richtext',  url: '/papers',             roles: 'all' },
-=======
->>>>>>> upstream/main
         { label: 'Certificates',        icon: 'bi-award',             url: '/certificates',       roles: 'coordinator,vparttcs,rcsc,admin' },
         { label: 'Analytics',           icon: 'bi-graph-up-arrow',    url: '/analytics',          roles: 'rcsc,vparttcs,admin' },
         { label: 'Reports Hub',         icon: 'bi-file-earmark-pdf',  url: '/reports',            roles: 'coordinator,dean,rcsc,vparttcs,admin' },
@@ -220,7 +206,6 @@
     });
 
     /* =========================================================================
-<<<<<<< HEAD
        REAL-TIME NOTIFICATION ENGINE & TOAST MANAGER
        ========================================================================= */
     var lastSeenNotificationId = null;
@@ -296,10 +281,6 @@
         container.appendChild(toast);
     }
 
-=======
-       NOTIFICATION POLLING (every 30 seconds)
-       ========================================================================= */
->>>>>>> upstream/main
     function pollNotifications() {
         var badge = document.getElementById('rpms-notif-badge');
         var mobileBadge = document.getElementById('rpms-notif-badge-mobile');
@@ -319,7 +300,6 @@
                 mobileBadge.textContent = count > 99 ? '99+' : count;
                 mobileBadge.style.display = count > 0 ? 'flex' : 'none';
             }
-<<<<<<< HEAD
 
             var recent = data.data.recent || [];
             if (recent.length > 0) {
@@ -342,13 +322,10 @@
                     lastSeenNotificationId = Math.max(lastSeenNotificationId, maxId);
                 }
             }
-=======
->>>>>>> upstream/main
         })
         .catch(function () { /* silently ignore */ });
     }
 
-<<<<<<< HEAD
     // Expose toast trigger & listen for custom events
     window.rpmsShowToast = showToast;
     window.addEventListener('rpms:notify', function (e) {
@@ -360,13 +337,6 @@
         setTimeout(pollNotifications, 2000);
         // Recurring poll every 20 seconds
         setInterval(pollNotifications, 20000);
-=======
-    document.addEventListener('DOMContentLoaded', function () {
-        // Initial poll
-        setTimeout(pollNotifications, 2000);
-        // Recurring poll every 30 seconds
-        setInterval(pollNotifications, 30000);
->>>>>>> upstream/main
     });
 
     /* =========================================================================

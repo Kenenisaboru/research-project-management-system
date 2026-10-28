@@ -2,11 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<<<<<<< HEAD
 <title>Gambella University RPMS - Security Audit Trail</title>
-=======
-<title>RPMS - Security Audit Trail</title>
->>>>>>> upstream/main
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10px; color: #1e293b; padding: 25px; }
@@ -36,11 +32,7 @@
 <body>
 
 <div class="header">
-<<<<<<< HEAD
     <h1>Gambella University &bull; Directorate of Research &amp; Community Service</h1>
-=======
-    <h1>Directorate of Research &amp; Community Service</h1>
->>>>>>> upstream/main
     <h3>Research Project Management System (RPMS) &bull; Security &amp; Compliance Office</h3>
     <div class="doc-title">Official Security Audit Trail &amp; System Event Log</div>
 </div>
@@ -137,11 +129,7 @@
 </table>
 
 <div class="footer">
-<<<<<<< HEAD
     Gambella University RPMS &bull; Immutable Audit Trail Archive &bull; This electronic document is generated for institutional compliance and internal auditing.
-=======
-    RPMS &bull; Immutable Audit Trail Archive &bull; This electronic document is generated for institutional compliance and internal auditing.
->>>>>>> upstream/main
 </div>
 
 </body>
