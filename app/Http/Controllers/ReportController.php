@@ -174,4 +174,92 @@ class ReportController extends Controller
 
         return $pdf->download('GU_Researcher_Performance_Summary_' . date('Y') . '.pdf');
     }
+
+    /**
+     * 5. Coordinator Operational & Periodic Portfolio Report
+     */
+    public function coordinatorOperational(Request $request)
+    {
+        $period = $request->input('period', 'quarterly');
+        if (!in_array($period, ['quarterly', 'biannual', 'annual'])) {
+            $period = 'quarterly';
+        }
+
+        $startDate = match ($period) {
+            'quarterly' => now()->subMonths(3),
+            'biannual'  => now()->subMonths(6),
+            'annual'    => now()->subYear(),
+        };
+
+        $user = Auth::user();
+        $query = Project::where('status', '!=', 'Draft')
+            ->with(['pi', 'department', 'presentationSchedules']);
+
+        if ($user->dept_id && !in_array($user->role, ['admin', 'vparttcs', 'rcsc'])) {
+            $query->where('dept_id', $user->dept_id);
+        }
+
+        $projects = $query->get();
+
+        $activeProjects = $projects->where('status', 'Active');
+        $activeCount = $activeProjects->count();
+        $activeBudget = $activeProjects->sum(fn($p) => $p->approved_budget ?: $p->requested_budget);
+
+        $completedProjects = $projects->where('status', 'Completed');
+        $completedCount = $completedProjects->count();
+        $completedBudget = $completedProjects->sum(fn($p) => $p->approved_budget ?: $p->requested_budget);
+
+        $reviewProjects = $projects->whereIn('status', ['UnderReview', 'DH_Screened', 'Dean_Review', 'RCSC_Review']);
+        $reviewCount = $reviewProjects->count();
+        $reviewBudget = $reviewProjects->sum('requested_budget');
+
+        $delayedProjects = $activeProjects->filter(fn($p) => $p->activated_at && $p->activated_at < now()->subMonths(12));
+        $delayedCount = $delayedProjects->count();
+        $delayedBudget = $delayedProjects->sum(fn($p) => $p->approved_budget ?: $p->requested_budget);
+
+        $projectIds = $projects->pluck('project_id');
+
+        $milestonesCount = \App\Models\MilestoneReport::whereIn('project_id', $projectIds)
+            ->where('created_at', '>=', $startDate)
+            ->count();
+
+        $totalDisbursed = \App\Models\BudgetRequest::whereIn('project_id', $projectIds)
+            ->where('status', 'Released')
+            ->where('created_at', '>=', $startDate)
+            ->sum('approved_amount');
+
+        $challenges = \App\Models\ProjectChallenge::whereIn('project_id', $projectIds)
+            ->latest()
+            ->limit(15)
+            ->get();
+
+        $data = [
+            'period'          => $period,
+            'startDate'       => $startDate,
+            'projects'        => $projects,
+            'activeCount'     => $activeCount,
+            'activeBudget'    => $activeBudget,
+            'completedCount'  => $completedCount,
+            'completedBudget' => $completedBudget,
+            'reviewCount'     => $reviewCount,
+            'reviewBudget'    => $reviewBudget,
+            'delayedCount'    => $delayedCount,
+            'delayedBudget'   => $delayedBudget,
+            'milestonesCount' => $milestonesCount,
+            'totalDisbursed'  => $totalDisbursed,
+            'challenges'      => $challenges,
+            'generatedAt'     => now()->format('M d, Y H:i'),
+            'generatedBy'     => $user->name,
+            'refNumber'       => 'GU-RPMS-COP-' . date('Y') . '-' . strtoupper(substr(uniqid(), -4)),
+        ];
+
+        if ($request->input('format') === 'html' || $request->input('view') === '1') {
+            return view('reports.coordinator_operational', $data);
+        }
+
+        $pdf = Pdf::loadView('reports.templates.coordinator_operational', $data)
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download("GU_Coordinator_Operational_{$period}_" . date('Y') . ".pdf");
+    }
 }
