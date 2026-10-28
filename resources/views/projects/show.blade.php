@@ -188,7 +188,7 @@
                 @if($project->status === 'Draft' && Auth::user()->role === 'pi')
                 <form action="{{ route('projects.submit', $project->project_id) }}" method="POST" class="mb-2">
                     @csrf
-                    <button type="button" class="btn btn-dark w-100 text-start confirm-btn fw-bold" data-confirm-title="Submit Proposal" data-confirm-message="This proposal will be sent to the Department Head for initial screening." data-confirm-icon="bi-send" data-confirm-color="text-success" data-confirm-btn-text="Yes, Submit" data-confirm-btn-class="btn-success">
+                    <button type="button" class="btn w-100 text-start confirm-btn fw-bold" style="background:#212529;color:#fff;border:none;" onmouseover="this.style.background='#495057'" onmouseout="this.style.background='#212529'" data-confirm-title="Submit Proposal" data-confirm-message="This proposal will be sent to the Department Head for initial screening." data-confirm-icon="bi-send" data-confirm-color="text-success" data-confirm-btn-text="Yes, Submit" data-confirm-btn-class="btn-success">
                         <i class="bi bi-send me-2"></i>Submit for Review
                     </button>
                 </form>
@@ -196,7 +196,7 @@
 
                 {{-- Edit --}}
                 @if(in_array($project->status, ['Draft', 'Withdrawn', 'Returned', 'Rejected']) && Auth::user()->role === 'pi')
-                <a href="{{ route('projects.edit', $project->project_id) }}" class="btn btn-outline-dark w-100 mb-2 text-start fw-bold">
+                <a href="{{ route('projects.edit', $project->project_id) }}" class="btn w-100 mb-2 text-start fw-bold" style="background:#fff;color:#212529;border:1.5px solid #dee2e6;" onmouseover="this.style.background='#212529';this.style.color='#fff';this.style.borderColor='#212529'" onmouseout="this.style.background='#fff';this.style.color='#212529';this.style.borderColor='#dee2e6'">
                     <i class="bi bi-pencil-square me-2"></i>Edit Proposal
                 </a>
                 @endif
@@ -209,7 +209,7 @@
                 @if(Auth::user()->role === 'pi' && in_array($project->status, ['Submitted', 'DH_Screened', 'UnderReview']))
                 <form action="{{ route('projects.cancel', $project->project_id) }}" method="POST" class="mb-2">
                     @csrf
-                    <button type="button" class="btn btn-outline-warning w-100 mb-2 text-start confirm-btn fw-bold" data-confirm-title="Withdraw Proposal" data-confirm-message="Are you sure you want to withdraw this proposal?" data-confirm-icon="bi-x-circle" data-confirm-color="text-warning" data-confirm-btn-text="Yes, Withdraw" data-confirm-btn-class="btn-warning">
+                    <button type="button" class="btn w-100 text-start confirm-btn fw-bold" style="background:#fff;color:#e67700;border:1.5px solid #e67700;" onmouseover="this.style.background='#e67700';this.style.color='#fff'" onmouseout="this.style.background='#fff';this.style.color='#e67700'" data-confirm-title="Withdraw Proposal" data-confirm-message="Are you sure you want to withdraw this proposal?" data-confirm-icon="bi-x-circle" data-confirm-color="text-warning" data-confirm-btn-text="Yes, Withdraw" data-confirm-btn-class="btn-warning">
                         <i class="bi bi-x-circle me-2"></i>Withdraw Proposal
                     </button>
                 </form>
@@ -220,7 +220,7 @@
                 <form action="{{ route('projects.destroy', $project->project_id) }}" method="POST" class="mb-2">
                     @csrf
                     @method('DELETE')
-                    <button type="button" class="btn btn-outline-danger w-100 text-start confirm-btn fw-bold" data-confirm-title="Delete Proposal" data-confirm-message="This will permanently delete this draft proposal." data-confirm-icon="bi-trash" data-confirm-color="text-danger" data-confirm-btn-text="Yes, Delete" data-confirm-btn-class="btn-danger">
+                    <button type="button" class="btn w-100 text-start confirm-btn fw-bold" style="background:#212529;color:#fff;border:1.5px solid #dc3545;" onmouseover="this.style.background='#dc3545';this.style.borderColor='#dc3545'" onmouseout="this.style.background='#212529';this.style.borderColor='#dc3545'" data-confirm-title="Delete Proposal" data-confirm-message="This will permanently delete this draft proposal." data-confirm-icon="bi-trash" data-confirm-color="text-danger" data-confirm-btn-text="Yes, Delete" data-confirm-btn-class="btn-danger">
                         <i class="bi bi-trash me-2"></i>Delete Draft
                     </button>
                 </form>
@@ -228,21 +228,21 @@
 
                 {{-- Procurement Tracker --}}
                 @if(in_array($project->status, ['Active', 'Approved']) && in_array(Auth::user()->role, ['pi', 'coordinator', 'admin']))
-                <a href="{{ route('procurement.index') }}" class="btn btn-outline-primary w-100 mb-2 text-start fw-bold">
+                <a href="{{ route('procurement.index') }}" class="btn w-100 mb-2 text-start fw-bold" style="background:#fff;color:#0d6efd;border:1.5px solid #0d6efd;" onmouseover="this.style.background='#0d6efd';this.style.color='#fff'" onmouseout="this.style.background='#fff';this.style.color='#0d6efd'">
                     <i class="bi bi-cart3 me-2"></i>Procurement Tracker
                 </a>
                 @endif
 
                 {{-- Extend --}}
                 @if(in_array($project->status, ['Active', 'Approved']) && Auth::user()->role === 'pi' && (int)$project->pi_id === (int)Auth::id())
-                <button class="btn btn-outline-warning w-100 mb-2 text-start fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#extensionForm">
+                <button class="btn w-100 mb-2 text-start fw-bold" style="background:#fff;color:#e67700;border:1.5px solid #e67700;" onmouseover="this.style.background='#e67700';this.style.color='#fff'" onmouseout="this.style.background='#fff';this.style.color='#e67700'" type="button" data-bs-toggle="collapse" data-bs-target="#extensionForm">
                     <i class="bi bi-hourglass-split me-2"></i>Request Extension
                 </button>
                 @endif
 
                 {{-- Terminate --}}
                 @if(!in_array($project->status, ['Completed', 'Terminated', 'Draft', 'Submitted', 'Withdrawn', 'PendingCancellation']) && in_array(Auth::user()->role, ['pi', 'coordinator', 'admin']))
-                <button class="btn btn-outline-danger w-100 mb-2 text-start fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#terminateForm">
+                <button class="btn w-100 mb-2 text-start fw-bold" style="background:#fff;color:#dc3545;border:1.5px solid #dc3545;" onmouseover="this.style.background='#dc3545';this.style.color='#fff'" onmouseout="this.style.background='#fff';this.style.color='#dc3545'" type="button" data-bs-toggle="collapse" data-bs-target="#terminateForm">
                     <i class="bi bi-x-octagon me-2"></i>Terminate Project
                 </button>
                 @endif
@@ -251,7 +251,7 @@
                 @if($project->status === 'Active' && in_array(Auth::user()->role, ['coordinator', 'admin']))
                 <form action="{{ route('projects.complete', $project->project_id) }}" method="POST" class="mb-2">
                     @csrf
-                    <button type="button" class="btn btn-success w-100 text-start confirm-btn fw-bold" data-confirm-title="Mark Complete" data-confirm-message="This will mark the project as Completed. A certificate can then be issued." data-confirm-icon="bi-trophy" data-confirm-color="text-success" data-confirm-btn-text="Yes, Complete" data-confirm-btn-class="btn-success">
+                    <button type="button" class="btn w-100 text-start confirm-btn fw-bold" style="background:#198754;color:#fff;border:none;" onmouseover="this.style.background='#157347'" onmouseout="this.style.background='#198754'" data-confirm-title="Mark Complete" data-confirm-message="This will mark the project as Completed. A certificate can then be issued." data-confirm-icon="bi-trophy" data-confirm-color="text-success" data-confirm-btn-text="Yes, Complete" data-confirm-btn-class="btn-success">
                         <i class="bi bi-trophy me-2"></i>Mark Complete
                     </button>
                 </form>
@@ -259,7 +259,7 @@
 
                 {{-- Request Withdrawal (Approved/Active - needs admin approval) --}}
                 @if(Auth::user()->role === 'pi' && in_array($project->status, ['Approved', 'Active']))
-                <button class="btn btn-outline-warning w-100 mb-2 text-start fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#requestCancelForm">
+                <button class="btn w-100 mb-2 text-start fw-bold" style="background:#fff;color:#e67700;border:1.5px solid #e67700;" onmouseover="this.style.background='#e67700';this.style.color='#fff'" onmouseout="this.style.background='#fff';this.style.color='#e67700'" type="button" data-bs-toggle="collapse" data-bs-target="#requestCancelForm">
                     <i class="bi bi-x-circle me-2"></i>Request Withdrawal
                 </button>
                 @endif

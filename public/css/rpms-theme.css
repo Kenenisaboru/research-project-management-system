@@ -24,7 +24,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 /* =====================================================================
-<<<<<<< HEAD
    1. DESIGN TOKENS — DARK THEME (Default)
    ===================================================================== */
 :root,
@@ -70,53 +69,6 @@ html[data-theme="dark"] {
     --rpms-sidebar-bg: #0c1222;
     --rpms-sidebar-hover: #172040;
     --rpms-sidebar-active: rgba(59, 130, 246, 0.18);
-=======
-   1. DESIGN TOKENS — LIGHT THEME (Default)
-   ===================================================================== */
-:root,
-html[data-theme="light"] {
-    /* --- Brand --- */
-    --rpms-primary: #104b3a;
-    --rpms-primary-hover: #0c382b;
-    --rpms-secondary: #17624b;
-    --rpms-secondary-hover: #124d3b;
-    --rpms-accent: #2e8b57;
-
-    /* --- Surfaces --- */
-    --rpms-surface: #ffffff;
-    --rpms-surface-elevated: #f9fafb;
-    --rpms-surface-overlay: rgba(255, 255, 255, 0.85);
-    --rpms-bg: #f4f7f5;
-    --rpms-border: #cbd5e1;
-    --rpms-border-subtle: #e2e8f0;
-
-    /* --- Typography --- */
-    --rpms-text: #1e293b;
-    --rpms-text-secondary: #475569;
-    --rpms-text-muted: #64748b;
-    --rpms-text-link: #104b3a;
-
-    /* --- Semantic Colors --- */
-    --rpms-success: #16a34a;
-    --rpms-success-bg: rgba(22, 163, 74, 0.1);
-    --rpms-danger: #dc2626;
-    --rpms-danger-bg: rgba(220, 38, 38, 0.1);
-    --rpms-warning: #ca8a04;
-    --rpms-warning-bg: rgba(202, 138, 4, 0.1);
-    --rpms-info: #2563eb;
-    --rpms-info-bg: rgba(37, 99, 235, 0.08);
-
-    /* --- Shadows --- */
-    --rpms-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
-    --rpms-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-    --rpms-shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
-    --rpms-shadow-glow: 0 0 20px rgba(23, 98, 75, 0.15);
-
-    /* --- Sidebar --- */
-    --rpms-sidebar-bg: #ffffff;
-    --rpms-sidebar-hover: #f9fafb;
-    --rpms-sidebar-active: rgba(23, 98, 75, 0.1);
->>>>>>> upstream/main
     --rpms-sidebar-width: 260px;
     --rpms-sidebar-collapsed: 60px;
 
@@ -133,7 +85,6 @@ html[data-theme="light"] {
     --rpms-transition-slow: 350ms ease;
 
     /* --- Glassmorphism --- */
-<<<<<<< HEAD
     --rpms-glass-bg: rgba(19, 26, 46, 0.72);
     --rpms-glass-border: rgba(148, 175, 255, 0.1);
     --rpms-glass-blur: 18px;
@@ -141,15 +92,6 @@ html[data-theme="light"] {
     /* --- Navbar --- */
     --rpms-navbar-bg: linear-gradient(135deg, #0c1222 0%, #131a2e 100%);
     --rpms-navbar-border: var(--rpms-primary);
-=======
-    --rpms-glass-bg: rgba(255, 255, 255, 0.65);
-    --rpms-glass-border: rgba(0, 0, 0, 0.06);
-    --rpms-glass-blur: 16px;
-
-    /* --- Navbar --- */
-    --rpms-navbar-bg: linear-gradient(135deg, #0f3e2e 0%, #1e5641 100%);
-    --rpms-navbar-border: var(--rpms-secondary);
->>>>>>> upstream/main
 
     /* --- Z-Index Scale --- */
     --rpms-z-dropdown: 1000;
@@ -160,20 +102,13 @@ html[data-theme="light"] {
 }
 
 /* =====================================================================
-<<<<<<< HEAD
    2. DESIGN TOKENS — LIGHT THEME
    ===================================================================== */
 html[data-theme="light"] {
-=======
-   2. DESIGN TOKENS — DARK THEME
-   ===================================================================== */
-html[data-theme="dark"] {
->>>>>>> upstream/main
     --rpms-primary: #1a56db;
     --rpms-primary-hover: #1e40af;
     --rpms-secondary: #6875f5;
     --rpms-secondary-hover: #5850ec;
-<<<<<<< HEAD
     --rpms-accent: #059669;
 
     --rpms-surface: #ffffff;
@@ -212,46 +147,6 @@ html[data-theme="dark"] {
 
     --rpms-navbar-bg: linear-gradient(135deg, #1a56db 0%, #1e40af 100%);
     --rpms-navbar-border: var(--rpms-secondary);
-=======
-    --rpms-accent: #10b981;
-
-    --rpms-surface: #111827;
-    --rpms-surface-elevated: #1f2937;
-    --rpms-surface-overlay: rgba(17, 24, 39, 0.85);
-    --rpms-bg: #0d1117;
-    --rpms-border: #21262d;
-    --rpms-border-subtle: #30363d;
-
-    --rpms-text: #e6edf3;
-    --rpms-text-secondary: #b1bac4;
-    --rpms-text-muted: #7d8590;
-    --rpms-text-link: #58a6ff;
-
-    --rpms-success: #238636;
-    --rpms-success-bg: rgba(35, 134, 54, 0.15);
-    --rpms-danger: #da3633;
-    --rpms-danger-bg: rgba(218, 54, 51, 0.15);
-    --rpms-warning: #d29922;
-    --rpms-warning-bg: rgba(210, 153, 34, 0.15);
-    --rpms-info: #58a6ff;
-    --rpms-info-bg: rgba(88, 166, 255, 0.12);
-
-    --rpms-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25);
-    --rpms-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
-    --rpms-shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.4);
-    --rpms-shadow-glow: 0 0 20px rgba(26, 86, 219, 0.25);
-
-    --rpms-sidebar-bg: #0d1117;
-    --rpms-sidebar-hover: #161b22;
-    --rpms-sidebar-active: rgba(26, 86, 219, 0.15);
-
-    --rpms-glass-bg: rgba(17, 24, 39, 0.65);
-    --rpms-glass-border: rgba(255, 255, 255, 0.08);
-    --rpms-glass-blur: 16px;
-
-    --rpms-navbar-bg: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
-    --rpms-navbar-border: var(--rpms-primary);
->>>>>>> upstream/main
 }
 
 /* =====================================================================
@@ -780,7 +675,6 @@ a:hover {
     font-weight: 700;
 }
 
-<<<<<<< HEAD
 @media (max-width: 768px) {
     .rpms-bottom-nav {
         display: block;
@@ -793,12 +687,6 @@ a:hover {
     .rpms-fab {
         bottom: 5rem;
     }
-=======
-.rpms-bottom-nav,
-.rpms-fab,
-.rpms-fab-menu {
-    display: none !important;
->>>>>>> upstream/main
 }
 
 /* =====================================================================
@@ -845,46 +733,20 @@ a:hover {
    ===================================================================== */
 .form-control,
 .form-select {
-<<<<<<< HEAD
     background: var(--rpms-surface);
     border: 1px solid var(--rpms-border);
     color: var(--rpms-text);
-=======
-    background: #ffffff;
-    border: 1px solid var(--rpms-border);
-    color: #1e293b;
->>>>>>> upstream/main
     border-radius: var(--rpms-radius-sm);
     transition: border-color var(--rpms-transition-fast), box-shadow var(--rpms-transition-fast);
     font-family: 'Inter', sans-serif;
     font-size: 0.9rem;
 }
-<<<<<<< HEAD
 .form-control:focus,
 .form-select:focus {
     border-color: var(--rpms-primary);
     box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.2);
     background: var(--rpms-surface);
     color: var(--rpms-text);
-=======
-.form-control::placeholder,
-input::placeholder,
-textarea::placeholder {
-    color: var(--rpms-text-muted) !important;
-    opacity: 1 !important;
-}
-.form-control:focus,
-.form-select:focus {
-    border-color: var(--rpms-primary);
-    box-shadow: 0 0 0 3px rgba(16, 75, 58, 0.2);
-    background: #ffffff;
-    color: #0f172a;
-}
-select.form-select option,
-select option {
-    background-color: #ffffff;
-    color: #1e293b;
->>>>>>> upstream/main
 }
 .form-label {
     font-weight: 600;
@@ -1097,7 +959,6 @@ select option {
         grid-template-columns: 1fr;
     }
 }
-<<<<<<< HEAD
 
 /* =====================================================================
    REAL-TIME TOAST NOTIFICATIONS & REACTIVE UI
@@ -2442,5 +2303,3 @@ html[data-theme="dark"] .gambella-btn-primary:hover {
 
 
 
-=======
->>>>>>> upstream/main

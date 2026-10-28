@@ -276,7 +276,6 @@ class ProjectController extends Controller
         $reviewers = \App\Models\User::where('role', 'reviewer')->get();
 
         return view('projects.show', compact('project', 'anonymized', 'reviewers', 'workflowGuidance', 'pendingReviewCount'));
-<<<<<<< HEAD
     }
 
     public function coordinatorAssess(Request $request, $id)
@@ -295,8 +294,6 @@ class ProjectController extends Controller
             "Coordinator submitted preliminary assessment for Project #{$project->project_id}");
 
         return back()->with('success', 'Coordinator preliminary assessment saved. You may now assign peer examiners.');
-=======
->>>>>>> upstream/main
     }
 
     public function assignReviewer(Request $request, $id)

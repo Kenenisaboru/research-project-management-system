@@ -2,11 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<<<<<<< HEAD
 <title>Gambella University RPMS - Thematic Area Impact Analysis</title>
-=======
-<title>RPMS - Thematic Area Impact Analysis</title>
->>>>>>> upstream/main
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10px; color: #1e293b; padding: 25px; }
@@ -33,11 +29,7 @@
 <body>
 
 <div class="header">
-<<<<<<< HEAD
     <h1>Gambella University &bull; Directorate of Research &amp; Technology Transfer</h1>
-=======
-    <h1>Directorate of Research &amp; Technology Transfer</h1>
->>>>>>> upstream/main
     <h3>Research Project Management System (RPMS) &bull; Priority Area Alignment</h3>
     <div class="doc-title">Thematic Area Impact &amp; Resource Allocation Analysis</div>
 </div>
@@ -82,29 +74,17 @@
     <tr>
         <td>
             <div class="sig-line">Director, Research &amp; Community Service</div>
-<<<<<<< HEAD
             <div style="font-size: 8px; color: #64748b; margin-top: 2px;">Gambella University</div>
         </td>
         <td>
             <div class="sig-line">Vice President, ARTTCS</div>
             <div style="font-size: 8px; color: #64748b; margin-top: 2px;">Gambella University</div>
-=======
-            <div style="font-size: 8px; color: #64748b; margin-top: 2px;">Research Directorate</div>
-        </td>
-        <td>
-            <div class="sig-line">Vice President, Academic Affairs</div>
-            <div style="font-size: 8px; color: #64748b; margin-top: 2px;">Academic Directorate</div>
->>>>>>> upstream/main
         </td>
     </tr>
 </table>
 
 <div class="footer">
-<<<<<<< HEAD
     Gambella University RPMS &bull; Strategic Research Portfolio Governance &bull; Prepared by {{ $generatedBy }}
-=======
-    RPMS &bull; Strategic Research Portfolio Governance &bull; Prepared by {{ $generatedBy }}
->>>>>>> upstream/main
 </div>
 
 </body>
