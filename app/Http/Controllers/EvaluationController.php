@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Evaluation;
 use App\Models\Project;
-use App\Http\Requests\EvaluationSubmitRequest;
 
 class EvaluationController extends Controller
 {
@@ -17,10 +16,18 @@ class EvaluationController extends Controller
             ->with('project.pi')
             ->get();
 
-        $pending = $assigned->where('decision', 'Pending');
-        $completed = $assigned->where('decision', '!=', 'Pending');
+        $pendingProposal  = $assigned->where('evaluation_type', 'Proposal')->where('decision', 'Pending');
+        $pendingProgress  = $assigned->where('evaluation_type', 'Progress')->where('decision', 'Pending');
+        $pendingFinal     = $assigned->where('evaluation_type', 'FinalDefence')->where('decision', 'Pending');
+        $completed        = $assigned->where('decision', '!=', 'Pending');
 
-        return view('evaluations.index', compact('pending', 'completed'));
+        // Legacy compat: items without evaluation_type are treated as Proposal
+        $legacyPending = $assigned->filter(fn($e) => empty($e->evaluation_type))->where('decision', 'Pending');
+        $pendingProposal = $pendingProposal->merge($legacyPending);
+
+        return view('evaluations.index', compact(
+            'pendingProposal', 'pendingProgress', 'pendingFinal', 'completed'
+        ));
     }
 
     public function show($evalId)
@@ -33,9 +40,8 @@ class EvaluationController extends Controller
         return view('evaluations.show', compact('evaluation'));
     }
 
-    public function submitScore(EvaluationSubmitRequest $request, $evalId)
+    public function submitScore(Request $request, $evalId)
     {
-
         $evaluation = Evaluation::where('eval_id', $evalId)
             ->where('examiner_id', Auth::id())
             ->firstOrFail();
@@ -44,72 +50,95 @@ class EvaluationController extends Controller
             return back()->with('error', 'This evaluation has already been submitted and cannot be re-submitted.');
         }
 
-        $evaluation->update([
-            'score' => $request->score,
-            'decision' => $request->decision,
-            'comments' => $request->comments,
-            'evaluated_at' => now(),
-        ]);
+        $type = $evaluation->evaluation_type ?? 'Proposal';
 
-        \App\Services\AuditService::log('EVALUATION_SCORED', 'Evaluation', $evaluation->eval_id, "Blind peer review scored ({$request->score}/100 - {$request->decision}) for Project #{$evaluation->project_id}");
+        if ($type === 'FinalDefence') {
+            $request->validate([
+                'score'             => 'nullable|numeric|min:0|max:100',
+                'final_decision'    => 'required|in:Accepted,AcceptedWithMinorModification,Rejected',
+                'revision_comments' => 'nullable|string',
+                'comments'          => 'nullable|string',
+            ]);
 
-        $project = $evaluation->project;
-        $allEvaluated = $project->evaluations()->where('decision', 'Pending')->count() === 0;
+            $evaluation->update([
+                'score'             => $request->score,
+                'decision'          => $request->final_decision === 'Rejected' ? 'Rejected' : 'Accepted',
+                'final_decision'    => $request->final_decision,
+                'revision_comments' => $request->revision_comments,
+                'comments'          => $request->comments,
+                'evaluated_at'      => now(),
+            ]);
 
-        if ($allEvaluated) {
-            $hasRejection = $project->evaluations()->where('decision', 'Rejected')->exists();
-            $hasMajorMods = $project->evaluations()->where('decision', 'AcceptedWithMajorMods')->exists();
+        } elseif ($type === 'Progress') {
+            $request->validate([
+                'score'    => 'nullable|numeric|min:0|max:100',
+                'decision' => 'required|in:Satisfactory,NeedsImprovement,Unsatisfactory,Pending',
+                'comments' => 'required|string|min:10',
+            ]);
 
-            if ($hasRejection) {
-                $comments = $project->evaluations()
-                    ->where('decision', 'Rejected')
-                    ->pluck('comments')
-                    ->implode('; ');
-                $project->update([
-                    'status' => 'Rejected',
-                    'feedback' => $comments,
-                ]);
-                \Illuminate\Support\Facades\DB::table('irerc_clearances')->where('project_id', $project->project_id)->delete();
-            } elseif ($hasMajorMods) {
-                $comments = $project->evaluations()
-                    ->where('decision', 'AcceptedWithMajorMods')
-                    ->pluck('comments')
-                    ->implode('; ');
-                $project->update([
-                    'status' => 'Returned',
-                    'feedback' => 'Major modifications required: ' . $comments,
-                ]);
-            } else {
-                $feedback = $project->evaluations()
-                    ->whereIn('decision', ['Accepted', 'AcceptedWithMinorMods'])
-                    ->pluck('comments')
-                    ->implode('; ');
+            $evaluation->update([
+                'score'        => $request->score,
+                'decision'     => $request->decision,
+                'comments'     => $request->comments,
+                'evaluated_at' => now(),
+            ]);
 
-                // Dual-Threshold Financial Routing: < 500k ETB -> Dean_Review, >= 500k ETB -> RCSC_Review
-                $targetStatus = ($project->requested_budget >= 500000.00) ? 'RCSC_Review' : 'Dean_Review';
-                $approvalTier = ($project->requested_budget >= 500000.00) ? 'RCSC_VP' : 'Dean';
+        } else {
+            // Proposal type evaluation
+            $request->validate([
+                'score'    => 'required|numeric|min:0|max:100',
+                'decision' => 'required|in:Accepted,AcceptedWithMinorMods,AcceptedWithMajorMods,Rejected,Pending',
+                'comments' => 'nullable|string',
+            ]);
 
-                $project->update([
-                    'status' => $targetStatus,
-                    'feedback' => $feedback ?: $project->feedback,
-                ]);
+            $evaluation->update([
+                'score'        => $request->score,
+                'decision'     => $request->decision,
+                'comments'     => $request->comments,
+                'evaluated_at' => now(),
+            ]);
 
-                // Ensure a pending BudgetRequest exists so it shows in Dean Approvals / RCSC Portal
-                \App\Models\BudgetRequest::firstOrCreate(
-                    [
-                        'project_id' => $project->project_id,
-                        'milestone_phase' => 1,
-                        'approval_tier' => $approvalTier,
-                    ],
-                    [
-                        'requested_amount' => $project->requested_budget,
-                        'status' => 'Pending',
-                    ]
-                );
+            \App\Services\AuditService::log('EVALUATION_SCORED', 'Evaluation', $evaluation->eval_id,
+                "Blind peer review scored ({$request->score}/100 - {$request->decision}) for Project #{$evaluation->project_id}");
+
+            $project = $evaluation->project;
+            $allEvaluated = $project->evaluations()
+                ->whereIn('evaluation_type', ['Proposal'])
+                ->where('decision', 'Pending')->count() === 0
+                && $project->evaluations()->whereNull('evaluation_type')->where('decision', 'Pending')->count() === 0;
+
+            if ($allEvaluated) {
+                $hasRejection = $project->evaluations()->where('decision', 'Rejected')->exists();
+                $hasMajorMods = $project->evaluations()->where('decision', 'AcceptedWithMajorMods')->exists();
+
+                if ($hasRejection) {
+                    $comments = $project->evaluations()->where('decision', 'Rejected')->pluck('comments')->implode('; ');
+                    $project->update(['status' => 'Rejected', 'feedback' => $comments]);
+                    \Illuminate\Support\Facades\DB::table('irerc_clearances')
+                        ->where('project_id', $project->project_id)->delete();
+                } elseif ($hasMajorMods) {
+                    $comments = $project->evaluations()->where('decision', 'AcceptedWithMajorMods')->pluck('comments')->implode('; ');
+                    $project->update(['status' => 'Returned', 'feedback' => 'Major modifications required: ' . $comments]);
+                } else {
+                    $feedback = $project->evaluations()
+                        ->whereIn('decision', ['Accepted', 'AcceptedWithMinorMods'])
+                        ->pluck('comments')->implode('; ');
+                    $targetStatus = ($project->requested_budget >= 500000.00) ? 'RCSC_Review' : 'Dean_Review';
+                    $approvalTier = ($project->requested_budget >= 500000.00) ? 'RCSC_VP' : 'Dean';
+                    $project->update(['status' => $targetStatus, 'feedback' => $feedback ?: $project->feedback]);
+                    \App\Models\BudgetRequest::firstOrCreate(
+                        ['project_id' => $project->project_id, 'milestone_phase' => 1, 'approval_tier' => $approvalTier],
+                        ['requested_amount' => $project->requested_budget, 'status' => 'Pending']
+                    );
+                }
             }
+
+            return back()->with('success', 'Evaluation rubric score and technical critique submitted securely under blind review protocol.');
         }
 
-        return back()->with('success', 'Evaluation rubric score and technical critique submitted securely under blind review protocol.');
+        \App\Services\AuditService::log('EVALUATION_SUBMITTED', 'Evaluation', $evaluation->eval_id,
+            "Examiner submitted {$type} evaluation (decision: {$evaluation->decision}) for Project #{$evaluation->project_id}");
+
+        return back()->with('success', 'Evaluation submitted successfully.');
     }
 }
-
