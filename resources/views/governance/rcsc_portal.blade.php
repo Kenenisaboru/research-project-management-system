@@ -1,7 +1,92 @@
 @extends('layouts.app')
 
 @section('content')
-<h3 class="fw-bold mb-4"><i class="bi bi-award me-2 text-dark"></i>RCSC High Budget (&ge;500k ETB) & Defense Portal</h3>
+<h3 class="fw-bold mb-4"><i class="bi bi-award me-2 text-dark"></i>RCSC High Budget (&ge;500k ETB) &amp; Defence Portal</h3>
+
+{{-- High Budget Proposal Financial Review Section --}}
+<h5 class="fw-bold mb-3"><i class="bi bi-file-earmark-spreadsheet me-2 text-primary"></i>High-Budget Proposals Review (&ge;500k ETB) ({{ $proposals->count() }})</h5>
+<div class="row g-3 mb-4">
+    @forelse($proposals as $prop)
+    <div class="col-12">
+        <div class="card card-custom p-4 border-start border-4 border-primary">
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+                <div>
+                    <span class="badge bg-primary me-2">{{ $prop->status }}</span>
+                    <span class="badge bg-secondary">{{ $prop->thematicArea->name ?? 'General' }}</span>
+                    <h5 class="fw-bold text-dark mt-2 mb-1">
+                        <a href="{{ route('projects.show', $prop->project_id) }}" class="text-decoration-none text-dark hover-primary">
+                            {{ $prop->title }}
+                        </a>
+                    </h5>
+                    <div class="small text-muted">
+                        <i class="bi bi-person me-1"></i>PI: <strong>{{ $prop->pi->name ?? 'N/A' }}</strong> ({{ $prop->pi->email ?? '' }})
+                        @if($prop->project_code)
+                        <span class="ms-3"><i class="bi bi-hash me-1"></i>Code: <code>{{ $prop->project_code }}</code></span>
+                        @endif
+                    </div>
+                </div>
+                <div class="text-md-end">
+                    <span class="d-block small text-muted">Requested Budget</span>
+                    <span class="fs-4 fw-bold text-success">{{ number_format($prop->requested_budget, 2) }} ETB</span>
+                </div>
+            </div>
+
+            {{-- Abstract with collapsible text --}}
+            <div class="mb-3">
+                <label class="small fw-bold text-muted d-block mb-1">Proposal Abstract:</label>
+                <div class="p-3 bg-light rounded-3 text-secondary small" style="line-height: 1.6;">
+                    {{ Str::limit($prop->abstract_text, 280) }}
+                    @if(strlen($prop->abstract_text) > 280)
+                    <div class="collapse mt-2" id="abstractMore{{ $prop->project_id }}">
+                        {{ substr($prop->abstract_text, 280) }}
+                    </div>
+                    <a class="text-primary text-decoration-none fw-bold ms-1" data-bs-toggle="collapse" href="#abstractMore{{ $prop->project_id }}" role="button" aria-expanded="false">
+                        Read more / less
+                    </a>
+                    @endif
+                </div>
+            </div>
+
+            {{-- Team Members --}}
+            <div class="mb-3">
+                <label class="small fw-bold text-muted d-block mb-1">Research Team Members:</label>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="badge bg-light text-dark border"><i class="bi bi-person-badge me-1"></i>{{ $prop->pi->name ?? 'PI' }} (Principal Investigator)</span>
+                    @forelse($prop->members as $member)
+                    <span class="badge bg-light text-dark border">
+                        <i class="bi bi-person me-1"></i>{{ $member->user->name ?? $member->name ?? 'Member' }}
+                        @if($member->role_in_project) ({{ $member->role_in_project }}) @endif
+                    </span>
+                    @empty
+                    <span class="small text-muted fst-italic">No additional co-investigators registered.</span>
+                    @endforelse
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                @if($prop->proposal_document_url)
+                <a href="{{ Storage::url($prop->proposal_document_url) }}" target="_blank" class="btn btn-outline-dark btn-sm">
+                    <i class="bi bi-file-pdf me-1 text-danger"></i> View Full Proposal Document
+                </a>
+                @else
+                <span class="small text-muted">No PDF attached</span>
+                @endif
+
+                <a href="{{ route('projects.show', $prop->project_id) }}" class="btn btn-dark btn-sm">
+                    <i class="bi bi-eye me-1"></i> Inspect Project Details &amp; Evaluations
+                </a>
+            </div>
+        </div>
+    </div>
+    @empty
+    <div class="col-12">
+        <div class="card card-custom p-4 text-center text-muted">
+            <i class="bi bi-check2-all fs-1 mb-2 text-muted"></i>
+            No high-budget proposals currently pending RCSC ratification.
+        </div>
+    </div>
+    @endforelse
+</div>
 
 <h5 class="fw-bold mb-3"><i class="bi bi-hourglass-split me-2 text-warning"></i>Pending RCSC Budget Requests ({{ $pending->count() }})</h5>
 <div class="card card-custom p-4 mb-4">
