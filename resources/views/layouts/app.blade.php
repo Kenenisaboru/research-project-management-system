@@ -88,44 +88,104 @@
             background: linear-gradient(135deg, #0f3e2e 0%, #103b32 45%, #0c302b 100%);
             border-bottom: 2px solid rgba(212, 175, 55, 0.7);
             box-shadow: 0 12px 30px rgba(15, 62, 46, 0.18);
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            isolation: isolate;
         }
         .guest-navbar {
-            padding: 0.9rem 0;
+            padding: 0.75rem 0;
         }
         .guest-brand-mark {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 42px;
-            height: 42px;
-            border-radius: 12px;
-            background: rgba(212, 175, 55, 0.18);
-            border: 1px solid rgba(212, 175, 55, 0.42);
-            color: #f6d677;
-            font-size: 1.3rem;
+            width: 48px;
+            height: 48px;
+            flex: 0 0 48px;
+            overflow: hidden;
+            border: 1px solid rgba(212, 175, 55, 0.75);
+            border-radius: 50%;
+            background: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+        }
+        .guest-brand-mark img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .institution-logo {
+            display: block;
+            width: 3rem;
+            height: 3rem;
+            flex: 0 0 3rem;
+            border: 1px solid rgba(212, 175, 55, 0.75);
+            border-radius: 50%;
+            background: #ffffff;
+            object-fit: contain;
         }
         .guest-nav {
             gap: 1.15rem;
         }
         .guest-nav a {
+            position: relative;
             color: rgba(255,255,255,0.8);
             text-decoration: none;
             font-size: 0.9rem;
             font-weight: 600;
             transition: color 0.2s ease;
         }
+        .guest-nav a:not(.guest-login-link)::after {
+            position: absolute;
+            right: 0;
+            bottom: -0.2rem;
+            left: 0;
+            height: 2px;
+            border-radius: 2px;
+            background: var(--UNI-gold);
+            content: "";
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.2s ease;
+        }
         .guest-nav a:hover {
             color: #fff;
+        }
+        .guest-nav a:not(.guest-login-link):hover::after,
+        .guest-nav a:not(.guest-login-link):focus-visible::after {
+            transform: scaleX(1);
+        }
+        .guest-nav a:focus-visible {
+            outline: 2px solid var(--UNI-gold);
+            outline-offset: 5px;
+            border-radius: 2px;
         }
         .guest-nav .guest-login-link {
             color: var(--UNI-primary-dark) !important;
             background-color: #fff;
             border-color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
         }
         .guest-nav .guest-login-link:hover {
             color: var(--UNI-primary) !important;
             background-color: #f1f5f9;
             border-color: #f1f5f9;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+            transform: translateY(-1px);
+        }
+        @media (max-width: 767.98px) {
+            .guest-navbar > .container {
+                flex-wrap: wrap;
+                row-gap: 0.65rem;
+            }
+            .guest-navbar .guest-nav {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 0.75rem 1.15rem !important;
+            }
         }
         .site-footer {
             background: linear-gradient(135deg, #0d2e26 0%, #102f2c 100%);
@@ -136,12 +196,18 @@
             display: inline-flex;
             width: 42px;
             height: 42px;
-            border-radius: 12px;
+            flex: 0 0 42px;
+            overflow: hidden;
+            border: 1px solid rgba(212, 175, 55, 0.65);
+            border-radius: 50%;
             align-items: center;
             justify-content: center;
-            background: rgba(212, 175, 55, 0.16);
-            color: #f6d677;
-            font-size: 1.25rem;
+            background: #ffffff;
+        }
+        .site-footer-brand img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
         .footer-title {
             color: #fef3c7;
@@ -956,7 +1022,9 @@
         <nav class="navbar navbar-expand-lg guest-navbar">
             <div class="container">
                 <a class="navbar-brand d-flex align-items-center gap-2" href="{{ route('home') }}">
-                    <span class="guest-brand-mark"><i class="bi bi-journal-bookmark-fill"></i></span>
+                    <span class="guest-brand-mark">
+                        <img src="{{ asset('images/gambella-university-logo.jpg') }}" alt="Gambella University logo">
+                    </span>
                     <div>
                         <div class="brand-text fs-6 mb-0">RPMS</div>
                         <div class="brand-sub">Research Project Management System</div>
@@ -1008,7 +1076,9 @@
             <div class="row g-4 align-items-center">
                 <div class="col-lg-4">
                     <div class="d-flex align-items-center gap-3 mb-2">
-                        <span class="site-footer-brand"><i class="bi bi-journal-bookmark-fill"></i></span>
+                        <span class="site-footer-brand">
+                            <img src="{{ asset('images/gambella-university-logo.jpg') }}" alt="Gambella University logo">
+                        </span>
                         <div>
                             <div class="fw-bold text-white">RPMS</div>
                             <small class="text-white-50">Research Project Management System</small>
@@ -1053,9 +1123,11 @@
         <aside class="rpms-sidebar">
             {{-- Brand header --}}
             <div class="p-3 border-bottom d-flex align-items-center gap-2" style="border-color: rgba(99, 140, 220, 0.12) !important;">
-                <div style="width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(99, 102, 241, 0.15) 100%); border: 1px solid rgba(99, 140, 220, 0.2); display: flex; align-items: center; justify-content: center; color: #60a5fa; font-size: 1.25rem;">
-                    <i class="bi bi-journal-bookmark-fill"></i>
-                </div>
+                <img
+                    src="{{ asset('images/gambella-university-logo.jpg') }}"
+                    alt="Gambella University logo"
+                    style="width: 38px; height: 38px; flex: 0 0 38px; border: 1px solid rgba(216, 180, 90, 0.7); border-radius: 50%; background: #fff; object-fit: contain;"
+                >
                 <div>
                     <div class="fw-bold text-white small lh-1">Gambella University</div>
                     <div style="font-size: 0.68rem; color: #7b8db0;">Research Project Management</div>
@@ -1256,9 +1328,11 @@
         <div class="offcanvas offcanvas-start text-white d-lg-none" tabindex="-1" id="navbarOffcanvas" aria-labelledby="navbarOffcanvasLabel" style="background: linear-gradient(180deg, #0c1528 0%, #0f1a32 40%, #101e38 100%); max-width: 300px; width: 80vw;">
             <div class="offcanvas-header pb-2 pt-3 px-3" style="border-bottom: 1px solid rgba(99, 140, 220, 0.12);">
                 <div class="d-flex align-items-center gap-2">
-                    <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(99, 102, 241, 0.15) 100%); display: flex; align-items: center; justify-content: center; color: #60a5fa;">
-                        <i class="bi bi-journal-bookmark-fill"></i>
-                    </div>
+                    <img
+                        src="{{ asset('images/gambella-university-logo.jpg') }}"
+                        alt="Gambella University logo"
+                        style="width: 32px; height: 32px; flex: 0 0 32px; border: 1px solid rgba(216, 180, 90, 0.7); border-radius: 50%; background: #fff; object-fit: contain;"
+                    >
                     <div>
                         <div class="fw-bold text-white small lh-1">Gambella University</div>
                         <div style="font-size: 0.68rem; color: #7b8db0;">RPMS Mobile Portal</div>

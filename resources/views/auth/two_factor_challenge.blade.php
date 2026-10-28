@@ -4,7 +4,7 @@
 <section class="login-frame" aria-labelledby="challenge-title">
     <div class="login-intro">
         <div class="login-brand">
-            <span class="login-brand-mark"><i class="bi bi-shield-lock-fill"></i></span>
+            <img class="institution-logo" src="{{ asset('images/gambella-university-logo.jpg') }}" alt="Gambella University logo">
             <span>
                 <strong>RPMS</strong>
                 <small>Institutional Security Gateway</small>

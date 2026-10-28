@@ -4,7 +4,7 @@
 <section class="login-frame" aria-labelledby="login-title">
     <div class="login-intro">
         <div class="login-brand">
-            <span class="login-brand-mark"><i class="bi bi-journal-bookmark-fill"></i></span>
+            <img class="institution-logo" src="{{ asset('images/gambella-university-logo.jpg') }}" alt="Gambella University logo">
             <span>
                 <strong>RPMS</strong>
                 <small>Research Project Management System</small>
@@ -185,17 +185,6 @@
         display: flex;
         align-items: center;
         gap: 0.85rem;
-    }
-    .login-brand-mark {
-        display: grid;
-        width: 3rem;
-        height: 3rem;
-        place-items: center;
-        border: 1px solid rgba(255, 255, 255, 0.22);
-        border-radius: 1rem;
-        color: #f2d58e;
-        background: rgba(255, 255, 255, 0.1);
-        font-size: 1.35rem;
     }
     .login-brand strong,
     .login-brand small {

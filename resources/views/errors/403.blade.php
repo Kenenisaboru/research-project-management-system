@@ -28,6 +28,15 @@
         }
         .brand-text { color: #ffffff; font-weight: 800; letter-spacing: 0.8px; font-size: 0.95rem; }
         .brand-sub { color: var(--UNI-gold); font-size: 0.72rem; font-weight: 500; }
+        .institution-brand-logo {
+            width: 42px;
+            height: 42px;
+            flex: 0 0 42px;
+            border: 1px solid rgba(212, 175, 55, 0.75);
+            border-radius: 50%;
+            background: #ffffff;
+            object-fit: contain;
+        }
         .error-card {
             border: 1px solid #e2e8f0;
             border-radius: 12px;
@@ -55,7 +64,7 @@
     <nav class="navbar navbar-expand-lg navbar-UNI py-2">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="{{ route('dashboard') }}">
-                <i class="bi bi-journal-bookmark-fill fs-2 text-warning me-2"></i>
+                <img class="institution-brand-logo me-2" src="{{ asset('images/gambella-university-logo.jpg') }}" alt="Gambella University logo">
                 <div>
                     <div class="brand-text fs-6">RPMS</div>
                     <div class="brand-sub">Research Project Management System</div>
