@@ -56,7 +56,7 @@ class PresentationScheduleController extends Controller
         $request->validate([
             'project_id'   => 'required|exists:projects,project_id',
             'type'         => 'required|in:InitialDefence,BudgetApproval,ProgressReport,FinalDefence',
-            'scheduled_at' => 'required|date|after:now',
+            'scheduled_at' => 'required|date',
             'venue'        => 'nullable|string|max:255',
             'notes'        => 'nullable|string',
         ]);
