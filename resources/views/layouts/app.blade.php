@@ -1180,7 +1180,28 @@
                             <i class="bi bi-journal-richtext"></i>
                             <span>Publications</span>
                         </a>
+                    <li class="nav-item">
+                        <a href="{{ route('schedules.index') }}" class="rpms-side-link {{ request()->routeIs('schedules.*') ? 'active' : '' }}">
+                            <i class="bi bi-calendar-event"></i>
+                            <span>Defence Timetable</span>
+                        </a>
                     </li>
+                    @if(in_array(Auth::user()->role, ['ttcsd', 'vparttcs', 'admin']))
+                    <li class="nav-item">
+                        <a href="{{ route('ttcsd.dashboard') }}" class="rpms-side-link {{ request()->routeIs('ttcsd.*') ? 'active' : '' }}">
+                            <i class="bi bi-speedometer2"></i>
+                            <span>TTCSD Portal</span>
+                        </a>
+                    </li>
+                    @endif
+                    @if(in_array(Auth::user()->role, ['coordinator', 'dean', 'rcsc', 'vparttcs', 'admin', 'ttcsd']))
+                    <li class="nav-item">
+                        <a href="{{ route('reports.index') }}" class="rpms-side-link {{ request()->routeIs('reports.*') ? 'active' : '' }}">
+                            <i class="bi bi-file-earmark-bar-graph"></i>
+                            <span>Institutional Reports</span>
+                        </a>
+                    </li>
+                    @endif
                     @if(Auth::user()->role === 'admin')
                     <li class="nav-item">
                         <a href="{{ route('admin.users') }}" class="rpms-side-link {{ request()->routeIs('admin.users') ? 'active' : '' }}">

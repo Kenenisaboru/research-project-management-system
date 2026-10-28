@@ -124,10 +124,18 @@ class DashboardController extends Controller
                 'total_budget' => (clone $myProjects)->sum('requested_budget'),
                 'approved_budget' => (clone $myProjects)->sum('approved_budget'),
                 'pending_extensions' => ProjectExtension::whereHas('project', fn($q) => $q->where('pi_id', $user->id))->where('status', 'Pending')->count(),
+                'next_defence' => \App\Models\PresentationSchedule::whereHas('project', fn($q) => $q->where('pi_id', $user->id))
+                    ->where('status', 'Scheduled')
+                    ->where('scheduled_at', '>=', now())
+                    ->orderBy('scheduled_at')
+                    ->first(),
             ];
         } elseif ($role === 'reviewer') {
             return [
                 'pending_reviews' => Evaluation::where('examiner_id', $user->id)->where('decision', 'Pending')->count(),
+                'pending_proposal_reviews' => Evaluation::where('examiner_id', $user->id)->where(fn($q) => $q->where('evaluation_type', 'Proposal')->orWhereNull('evaluation_type'))->where('decision', 'Pending')->count(),
+                'pending_progress_reviews' => Evaluation::where('examiner_id', $user->id)->where('evaluation_type', 'Progress')->where('decision', 'Pending')->count(),
+                'pending_final_reviews' => Evaluation::where('examiner_id', $user->id)->where('evaluation_type', 'FinalDefence')->where('decision', 'Pending')->count(),
                 'completed_reviews' => Evaluation::where('examiner_id', $user->id)->where('decision', '!=', 'Pending')->count(),
                 'avg_score' => Evaluation::where('examiner_id', $user->id)->where('decision', '!=', 'Pending')->avg('score') ?? 0,
             ];
@@ -189,6 +197,15 @@ class DashboardController extends Controller
             return [
                 'team_projects' => ProjectMember::where('user_id', $user->id)->count(),
                 'active_projects' => ProjectMember::where('user_id', $user->id)->whereHas('project', fn($q) => $q->where('status', 'Active'))->count(),
+            ];
+        } elseif ($role === 'ttcsd') {
+            return [
+                'total_projects'       => Project::where('status', '!=', 'Draft')->count(),
+                'active_projects'      => Project::where('status', 'Active')->count(),
+                'delayed_projects'     => Project::where('status', 'Active')->where('activated_at', '<', now()->subMonths(12))->count(),
+                'pending_terminations' => \App\Models\ProjectTermination::where('status', 'Pending')->count(),
+                'pending_amendments'   => \App\Models\BudgetAmendment::where('status', 'Pending')->count(),
+                'pending_extensions'   => \App\Models\ProjectExtension::where('status', 'Pending')->count(),
             ];
         }
 

@@ -17,6 +17,7 @@
         'rcsc' => 'RCSC Chair',
         'finance' => 'Finance Office',
         'admin' => 'System Administrator',
+        'ttcsd' => 'TTCSD / RPED Directorate',
     ];
 
     $totalProjects = max(1, $totalProjectsCount ?? 24);
@@ -87,6 +88,10 @@
                 <a href="{{ route('rcsc.portal') }}" class="gambella-btn-primary">
                     <i class="bi bi-shield-lock"></i> Governance Portal
                 </a>
+            @elseif($role === 'ttcsd')
+                <a href="{{ route('ttcsd.dashboard') }}" class="gambella-btn-primary">
+                    <i class="bi bi-speedometer2"></i> TTCSD Portal
+                </a>
             @else
                 <a href="{{ route('projects.index') }}" class="gambella-btn-primary">
                     <i class="bi bi-folder2-open"></i> View Projects
@@ -94,6 +99,32 @@
             @endif
         </div>
     </div>
+
+    {{-- Upcoming Presentation / Defence Banner for PI --}}
+    @if($role === 'pi' && !empty($stats['next_defence']))
+    <div class="card card-custom mb-4 border-start border-4 border-success bg-white shadow-sm">
+        <div class="card-body d-flex flex-wrap justify-content-between align-items-center py-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-success text-white p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                    <i class="bi bi-calendar-event fs-5"></i>
+                </div>
+                <div>
+                    <span class="badge bg-success mb-1">Upcoming Defence / Presentation</span>
+                    <h6 class="fw-bold mb-0 text-dark">{{ $stats['next_defence']->type_display }} for &ldquo;{{ $stats['next_defence']->project->title ?? 'Project' }}&rdquo;</h6>
+                    <small class="text-muted">
+                        <i class="bi bi-clock me-1"></i>{{ $stats['next_defence']->scheduled_at->format('M d, Y \a\t h:i A') }}
+                        @if($stats['next_defence']->venue)
+                            &bull; <i class="bi bi-geo-alt me-1"></i>{{ $stats['next_defence']->venue }}
+                        @endif
+                    </small>
+                </div>
+            </div>
+            <a href="{{ route('schedules.index') }}" class="btn btn-outline-success btn-sm fw-bold">
+                <i class="bi bi-calendar3 me-1"></i> View Defence Timetable
+            </a>
+        </div>
+    </div>
+    @endif
 
     {{-- System Risk Alerts (if active) --}}
     @isset($alerts)

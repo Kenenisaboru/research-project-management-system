@@ -25,6 +25,7 @@ class RbacSeeder extends Seeder
             ['name' => 'finance', 'display_name' => 'Finance Office', 'description' => 'Processes budget disbursements and financial transactions'],
             ['name' => 'admin', 'display_name' => 'System Administrator', 'description' => 'Manages users, thematic areas, audit logs, and system configuration'],
             ['name' => 'ttcsd', 'display_name' => 'TTCSD / RPED Officer', 'description' => 'Technology Transfer & Community Services Directorate — evaluates high-level projects and processes terminations/amendments'],
+        ];
 
         foreach ($roles as $role) {
             Role::firstOrCreate(['name' => $role['name']], $role);
