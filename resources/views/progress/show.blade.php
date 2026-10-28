@@ -27,28 +27,36 @@
             $pendingCount = $reports->where('status', 'Submitted')->count();
             $revisionCount = $reports->where('status', 'Needs_Revision')->count();
         @endphp
-        <div class="card card-custom">
+        <div class="card card-custom" x-data="{ progress: {{ $overallProgress }} }">
             <div class="card-body">
                 <div class="row align-items-center">
                     <div class="col-md-3 text-center border-end">
                         <div class="position-relative d-inline-block">
-                            <svg width="100" height="100" viewBox="0 0 100 100">
+                            <svg width="110" height="110" viewBox="0 0 100 100">
                                 <circle cx="50" cy="50" r="45" fill="none" stroke="#e9ecef" stroke-width="8"/>
                                 <circle cx="50" cy="50" r="45" fill="none" 
-                                        stroke="#212529" 
+                                        :stroke="progress >= 100 ? '#10b981' : (progress >= 50 ? '#0f3e2e' : '#d4af37')" 
                                         stroke-width="8" stroke-linecap="round"
-                                        stroke-dasharray="{{ $overallProgress * 2.83 }} 283"
+                                        :stroke-dasharray="(progress * 2.83) + ' 283'"
+                                        style="transition: stroke-dasharray 0.4s ease, stroke 0.4s ease;"
                                         transform="rotate(-90 50 50)"/>
                                 <text x="50" y="50" text-anchor="middle" dy=".3em" 
-                                      class="fs-4 fw-bold" fill="#212529">
+                                      class="fs-4 fw-bold" fill="#212529" x-text="progress + '%'">
                                     {{ $overallProgress }}%
                                 </text>
                             </svg>
                         </div>
                         <div class="mt-2 small fw-semibold text-muted">Overall Progress</div>
+                        <div class="mt-1">
+                            <span class="badge" 
+                                  :class="progress >= 100 ? 'bg-success' : (progress >= 70 ? 'bg-primary' : (progress >= 30 ? 'bg-info text-dark' : 'bg-warning text-dark'))"
+                                  x-text="progress >= 100 ? 'Completed' : (progress >= 70 ? 'Final Stage' : (progress >= 30 ? 'Midterm Stage' : 'Inception Stage'))">
+                                {{ $overallProgress >= 100 ? 'Completed' : ($overallProgress >= 70 ? 'Final Stage' : ($overallProgress >= 30 ? 'Midterm Stage' : 'Inception Stage')) }}
+                            </span>
+                        </div>
                     </div>
                     <div class="col-md-9">
-                        <div class="row text-center g-3">
+                        <div class="row text-center g-3 mb-3">
                             <div class="col">
                                 <div class="border rounded p-3 bg-light">
                                     <div class="fs-3 fw-bold text-dark">{{ $reports->count() }}</div>
@@ -57,21 +65,33 @@
                             </div>
                             <div class="col">
                                 <div class="border rounded p-3 bg-light">
-                                    <div class="fs-3 fw-bold text-dark">{{ $approvedCount }}</div>
+                                    <div class="fs-3 fw-bold text-success">{{ $approvedCount }}</div>
                                     <div class="small text-muted">Approved</div>
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="border rounded p-3 bg-light">
-                                    <div class="fs-3 fw-bold text-dark">{{ $pendingCount }}</div>
+                                    <div class="fs-3 fw-bold text-warning">{{ $pendingCount }}</div>
                                     <div class="small text-muted">Pending</div>
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="border rounded p-3 bg-light">
-                                    <div class="fs-3 fw-bold text-dark">{{ $revisionCount }}</div>
+                                    <div class="fs-3 fw-bold text-danger">{{ $revisionCount }}</div>
                                     <div class="small text-muted">Needs Revision</div>
                                 </div>
+                            </div>
+                        </div>
+
+                        {{-- Milestone Phase Progress Indicator --}}
+                        <div class="p-2 border rounded bg-white">
+                            <div class="d-flex justify-content-between text-muted small fw-bold mb-1" style="font-size:0.75rem;">
+                                <span :class="progress >= 30 ? 'text-success' : 'text-muted'"><i class="bi bi-flag me-1"></i>Phase 1: Inception (0-30%)</span>
+                                <span :class="progress >= 70 ? 'text-success' : 'text-muted'"><i class="bi bi-gear me-1"></i>Phase 2: Execution (30-70%)</span>
+                                <span :class="progress >= 100 ? 'text-success' : 'text-muted'"><i class="bi bi-award me-1"></i>Phase 3: Final (70-100%)</span>
+                            </div>
+                            <div class="progress" style="height: 10px; border-radius: 6px;">
+                                <div class="progress-bar bg-success" role="progressbar" :style="'width: ' + progress + '%'" style="width: {{ $overallProgress }}%; transition: width 0.4s ease;"></div>
                             </div>
                         </div>
                     </div>

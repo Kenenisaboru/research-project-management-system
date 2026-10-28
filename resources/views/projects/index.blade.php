@@ -10,6 +10,71 @@
     @endif
 </div>
 
+<<<<<<< HEAD
+<div x-data="projectIndexFilter()" x-init="init()">
+    <form method="GET" action="{{ route('projects.index') }}" id="filterForm">
+        <div class="card card-custom p-3 mb-4">
+            <div class="row g-3 align-items-center">
+                <div class="col-12 col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                        <input type="search" name="search" x-model="search" @input.debounce.150ms="applyClientFilter()" class="form-control border-start-0 ps-0" placeholder="Instant search title or PI..." aria-label="Search project title" value="{{ request('search') }}">
+                    </div>
+                </div>
+                <div class="col-12 col-md-8">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label class="form-label fw-semibold small text-muted mb-0">Filter by Status</label>
+                        <span class="badge bg-light text-dark border small" x-text="'Showing ' + visibleCount + ' of ' + totalCount + ' projects'">Showing {{ $projects->count() }} of {{ $projects->count() }} projects</span>
+                    </div>
+                    <div class="d-flex flex-wrap gap-1 gap-md-2">
+                        @php
+                            $statuses = [
+                                '' => ['label' => 'All', 'color' => 'dark', 'icon' => 'bi-grid'],
+                                'Draft' => ['label' => 'Draft', 'color' => 'secondary', 'icon' => 'bi-pencil'],
+                                'Submitted' => ['label' => 'Submitted', 'color' => 'info', 'icon' => 'bi-send'],
+                                'Returned' => ['label' => 'Returned', 'color' => 'warning', 'icon' => 'bi-arrow-return-left'],
+                                'DH_Screened' => ['label' => 'Screened', 'color' => 'primary', 'icon' => 'bi-eye'],
+                                'UnderReview' => ['label' => 'Under Review', 'color' => 'warning', 'icon' => 'bi-hourglass-split'],
+                                'Dean_Review' => ['label' => 'Dean Review', 'color' => 'info', 'icon' => 'bi-bank'],
+                                'RCSC_Review' => ['label' => 'RCSC Review', 'color' => 'danger', 'icon' => 'bi-bank'],
+                                'Approved' => ['label' => 'Approved', 'color' => 'success', 'icon' => 'bi-check-circle'],
+                                'Rejected' => ['label' => 'Rejected', 'color' => 'danger', 'icon' => 'bi-x-circle'],
+                                'Active' => ['label' => 'Active', 'color' => 'primary', 'icon' => 'bi-play-circle'],
+                                'Completed' => ['label' => 'Completed', 'color' => 'success', 'icon' => 'bi-trophy'],
+                                'PendingCancellation' => ['label' => 'Withdrawal Review', 'color' => 'warning', 'icon' => 'bi-hourglass-split'],
+                                'Withdrawn' => ['label' => 'Withdrawn', 'color' => 'dark', 'icon' => 'bi-x-circle'],
+                                'Terminated' => ['label' => 'Terminated', 'color' => 'danger', 'icon' => 'bi-x-octagon'],
+                            ];
+                            $current = request('status', '');
+                        @endphp
+                        @foreach($statuses as $val => $info)
+                            <button type="button"
+                                @click="setStatus('{{ $val }}')"
+                                :class="status === '{{ $val }}' ? 'btn-dark' : 'btn-outline-secondary'"
+                                class="btn btn-sm fw-semibold rounded-pill px-2 px-md-3 py-1 {{ $current === $val ? 'btn-dark' : 'btn-outline-secondary' }}" style="font-size: 0.78rem;">
+                                <i class="bi {{ $info['icon'] }} me-1"></i>{{ $info['label'] }}
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <label for="thematic-area" class="form-label fw-semibold small text-muted mb-1">Thematic area</label>
+                    <select id="thematic-area" name="thematic_area" x-model="thematicArea" @change="applyClientFilter()" class="form-select">
+                        <option value="">All thematic areas</option>
+                        @foreach($thematicAreas as $area)
+                            <option value="{{ $area->id }}" {{ (string) request('thematic_area') === (string) $area->id ? 'selected' : '' }}>{{ $area->title }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-12 col-md-auto d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-dark"><i class="bi bi-funnel me-1"></i>Apply filters</button>
+                    <button type="button" @click="clearFilters()" class="btn btn-outline-secondary">Clear</button>
+                </div>
+            </div>
+            <input type="hidden" name="status" :value="status" value="{{ request('status') }}">
+        </div>
+    </form>
+=======
 <form method="GET" action="{{ route('projects.index') }}" id="filterForm">
     <div class="card card-custom p-3 mb-4">
         <div class="row g-3 align-items-center">
@@ -67,119 +132,191 @@
         <input type="hidden" name="status" value="{{ request('status') }}">
     </div>
 </form>
+>>>>>>> upstream/main
 
-<div class="card card-custom p-3 p-md-4">
-    <div class="table-responsive">
-        <table class="table table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>ID</th>
-                    <th>Title</th>
-                    <th>Principal Investigator</th>
-                    <th>Thematic Area</th>
-                    <th>Budget</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($projects as $p)
-                <tr>
-                    <td class="font-monospace text-muted">#{{ $p->project_id }}</td>
-                    <td class="fw-bold text-dark" style="max-width: 250px;" title="{{ $p->title }}">{{ Str::limit($p->title, 50) }}</td>
-                    <td>
-                        <span class="d-inline-flex align-items-center"><i class="bi bi-person-circle me-1 text-muted"></i> {{ $p->pi->name }}</span>
-                    </td>
-                    <td>
-                        <span class="badge bg-light text-dark border">{{ $p->thematicArea ? $p->thematicArea->title : 'General' }}</span>
-                    </td>
-                    <td class="fw-semibold text-dark">{{ number_format($p->requested_budget, 2) }} ETB</td>
-                    <td>
-                        @if($p->status === 'Draft')
-                            <span class="badge bg-secondary text-white px-2 py-1"><i class="bi bi-pencil me-1"></i>Draft</span>
-                        @elseif($p->status === 'Returned')
-                            <span class="badge bg-warning text-dark px-2 py-1"><i class="bi bi-arrow-return-left me-1"></i>Returned</span>
-                        @elseif($p->status === 'Withdrawn')
-                            <span class="badge bg-dark text-white px-2 py-1"><i class="bi bi-x-circle me-1"></i>Withdrawn</span>
-                        @elseif($p->status === 'Approved')
-                            <span class="badge bg-success text-white px-2 py-1"><i class="bi bi-check-circle me-1"></i>Approved</span>
-                            @if($p->irercClearance)
-                                @if($p->irercClearance->status === 'Approved')
-                                    <div class="mt-1"><span class="badge bg-success text-white px-2 py-1" style="font-size: 0.72rem;"><i class="bi bi-shield-check me-1"></i>Ethics Cleared</span></div>
-                                @elseif($p->irercClearance->status === 'Rejected')
-                                    <div class="mt-1"><span class="badge bg-danger text-white px-2 py-1" style="font-size: 0.72rem;"><i class="bi bi-shield-x me-1"></i>Ethics Rejected</span></div>
-                                @else
-                                    <div class="mt-1"><span class="badge bg-warning text-dark px-2 py-1" style="font-size: 0.72rem;"><i class="bi bi-shield-exclamation me-1"></i>Ethics Pending</span></div>
+    <div class="card card-custom p-3 p-md-4">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="projectsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Principal Investigator</th>
+                        <th>Thematic Area</th>
+                        <th>Budget</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($projects as $p)
+                    <tr class="project-row"
+                        data-id="{{ $p->project_id }}"
+                        data-title="{{ strtolower($p->title) }}"
+                        data-pi="{{ strtolower($p->pi->name ?? '') }}"
+                        data-status="{{ $p->status }}"
+                        data-thematic="{{ $p->thematic_id ?? '' }}">
+                        <td class="font-monospace text-muted">#{{ $p->project_id }}</td>
+                        <td class="fw-bold text-dark" style="max-width: 250px;" title="{{ $p->title }}">{{ Str::limit($p->title, 50) }}</td>
+                        <td>
+                            <span class="d-inline-flex align-items-center"><i class="bi bi-person-circle me-1 text-muted"></i> {{ $p->pi->name }}</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border">{{ $p->thematicArea ? $p->thematicArea->title : 'General' }}</span>
+                        </td>
+                        <td class="fw-semibold text-dark">{{ number_format($p->requested_budget, 2) }} ETB</td>
+                        <td>
+                            @if($p->status === 'Draft')
+                                <span class="badge bg-secondary text-white px-2 py-1"><i class="bi bi-pencil me-1"></i>Draft</span>
+                            @elseif($p->status === 'Returned')
+                                <span class="badge bg-warning text-dark px-2 py-1"><i class="bi bi-arrow-return-left me-1"></i>Returned</span>
+                            @elseif($p->status === 'Withdrawn')
+                                <span class="badge bg-dark text-white px-2 py-1"><i class="bi bi-x-circle me-1"></i>Withdrawn</span>
+                            @elseif($p->status === 'Approved')
+                                <span class="badge bg-success text-white px-2 py-1"><i class="bi bi-check-circle me-1"></i>Approved</span>
+                                @if($p->irercClearance)
+                                    @if($p->irercClearance->status === 'Approved')
+                                        <div class="mt-1"><span class="badge bg-success text-white px-2 py-1" style="font-size: 0.72rem;"><i class="bi bi-shield-check me-1"></i>Ethics Cleared</span></div>
+                                    @elseif($p->irercClearance->status === 'Rejected')
+                                        <div class="mt-1"><span class="badge bg-danger text-white px-2 py-1" style="font-size: 0.72rem;"><i class="bi bi-shield-x me-1"></i>Ethics Rejected</span></div>
+                                    @else
+                                        <div class="mt-1"><span class="badge bg-warning text-dark px-2 py-1" style="font-size: 0.72rem;"><i class="bi bi-shield-exclamation me-1"></i>Ethics Pending</span></div>
+                                    @endif
                                 @endif
-                            @endif
-                        @elseif($p->status === 'Completed')
-                            <span class="badge bg-success text-white px-2 py-1"><i class="bi bi-check-circle me-1"></i>Completed</span>
-                        @elseif($p->status === 'Active')
-                            <span class="badge bg-primary text-white px-2 py-1"><i class="bi bi-play-circle me-1"></i>Active</span>
-                        @elseif(in_array($p->status, ['Submitted', 'DH_Screened', 'UnderReview', 'Dean_Review', 'RCSC_Review']))
-                            @if($p->status === 'Dean_Review')
-                                <span class="badge bg-info text-dark px-2 py-1"><i class="bi bi-bank me-1"></i>Dean Review</span>
-                            @elseif($p->status === 'RCSC_Review')
-                                <span class="badge bg-danger text-white px-2 py-1"><i class="bi bi-bank me-1"></i>RCSC Review</span>
+                            @elseif($p->status === 'Completed')
+                                <span class="badge bg-success text-white px-2 py-1"><i class="bi bi-check-circle me-1"></i>Completed</span>
+                            @elseif($p->status === 'Active')
+                                <span class="badge bg-primary text-white px-2 py-1"><i class="bi bi-play-circle me-1"></i>Active</span>
+                            @elseif(in_array($p->status, ['Submitted', 'DH_Screened', 'UnderReview', 'Dean_Review', 'RCSC_Review']))
+                                @if($p->status === 'Dean_Review')
+                                    <span class="badge bg-info text-dark px-2 py-1"><i class="bi bi-bank me-1"></i>Dean Review</span>
+                                @elseif($p->status === 'RCSC_Review')
+                                    <span class="badge bg-danger text-white px-2 py-1"><i class="bi bi-bank me-1"></i>RCSC Review</span>
+                                @else
+                                    <span class="badge bg-warning text-dark px-2 py-1"><i class="bi bi-hourglass-split me-1"></i>{{ $p->status }}</span>
+                                @endif
+                                @if($p->irercClearance)
+                                    @if($p->irercClearance->status === 'Approved')
+                                        <div class="mt-1"><span class="badge bg-success text-white px-2 py-1" style="font-size: 0.72rem;"><i class="bi bi-shield-check me-1"></i>Ethics Cleared</span></div>
+                                    @elseif($p->irercClearance->status === 'Rejected')
+                                        <div class="mt-1"><span class="badge bg-danger text-white px-2 py-1" style="font-size: 0.72rem;"><i class="bi bi-shield-x me-1"></i>Ethics Rejected</span></div>
+                                    @else
+                                        <div class="mt-1"><span class="badge bg-warning text-dark px-2 py-1" style="font-size: 0.72rem;"><i class="bi bi-shield-exclamation me-1"></i>Ethics Pending</span></div>
+                                    @endif
+                                @endif
+                            @elseif($p->status === 'Rejected' || $p->status === 'Terminated')
+                                <span class="badge bg-danger text-white px-2 py-1"><i class="bi bi-x-circle me-1"></i>{{ $p->status }}</span>
+                            @elseif($p->status === 'PendingCancellation')
+                                <span class="badge bg-warning text-dark px-2 py-1"><i class="bi bi-hourglass-split me-1"></i>Pending Withdraw</span>
                             @else
-                                <span class="badge bg-warning text-dark px-2 py-1"><i class="bi bi-hourglass-split me-1"></i>{{ $p->status }}</span>
+                                <span class="badge bg-secondary text-white px-2 py-1">{{ $p->status }}</span>
                             @endif
-                            @if($p->irercClearance)
-                                @if($p->irercClearance->status === 'Approved')
-                                    <div class="mt-1"><span class="badge bg-success text-white px-2 py-1" style="font-size: 0.72rem;"><i class="bi bi-shield-check me-1"></i>Ethics Cleared</span></div>
-                                @elseif($p->irercClearance->status === 'Rejected')
-                                    <div class="mt-1"><span class="badge bg-danger text-white px-2 py-1" style="font-size: 0.72rem;"><i class="bi bi-shield-x me-1"></i>Ethics Rejected</span></div>
-                                @else
-                                    <div class="mt-1"><span class="badge bg-warning text-dark px-2 py-1" style="font-size: 0.72rem;"><i class="bi bi-shield-exclamation me-1"></i>Ethics Pending</span></div>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                @if(in_array($p->status, ['Draft', 'Withdrawn', 'Returned']) && Auth::user()->role === 'pi')
+                                    <form action="{{ route('projects.submit', $p->project_id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button type="button" class="btn btn-sm btn-dark confirm-btn" data-confirm-title="Submit Proposal" data-confirm-message="This proposal will be sent to the Department Head for initial screening." data-confirm-icon="bi-send" data-confirm-color="text-success" data-confirm-btn-text="Yes, Submit" data-confirm-btn-class="btn-success" style="min-width:80px"><i class="bi bi-send me-1"></i>Submit</button>
+                                    </form>
                                 @endif
-                            @endif
-                        @elseif($p->status === 'Rejected' || $p->status === 'Terminated')
-                            <span class="badge bg-danger text-white px-2 py-1"><i class="bi bi-x-circle me-1"></i>{{ $p->status }}</span>
-                        @elseif($p->status === 'PendingCancellation')
-                            <span class="badge bg-warning text-dark px-2 py-1"><i class="bi bi-hourglass-split me-1"></i>Pending Withdraw</span>
-                        @else
-                            <span class="badge bg-secondary text-white px-2 py-1">{{ $p->status }}</span>
-                        @endif
-                    </td>
-                    <td>
-                        <div class="d-flex gap-1">
-                            @if(in_array($p->status, ['Draft', 'Withdrawn', 'Returned']) && Auth::user()->role === 'pi')
-                                <form action="{{ route('projects.submit', $p->project_id) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    <button type="button" class="btn btn-sm btn-dark confirm-btn" data-confirm-title="Submit Proposal" data-confirm-message="This proposal will be sent to the Department Head for initial screening." data-confirm-icon="bi-send" data-confirm-color="text-success" data-confirm-btn-text="Yes, Submit" data-confirm-btn-class="btn-success" style="min-width:80px"><i class="bi bi-send me-1"></i>Submit</button>
-                                </form>
-                            @endif
-                            @if(Auth::user()->role === 'pi' && in_array($p->status, ['Submitted', 'DH_Screened', 'UnderReview']))
-                                <form action="{{ route('projects.cancel', $p->project_id) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    <button type="button" class="btn btn-sm btn-outline-danger confirm-btn" data-confirm-title="Withdraw Proposal" data-confirm-message="Are you sure you want to withdraw this proposal?" data-confirm-icon="bi-x-circle" data-confirm-color="text-danger" data-confirm-btn-text="Yes, Withdraw" data-confirm-btn-class="btn-danger" style="min-width:80px"><i class="bi bi-x-circle me-1"></i>Withdraw</button>
-                                </form>
-                            @endif
-                            <a href="{{ route('projects.show', $p->project_id) }}" class="btn btn-sm btn-outline-dark" style="min-width:80px">
-                                <i class="bi bi-eye me-1"></i>View
-                            </a>
-                            @if($p->proposal_document_url)
-                            <a href="{{ Storage::url($p->proposal_document_url) }}" target="_blank" class="btn btn-sm btn-outline-danger" title="View Document">
-                                <i class="bi bi-file-pdf"></i>
-                            </a>
-                            @endif
-                        </div>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="7" class="text-center text-muted py-4">
-                        <i class="bi bi-folder2-open fs-3 d-block text-secondary mb-2"></i>
-                        No research projects found.
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-    <div class="mt-3">
-        {{ $projects->links() }}
+                                @if(Auth::user()->role === 'pi' && in_array($p->status, ['Submitted', 'DH_Screened', 'UnderReview']))
+                                    <form action="{{ route('projects.cancel', $p->project_id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button type="button" class="btn btn-sm btn-outline-danger confirm-btn" data-confirm-title="Withdraw Proposal" data-confirm-message="Are you sure you want to withdraw this proposal?" data-confirm-icon="bi-x-circle" data-confirm-color="text-danger" data-confirm-btn-text="Yes, Withdraw" data-confirm-btn-class="btn-danger" style="min-width:80px"><i class="bi bi-x-circle me-1"></i>Withdraw</button>
+                                    </form>
+                                @endif
+                                <a href="{{ route('projects.show', $p->project_id) }}" class="btn btn-sm btn-outline-dark" style="min-width:80px">
+                                    <i class="bi bi-eye me-1"></i>View
+                                </a>
+                                @if($p->proposal_document_url)
+                                <a href="{{ Storage::url($p->proposal_document_url) }}" target="_blank" class="btn btn-sm btn-outline-danger" title="View Document">
+                                    <i class="bi bi-file-pdf"></i>
+                                </a>
+                                @endif
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            <i class="bi bi-folder2-open fs-3 d-block text-secondary mb-2"></i>
+                            No research projects found.
+                        </td>
+                    </tr>
+                    @endforelse
+                    <tr id="emptyClientFilterRow" style="display: none;">
+                        <td colspan="7" class="text-center text-muted py-4">
+                            <i class="bi bi-funnel fs-3 d-block text-secondary mb-2"></i>
+                            No research projects match your current filter criteria.
+                            <div class="mt-2">
+                                <button type="button" @click="clearFilters()" class="btn btn-sm btn-dark">Clear all filters</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-3">
+            {{ $projects->links() }}
+        </div>
     </div>
 </div>
+
+<script>
+function projectIndexFilter() {
+    return {
+        search: @json(request('search', '')),
+        status: @json(request('status', '')),
+        thematicArea: @json(request('thematic_area', '')),
+        visibleCount: {{ $projects->count() }},
+        totalCount: {{ $projects->count() }},
+        init() {
+            this.applyClientFilter();
+        },
+        setStatus(newStatus) {
+            this.status = (this.status === newStatus) ? '' : newStatus;
+            this.applyClientFilter();
+        },
+        clearFilters() {
+            this.search = '';
+            this.status = '';
+            this.thematicArea = '';
+            this.applyClientFilter();
+        },
+        applyClientFilter() {
+            var term = (this.search || '').trim().toLowerCase();
+            var st = (this.status || '').trim();
+            var th = (this.thematicArea || '').toString().trim();
+            var rows = document.querySelectorAll('.project-row');
+            var matches = 0;
+
+            rows.forEach(function (row) {
+                var title = row.getAttribute('data-title') || '';
+                var pi = row.getAttribute('data-pi') || '';
+                var rStatus = row.getAttribute('data-status') || '';
+                var rThematic = (row.getAttribute('data-thematic') || '').trim();
+
+                var matchesSearch = !term || title.indexOf(term) !== -1 || pi.indexOf(term) !== -1 || ('#' + row.getAttribute('data-id')).indexOf(term) !== -1;
+                var matchesStatus = !st || rStatus === st;
+                var matchesThematic = !th || rThematic === th;
+
+                if (matchesSearch && matchesStatus && matchesThematic) {
+                    row.style.display = '';
+                    matches++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            this.visibleCount = matches;
+            var emptyRow = document.getElementById('emptyClientFilterRow');
+            if (emptyRow) {
+                emptyRow.style.display = (matches === 0 && rows.length > 0) ? '' : 'none';
+            }
+        }
+    };
+}
+</script>
 
 @endsection

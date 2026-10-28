@@ -24,6 +24,7 @@ class RbacSeeder extends Seeder
             ['name' => 'rcsc', 'display_name' => 'RCSC Chair', 'description' => 'Research and Community Service Committee chair for high-budget and analytics'],
             ['name' => 'finance', 'display_name' => 'Finance Office', 'description' => 'Processes budget disbursements and financial transactions'],
             ['name' => 'admin', 'display_name' => 'System Administrator', 'description' => 'Manages users, thematic areas, audit logs, and system configuration'],
+            ['name' => 'ttcsd', 'display_name' => 'TTCSD / RPED Officer', 'description' => 'Technology Transfer & Community Services Directorate — evaluates high-level projects and processes terminations/amendments'],
         ];
 
         foreach ($roles as $role) {
@@ -71,6 +72,10 @@ class RbacSeeder extends Seeder
             ['name' => 'record_paper', 'display_name' => 'Record Paper', 'description' => 'Record approved papers in the publication registry'],
             ['name' => 'manage_backups', 'display_name' => 'Manage Backups', 'description' => 'Create, download and restore system backups'],
             ['name' => 'data_migration', 'display_name' => 'Data Migration', 'description' => 'Import legacy project data from CSV/Excel files'],
+            ['name' => 'manage_schedules', 'display_name' => 'Manage Schedules', 'description' => 'Create and manage presentation schedules for projects'],
+            ['name' => 'view_schedules', 'display_name' => 'View Schedules', 'description' => 'View presentation schedules and defence dates'],
+            ['name' => 'submit_challenge', 'display_name' => 'Submit Challenge', 'description' => 'Submit project challenges/changes to coordinator'],
+            ['name' => 'view_ttcsd_portal', 'display_name' => 'View TTCSD Portal', 'description' => 'Access TTCSD directorate dashboard and project inspection tools'],
         ];
 
         foreach ($permissions as $permission) {
@@ -83,6 +88,7 @@ class RbacSeeder extends Seeder
                 'manage_team', 'request_extension', 'request_amendment', 'request_termination',
                 'request_pi_transfer', 'submit_procurement', 'sign_contract',
                 'submit_progress_report', 'view_calls', 'submit_paper',
+                'submit_challenge', 'view_schedules',
             ],
             'tm' => [
                 'view_dashboard', 'manage_profile', 'view_projects', 'submit_progress_report',
@@ -101,6 +107,7 @@ class RbacSeeder extends Seeder
                 'manage_certificates', 'manage_procurement', 'approve_extensions',
                 'approve_amendments', 'approve_pi_transfer', 'review_progress_report',
                 'view_calls', 'manage_calls', 'evaluate_paper', 'record_paper',
+                'manage_schedules', 'view_schedules', 'approve_termination',
             ],
             'dean' => [
                 'view_dashboard', 'manage_profile', 'view_projects', 'approve_budget',
@@ -133,8 +140,19 @@ class RbacSeeder extends Seeder
                 'approve_termination', 'view_analytics', 'view_calls', 'manage_calls',
                 'submit_paper', 'evaluate_paper', 'approve_paper', 'award_papers',
                 'record_paper', 'manage_backups', 'data_migration',
+                'manage_schedules', 'view_schedules',
+            ],
+            'ttcsd' => [
+                'view_dashboard', 'manage_profile', 'view_projects', 'view_ttcsd_portal',
+                'approve_termination', 'approve_amendments', 'approve_extensions',
+                'view_analytics', 'view_calls', 'view_schedules',
+            ],
+            'reviewer' => [
+                'view_dashboard', 'manage_profile', 'view_projects', 'submit_evaluation',
+                'view_calls', 'evaluate_paper', 'view_schedules',
             ],
         ];
+
 
         foreach ($rolePermissions as $roleName => $permissionNames) {
             $role = Role::where('name', $roleName)->first();

@@ -37,6 +37,11 @@ class Project extends Model
         'cancellation_reason',
         'admin_cancel_notes',
         'project_code',
+<<<<<<< HEAD
+        'coordinator_assessment',
+        'coordinator_assessed_at',
+=======
+>>>>>>> upstream/main
     ];
 
     protected $casts = [
@@ -50,6 +55,7 @@ class Project extends Model
         'activated_at' => 'datetime',
         'completed_at' => 'datetime',
         'cancelled_at' => 'datetime',
+        'coordinator_assessed_at' => 'datetime',
     ];
 
     /**
@@ -157,5 +163,18 @@ class Project extends Model
     {
         return $this->hasMany(ProjectDocument::class, 'project_id', 'project_id');
     }
+<<<<<<< HEAD
+
+    public function presentationSchedules()
+    {
+        return $this->hasMany(PresentationSchedule::class, 'project_id', 'project_id');
+    }
+
+    public function challenges()
+    {
+        return $this->hasMany(ProjectChallenge::class, 'project_id', 'project_id');
+    }
+=======
+>>>>>>> upstream/main
 }
 

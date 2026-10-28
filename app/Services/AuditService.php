@@ -37,7 +37,11 @@ class AuditService
             $url = null;
         }
 
+<<<<<<< HEAD
+        return AuditLog::create([
+=======
         $data = [
+>>>>>>> upstream/main
             'user_id'        => $userId ?: Auth::id(),
             'action'         => strtoupper($action),
             'entity_type'    => $entityType,
@@ -48,6 +52,9 @@ class AuditService
             'request_method' => Request::method() ?: 'CLI',
             'request_url'    => $url,
             'diff_json'      => $diffJson,
+<<<<<<< HEAD
+        ]);
+=======
         ];
 
         try {
@@ -75,6 +82,64 @@ class AuditService
             \Illuminate\Support\Facades\Log::warning('AuditLog creation unexpected error: ' . $e->getMessage());
             return new AuditLog($data);
         }
+    }
+
+    /**
+     * Log a model modification with before/after attribute diff snapshot.
+     *
+     * @param string $action
+     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param array $before
+     * @param array $after
+     * @param string|null $details
+     * @return AuditLog
+     */
+    public static function diff(
+        string $action,
+        \Illuminate\Database\Eloquent\Model $model,
+        array $before,
+        array $after,
+        ?string $details = null
+    ): AuditLog {
+        $changes = [];
+        $allKeys = array_unique(array_merge(array_keys($before), array_keys($after)));
+
+        foreach ($allKeys as $key) {
+            $oldVal = $before[$key] ?? null;
+            $newVal = $after[$key] ?? null;
+            if ($oldVal !== $newVal) {
+                $changes[$key] = [
+                    'before' => $oldVal,
+                    'after'  => $newVal,
+                ];
+            }
+        }
+
+        $entityClass = class_basename($model);
+        $diffPayload = [
+            'entity'  => $entityClass,
+            'id'      => $model->getKey(),
+            'table'   => $model->getTable(),
+            'changes' => $changes,
+        ];
+
+        $desc = $details ?: sprintf(
+            '%s #%s updated (%d attribute%s changed)',
+            $entityClass,
+            $model->getKey(),
+            count($changes),
+            count($changes) === 1 ? '' : 's'
+        );
+
+        return self::log(
+            $action,
+            $entityClass,
+            $model->getKey(),
+            $desc,
+            Auth::id(),
+            $diffPayload
+        );
+>>>>>>> upstream/main
     }
 
     /**

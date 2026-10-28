@@ -53,7 +53,11 @@
                             </div>
 
                             <div class="alert alert-info py-2 small">
+<<<<<<< HEAD
+                                <i class="bi bi-info-circle me-1"></i> Account identifier: <strong>{{ $user->email }}</strong> &bull; Issuer: <strong>Gambella University RPMS</strong>
+=======
                                 <i class="bi bi-info-circle me-1"></i> Account identifier: <strong>{{ $user->email }}</strong> &bull; Issuer: <strong>University RPMS</strong>
+>>>>>>> upstream/main
                             </div>
                         </div>
 

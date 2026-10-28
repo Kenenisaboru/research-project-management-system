@@ -22,6 +22,12 @@ use App\Http\Controllers\Api\V1\NotificationController as ApiNotificationControl
 use App\Http\Controllers\ProjectDocumentController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\HealthCheckController;
+<<<<<<< HEAD
+use App\Http\Controllers\PresentationScheduleController;
+use App\Http\Controllers\TtcsdController;
+use App\Http\Controllers\ChallengeController;
+=======
+>>>>>>> upstream/main
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +39,9 @@ use App\Http\Controllers\HealthCheckController;
 Route::get('/health', [HealthCheckController::class, 'check'])->name('health');
 
 Route::get('/', function () {
+<<<<<<< HEAD
+    return view('home');
+=======
     $thematicAreas = \App\Models\ThematicArea::where('is_active', true)->get();
     $stats = [
         'projects'   => \App\Models\Project::count(),
@@ -42,6 +51,7 @@ Route::get('/', function () {
     ];
     $activeCalls = \App\Models\ResearchCall::where('status', 'Open')->take(3)->get();
     return view('home', compact('thematicAreas', 'stats', 'activeCalls'));
+>>>>>>> upstream/main
 })->name('home');
 
 // Authentication
@@ -712,5 +722,56 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/admin/data-migration', [DataMigrationController::class, 'index'])->name('admin.data-migration');
         Route::post('/admin/data-migration/import', [DataMigrationController::class, 'import'])->name('admin.data-migration.import');
         Route::get('/admin/data-migration/template', [DataMigrationController::class, 'template'])->name('admin.data-migration.template');
+    });
+
+    // ---------------------------------------------------------------------
+    // Module: Presentation Schedules & Defence Timetable
+    // ---------------------------------------------------------------------
+    Route::get('/schedules', [PresentationScheduleController::class, 'index'])->name('schedules.index');
+    Route::middleware(['role:coordinator,admin'])->group(function () {
+        Route::post('/schedules', [PresentationScheduleController::class, 'store'])->name('schedules.store');
+        Route::put('/schedules/{id}', [PresentationScheduleController::class, 'update'])->name('schedules.update');
+        Route::delete('/schedules/{id}', [PresentationScheduleController::class, 'destroy'])->name('schedules.destroy');
+    });
+
+    // ---------------------------------------------------------------------
+    // Module: TTCSD / RPED Directorate Portal
+    // ---------------------------------------------------------------------
+    Route::middleware(['role:ttcsd,vparttcs,admin'])->group(function () {
+        Route::get('/ttcsd/dashboard', [TtcsdController::class, 'dashboard'])->name('ttcsd.dashboard');
+        Route::get('/ttcsd/projects/{id}', [TtcsdController::class, 'inspectProject'])->name('ttcsd.project');
+        Route::post('/ttcsd/termination/{id}/decision', [TtcsdController::class, 'processTermination'])->name('ttcsd.termination.decision');
+        Route::post('/ttcsd/amendment/{id}/decision', [TtcsdController::class, 'processBudgetAmendment'])->name('ttcsd.amendment.decision');
+        Route::post('/ttcsd/extension/{id}/decision', [TtcsdController::class, 'processExtension'])->name('ttcsd.extension.decision');
+    });
+
+    // ---------------------------------------------------------------------
+    // Module: Project Challenges & Bottlenecks
+    // ---------------------------------------------------------------------
+    Route::middleware(['role:pi,tm'])->group(function () {
+        Route::post('/projects/{projectId}/challenges', [ChallengeController::class, 'store'])->name('challenges.store');
+    });
+    Route::get('/projects/{projectId}/challenges', [ChallengeController::class, 'index'])->name('challenges.index');
+    Route::middleware(['role:coordinator,admin'])->group(function () {
+        Route::post('/challenges/{id}/acknowledge', [ChallengeController::class, 'acknowledge'])->name('challenges.acknowledge');
+    });
+
+    // ---------------------------------------------------------------------
+    // Coordinator Preliminary Assessment Step
+    // ---------------------------------------------------------------------
+    Route::middleware(['role:coordinator,admin'])->group(function () {
+        Route::post('/projects/{id}/assess', [ProjectController::class, 'coordinatorAssess'])->name('projects.assess');
+    });
+
+    // ---------------------------------------------------------------------
+    // Module: Reports Hub & Operational Reports
+    // ---------------------------------------------------------------------
+    Route::middleware(['role:coordinator,dean,rcsc,vparttcs,admin,ttcsd'])->group(function () {
+        Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+        Route::get('/reports/annual-output', [ReportController::class, 'annualOutput'])->name('reports.annual-output');
+        Route::get('/reports/financial-audit', [ReportController::class, 'financialAudit'])->name('reports.financial-audit');
+        Route::get('/reports/thematic-impact', [ReportController::class, 'thematicImpact'])->name('reports.thematic-impact');
+        Route::get('/reports/researcher-performance', [ReportController::class, 'researcherPerformance'])->name('reports.researcher-performance');
+        Route::get('/reports/coordinator-operational', [ReportController::class, 'coordinatorOperational'])->name('reports.coordinator-operational');
     });
 });

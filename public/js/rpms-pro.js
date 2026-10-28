@@ -16,6 +16,56 @@
        THEME TOGGLE
        ========================================================================= */
     const THEME_KEY = 'rpms-theme';
+<<<<<<< HEAD
+    const THEME_VERSION_KEY = 'rpms-theme-ver-2';
+
+    function getPreferredTheme() {
+        // If theme version 2 has not been established yet, default to light
+        if (!localStorage.getItem(THEME_VERSION_KEY)) {
+            localStorage.setItem(THEME_VERSION_KEY, '2');
+            localStorage.setItem(THEME_KEY, 'light');
+            return 'light';
+        }
+        const stored = localStorage.getItem(THEME_KEY);
+        if (stored) return stored;
+        return 'light';
+    }
+
+    function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem(THEME_KEY, theme);
+        // Update toggle button icon
+        const toggleBtn = document.getElementById('rpms-theme-btn');
+        if (toggleBtn) {
+            const icon = toggleBtn.querySelector('.bi');
+            if (icon) {
+                icon.className = theme === 'dark' ? 'bi bi-sun-fill text-warning' : 'bi bi-moon-stars text-secondary';
+            }
+            toggleBtn.setAttribute('title', theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode');
+        }
+    }
+
+    function toggleTheme() {
+        const current = document.documentElement.getAttribute('data-theme') || 'light';
+        applyTheme(current === 'dark' ? 'light' : 'dark');
+    }
+
+    // Apply on load
+    applyTheme(getPreferredTheme());
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const btn = document.getElementById('rpms-theme-btn');
+        if (btn) {
+            btn.addEventListener('click', toggleTheme);
+            // Sync icon on DOMContentLoaded
+            const current = document.documentElement.getAttribute('data-theme') || 'light';
+            const icon = btn.querySelector('.bi');
+            if (icon) {
+                icon.className = current === 'dark' ? 'bi bi-sun-fill text-warning' : 'bi bi-moon-stars text-secondary';
+            }
+        }
+    });
+=======
 
     function applyTheme() {
         document.documentElement.setAttribute('data-theme', 'light');
@@ -24,6 +74,7 @@
 
     // Always ensure standard clean light theme
     applyTheme();
+>>>>>>> upstream/main
 
     /* =========================================================================
        COMMAND PALETTE  (Ctrl+K)
@@ -34,6 +85,11 @@
         { label: 'Create Project',      icon: 'bi-plus-circle',       url: '/projects/create',    roles: 'pi' },
         { label: 'Progress Reports',    icon: 'bi-bar-chart-line',    url: '/progress',           roles: 'all' },
         { label: 'Notifications',       icon: 'bi-bell',              url: '/notifications',      roles: 'all' },
+<<<<<<< HEAD
+        { label: 'Research Calls',      icon: 'bi-megaphone',         url: '/calls',              roles: 'all' },
+        { label: 'Publications',        icon: 'bi-journal-richtext',  url: '/papers',             roles: 'all' },
+=======
+>>>>>>> upstream/main
         { label: 'Certificates',        icon: 'bi-award',             url: '/certificates',       roles: 'coordinator,vparttcs,rcsc,admin' },
         { label: 'Analytics',           icon: 'bi-graph-up-arrow',    url: '/analytics',          roles: 'rcsc,vparttcs,admin' },
         { label: 'Reports Hub',         icon: 'bi-file-earmark-pdf',  url: '/reports',            roles: 'coordinator,dean,rcsc,vparttcs,admin' },
@@ -164,8 +220,86 @@
     });
 
     /* =========================================================================
+<<<<<<< HEAD
+       REAL-TIME NOTIFICATION ENGINE & TOAST MANAGER
+       ========================================================================= */
+    var lastSeenNotificationId = null;
+    var isFirstNotificationPoll = true;
+
+    function getNotificationCategoryMeta(category, title) {
+        var cat = (category || '').toLowerCase();
+        var t = (title || '').toLowerCase();
+        if (cat.indexOf('review') !== -1 || t.indexOf('review') !== -1) {
+            return { type: 'review', icon: 'bi-eye', label: 'Peer Review' };
+        }
+        if (cat.indexOf('ethics') !== -1 || t.indexOf('ethics') !== -1 || t.indexOf('irerc') !== -1) {
+            return { type: 'ethics', icon: 'bi-shield-check', label: 'Ethics Clearance' };
+        }
+        if (cat.indexOf('budget') !== -1 || t.indexOf('budget') !== -1 || t.indexOf('tranche') !== -1 || t.indexOf('disbursement') !== -1) {
+            return { type: 'budget', icon: 'bi-cash-coin', label: 'Financial Governance' };
+        }
+        if (t.indexOf('approved') !== -1 || t.indexOf('ratified') !== -1 || t.indexOf('completed') !== -1) {
+            return { type: 'approval', icon: 'bi-check2-circle', label: 'Workflow Approval' };
+        }
+        return { type: 'system', icon: 'bi-bell-fill', label: 'System Alert' };
+    }
+
+    function showToast(options) {
+        var container = document.getElementById('rpms-toast-container');
+        if (!container) return;
+
+        var meta = getNotificationCategoryMeta(options.category, options.title);
+        var toast = document.createElement('div');
+        toast.className = 'rpms-toast';
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+
+        var actionHtml = options.action_url
+            ? '<a href="' + options.action_url + '" class="btn btn-sm btn-dark px-2 py-0 mt-1 fw-bold" style="font-size:0.75rem;"><i class="bi bi-box-arrow-up-right me-1"></i>View Details</a>'
+            : '';
+
+        toast.innerHTML = [
+            '<div class="d-flex align-items-start gap-3">',
+            '  <div class="rpms-toast-icon ' + meta.type + '">',
+            '    <i class="bi ' + (options.icon || meta.icon) + '"></i>',
+            '  </div>',
+            '  <div class="flex-grow-1" style="min-width:0;">',
+            '    <div class="d-flex align-items-center justify-content-between gap-2">',
+            '      <span class="badge rounded-pill bg-light text-dark border fw-bold" style="font-size:0.68rem;">' + meta.label + '</span>',
+            '      <small class="text-muted" style="font-size:0.7rem;">Just now</small>',
+            '    </div>',
+            '    <h6 class="fw-bold mb-1 mt-1 text-truncate" style="font-size:0.88rem;">' + (options.title || 'Notification') + '</h6>',
+            '    <p class="mb-1 text-muted small text-break" style="font-size:0.8rem; line-height:1.4;">' + (options.message || '') + '</p>',
+            '    ' + actionHtml,
+            '  </div>',
+            '  <button type="button" class="btn-close btn-close-white ms-auto" aria-label="Close" style="font-size:0.65rem; opacity:0.7;"></button>',
+            '</div>',
+            '<div class="rpms-toast-progress"></div>'
+        ].join('');
+
+        // Dismiss logic
+        var dismissTimer;
+        function dismiss() {
+            clearTimeout(dismissTimer);
+            toast.classList.add('dismissing');
+            setTimeout(function () {
+                if (toast.parentNode) toast.parentNode.removeChild(toast);
+            }, 300);
+        }
+
+        var closeBtn = toast.querySelector('.btn-close');
+        if (closeBtn) closeBtn.addEventListener('click', dismiss);
+
+        // Auto dismiss after 6s
+        dismissTimer = setTimeout(dismiss, 6000);
+
+        container.appendChild(toast);
+    }
+
+=======
        NOTIFICATION POLLING (every 30 seconds)
        ========================================================================= */
+>>>>>>> upstream/main
     function pollNotifications() {
         var badge = document.getElementById('rpms-notif-badge');
         var mobileBadge = document.getElementById('rpms-notif-badge-mobile');
@@ -185,15 +319,54 @@
                 mobileBadge.textContent = count > 99 ? '99+' : count;
                 mobileBadge.style.display = count > 0 ? 'flex' : 'none';
             }
+<<<<<<< HEAD
+
+            var recent = data.data.recent || [];
+            if (recent.length > 0) {
+                var maxId = Math.max.apply(null, recent.map(function(n) { return n.id || 0; }));
+                if (isFirstNotificationPoll) {
+                    lastSeenNotificationId = maxId;
+                    isFirstNotificationPoll = false;
+                } else if (lastSeenNotificationId !== null) {
+                    // Check for newly arrived unread notifications
+                    recent.forEach(function (n) {
+                        if (n.id > lastSeenNotificationId && !n.read_at) {
+                            showToast({
+                                title: n.title,
+                                message: n.message,
+                                category: n.category,
+                                action_url: n.action_url
+                            });
+                        }
+                    });
+                    lastSeenNotificationId = Math.max(lastSeenNotificationId, maxId);
+                }
+            }
+=======
+>>>>>>> upstream/main
         })
         .catch(function () { /* silently ignore */ });
     }
 
+<<<<<<< HEAD
+    // Expose toast trigger & listen for custom events
+    window.rpmsShowToast = showToast;
+    window.addEventListener('rpms:notify', function (e) {
+        if (e && e.detail) showToast(e.detail);
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initial poll
+        setTimeout(pollNotifications, 2000);
+        // Recurring poll every 20 seconds
+        setInterval(pollNotifications, 20000);
+=======
     document.addEventListener('DOMContentLoaded', function () {
         // Initial poll
         setTimeout(pollNotifications, 2000);
         // Recurring poll every 30 seconds
         setInterval(pollNotifications, 30000);
+>>>>>>> upstream/main
     });
 
     /* =========================================================================

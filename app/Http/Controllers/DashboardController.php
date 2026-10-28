@@ -36,6 +36,27 @@ class DashboardController extends Controller
         $disbursedHistory = collect();
         $recentActivity = collect();
         $pendingCancellations = collect();
+<<<<<<< HEAD
+
+        if (in_array($role, ['admin', 'coordinator', 'dean', 'rcsc', 'vparttcs'])) {
+            $cancellations = Project::where('status', 'PendingCancellation')
+                ->with('pi');
+
+            if (in_array($role, ['coordinator', 'dean'])) {
+                $collegeId = Department::where('id', $user->dept_id)->value('college_id');
+                $collegeDepartmentIds = Department::where('college_id', $collegeId)->pluck('id');
+                $cancellations->whereIn('dept_id', $collegeDepartmentIds);
+            }
+
+            $pendingCancellations = $cancellations->latest()->get();
+        }
+
+        $recentActivity = \App\Models\AuditLog::with('user')
+            ->latest()
+            ->limit(5)
+            ->get();
+=======
+>>>>>>> upstream/main
 
         if (in_array($role, ['admin', 'coordinator', 'dean', 'rcsc', 'vparttcs'])) {
             $cancellations = Project::where('status', 'PendingCancellation')
@@ -87,9 +108,32 @@ class DashboardController extends Controller
             $pendingApprovals = Project::where('status', '!=', 'Draft')->where('status', '!=', 'Withdrawn')->with(['pi', 'thematicArea'])->latest()->limit(10)->get();
         }
 
+        $statusDistribution = [
+            'In Progress' => Project::whereIn('status', ['Active', 'Approved'])->count(),
+            'Submitted'   => Project::whereIn('status', ['Submitted', 'DH_Screened'])->count(),
+            'Under Review'=> Project::where('status', 'UnderReview')->count(),
+            'On Hold'     => Project::whereIn('status', ['Returned', 'PendingCancellation'])->count(),
+            'Completed'   => Project::where('status', 'Completed')->count(),
+        ];
+        $totalProjectsCount = array_sum($statusDistribution);
+        if ($totalProjectsCount === 0) {
+            $totalProjectsCount = max(1, Project::count());
+        }
+
+        $recentProjectsList = Project::with(['pi', 'thematicArea'])->latest()->limit(5)->get();
+
         $alerts = \App\Services\AlertsService::all();
 
+<<<<<<< HEAD
+        return view('dashboard', compact(
+            'user', 'role', 'stats', 'myProjects', 'assignedReviews', 
+            'pendingApprovals', 'teamProjects', 'pendingDisbursements', 
+            'disbursedHistory', 'recentActivity', 'pendingCancellations', 
+            'alerts', 'statusDistribution', 'totalProjectsCount', 'recentProjectsList'
+        ));
+=======
         return view('dashboard', compact('user', 'role', 'stats', 'myProjects', 'assignedReviews', 'pendingApprovals', 'teamProjects', 'pendingDisbursements', 'disbursedHistory', 'recentActivity', 'pendingCancellations', 'alerts'));
+>>>>>>> upstream/main
     }
 
     private function getRoleSpecificStats($user, $role)
@@ -105,10 +149,18 @@ class DashboardController extends Controller
                 'total_budget' => (clone $myProjects)->sum('requested_budget'),
                 'approved_budget' => (clone $myProjects)->sum('approved_budget'),
                 'pending_extensions' => ProjectExtension::whereHas('project', fn($q) => $q->where('pi_id', $user->id))->where('status', 'Pending')->count(),
+                'next_defence' => \App\Models\PresentationSchedule::whereHas('project', fn($q) => $q->where('pi_id', $user->id))
+                    ->where('status', 'Scheduled')
+                    ->where('scheduled_at', '>=', now())
+                    ->orderBy('scheduled_at')
+                    ->first(),
             ];
         } elseif ($role === 'reviewer') {
             return [
                 'pending_reviews' => Evaluation::where('examiner_id', $user->id)->where('decision', 'Pending')->count(),
+                'pending_proposal_reviews' => Evaluation::where('examiner_id', $user->id)->where(fn($q) => $q->where('evaluation_type', 'Proposal')->orWhereNull('evaluation_type'))->where('decision', 'Pending')->count(),
+                'pending_progress_reviews' => Evaluation::where('examiner_id', $user->id)->where('evaluation_type', 'Progress')->where('decision', 'Pending')->count(),
+                'pending_final_reviews' => Evaluation::where('examiner_id', $user->id)->where('evaluation_type', 'FinalDefence')->where('decision', 'Pending')->count(),
                 'completed_reviews' => Evaluation::where('examiner_id', $user->id)->where('decision', '!=', 'Pending')->count(),
                 'avg_score' => Evaluation::where('examiner_id', $user->id)->where('decision', '!=', 'Pending')->avg('score') ?? 0,
             ];
@@ -170,6 +222,15 @@ class DashboardController extends Controller
             return [
                 'team_projects' => ProjectMember::where('user_id', $user->id)->count(),
                 'active_projects' => ProjectMember::where('user_id', $user->id)->whereHas('project', fn($q) => $q->where('status', 'Active'))->count(),
+            ];
+        } elseif ($role === 'ttcsd') {
+            return [
+                'total_projects'       => Project::where('status', '!=', 'Draft')->count(),
+                'active_projects'      => Project::where('status', 'Active')->count(),
+                'delayed_projects'     => Project::where('status', 'Active')->where('activated_at', '<', now()->subMonths(12))->count(),
+                'pending_terminations' => \App\Models\ProjectTermination::where('status', 'Pending')->count(),
+                'pending_amendments'   => \App\Models\BudgetAmendment::where('status', 'Pending')->count(),
+                'pending_extensions'   => \App\Models\ProjectExtension::where('status', 'Pending')->count(),
             ];
         }
 

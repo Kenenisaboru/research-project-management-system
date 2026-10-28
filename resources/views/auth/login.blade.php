@@ -3,23 +3,38 @@
 @section('content')
 <section class="login-frame" aria-labelledby="login-title">
     <div class="login-intro">
+<<<<<<< HEAD
+        <div class="login-brand">
+=======
         <a href="{{ route('home') }}" class="login-brand text-decoration-none text-white" title="Return to Home">
+>>>>>>> upstream/main
             <span class="login-brand-mark"><i class="bi bi-journal-bookmark-fill"></i></span>
             <span>
                 <strong>RPMS</strong>
                 <small>Research Project Management System</small>
             </span>
+<<<<<<< HEAD
+        </div>
+
+        <div class="login-intro-copy">
+            <span class="login-eyebrow"><i class="bi bi-stars me-2"></i>Research, made manageable</span>
+=======
         </a>
 
         <div class="login-intro-copy">
             <span class="login-eyebrow"><i class="bi bi-star me-2"></i>Research, made manageable</span>
+>>>>>>> upstream/main
             <h1>Ideas into impact.<br><span>Every step, connected.</span></h1>
             <p>One secure workspace for research proposals, reviews, funding, and project progress.</p>
 
             <div class="login-benefits">
                 <div><i class="bi bi-check2-circle"></i><span>Follow projects from proposal to completion</span></div>
                 <div><i class="bi bi-shield-check"></i><span>Keep reviews and approvals in one place</span></div>
+<<<<<<< HEAD
+                <div><i class="bi bi-graph-up-arrow"></i><span>See progress and funding at a glance</span></div>
+=======
                 <div><i class="bi bi-graph-up"></i><span>See progress and funding at a glance</span></div>
+>>>>>>> upstream/main
             </div>
         </div>
 
@@ -48,7 +63,11 @@
             <form method="POST" action="{{ route('login') }}" autocomplete="on" id="loginForm">
                 @csrf
 
+<<<<<<< HEAD
+                <div class="mb-3">
+=======
                 <div class="mb-2">
+>>>>>>> upstream/main
                     <label class="form-label" for="email">Email address</label>
                     <div class="login-input-wrap">
                         <i class="bi bi-envelope"></i>
@@ -59,12 +78,21 @@
                     </div>
                 </div>
 
+<<<<<<< HEAD
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <label class="form-label mb-0" for="password">Password</label>
+                        <span class="login-help">Need help? Contact your system administrator.</span>
+                    </div>
+                    <div class="login-input-wrap login-password-wrap mt-2">
+=======
                 <div class="mb-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <label class="form-label mb-0" for="password">Password</label>
                         <span class="login-help">Need help? Contact administrator.</span>
                     </div>
                     <div class="login-input-wrap login-password-wrap mt-1">
+>>>>>>> upstream/main
                         <i class="bi bi-lock"></i>
                         <input type="password" id="password" name="password" class="form-control"
                                required placeholder="Enter your password" autocomplete="current-password">
@@ -75,12 +103,21 @@
                     </div>
                 </div>
 
+<<<<<<< HEAD
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <label class="form-check login-remember mb-0" for="remember">
+                        <input type="checkbox" class="form-check-input" id="remember" name="remember" {{ old('remember') ? 'checked' : '' }}>
+                        <span class="form-check-label">Remember me</span>
+                    </label>
+                    <span class="login-secure"><i class="bi bi-shield-lock me-1"></i>Secure sign in</span>
+=======
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <label class="form-check login-remember mb-0" for="remember">
                         <input type="checkbox" class="form-check-input" id="remember" name="remember" {{ old('remember') ? 'checked' : '' }}>
                         <span class="form-check-label" style="font-size:0.78rem;">Remember me</span>
                     </label>
                     <span class="login-secure" style="font-size:0.72rem;"><i class="bi bi-shield-lock me-1"></i>Secure sign in</span>
+>>>>>>> upstream/main
                 </div>
 
                 <button type="submit" id="loginBtn" class="btn btn-success w-100 login-submit">
@@ -92,6 +129,27 @@
                 </button>
             </form>
 
+<<<<<<< HEAD
+            @if(app()->environment('local'))
+            <div class="login-demo">
+                <div class="login-divider"><span>Workflow test accounts</span></div>
+                <p class="small text-muted mb-2">Sign in with each role separately, then sign out before continuing to the next approval step.</p>
+                <div class="workflow-account-list">
+                    <div><span>Principal Investigator</span><code>pi@rpms.local</code></div>
+                    <div><span>Team Member</span><code>tm@rpms.local</code></div>
+                    <div><span>Department Head</span><code>dh@rpms.local</code></div>
+                    <div><span>Research Coordinator</span><code>coordinator@rpms.local</code></div>
+                    <div><span>Peer Reviewer</span><code>reviewer@rpms.local</code></div>
+                    <div><span>Peer Reviewer 2</span><code>reviewer2@rpms.local</code></div>
+                    <div><span>College Dean</span><code>dean@rpms.local</code></div>
+                    <div><span>IRERC Ethics</span><code>irerc@rpms.local</code></div>
+                    <div><span>Vice President</span><code>vp@rpms.local</code></div>
+                    <div><span>RCSC Chair</span><code>rcsc@rpms.local</code></div>
+                    <div><span>Finance Office</span><code>finance@rpms.local</code></div>
+                    <div><span>System Administrator</span><code>admin@rpms.local</code></div>
+                </div>
+                <p class="small text-muted mt-2 mb-0">Local test password for these seeded accounts: <code>UNI@Demo1</code>. Do not use demo accounts or passwords in production.</p>
+=======
             @if(config('rpms.show_demo_accounts'))
             <div class="login-demo mt-2 pt-2 border-top">
                 <div class="d-flex align-items-center justify-content-between mb-1">
@@ -114,6 +172,7 @@
                     <button type="button" class="demo-btn" data-email="finance@rpms.local" title="Finance Office (finance@rpms.local)">Finance</button>
                     <button type="button" class="demo-btn" data-email="admin@rpms.local" title="System Administrator (admin@rpms.local)">Admin</button>
                 </div>
+>>>>>>> upstream/main
             </div>
             @endif
 
@@ -186,6 +245,17 @@
 <style>
     .login-frame {
         display: grid;
+<<<<<<< HEAD
+        grid-template-columns: minmax(0, 1.05fr) minmax(420px, 0.95fr);
+        width: min(1120px, calc(100% - 3rem));
+        min-height: min(680px, calc(100vh - 3rem));
+        margin: 1.5rem auto;
+        overflow: hidden;
+        border: 1px solid #e2e9e5;
+        border-radius: 1.6rem;
+        background: #fff;
+        box-shadow: 0 28px 80px rgba(20, 52, 42, 0.13);
+=======
         grid-template-columns: minmax(0, 1.05fr) minmax(390px, 0.95fr);
         width: min(980px, 100%);
         min-height: 520px;
@@ -195,6 +265,7 @@
         border-radius: 1.25rem;
         background: #fff;
         box-shadow: 0 16px 50px rgba(20, 52, 42, 0.12);
+>>>>>>> upstream/main
     }
     .login-intro {
         position: relative;
@@ -203,7 +274,11 @@
         justify-content: space-between;
         min-height: 100%;
         overflow: hidden;
+<<<<<<< HEAD
+        padding: clamp(2rem, 5vw, 4rem);
+=======
         padding: clamp(1.5rem, 3.5vw, 2.5rem);
+>>>>>>> upstream/main
         color: #fff;
         background:
             radial-gradient(circle at 84% 14%, rgba(113, 201, 156, 0.22), transparent 15rem),
@@ -213,11 +288,19 @@
         position: absolute;
         right: -8rem;
         bottom: -11rem;
+<<<<<<< HEAD
+        width: 27rem;
+        height: 27rem;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 50%;
+        box-shadow: 0 0 0 34px rgba(255, 255, 255, 0.025), 0 0 0 72px rgba(255, 255, 255, 0.02);
+=======
         width: 24rem;
         height: 24rem;
         border: 1px solid rgba(255, 255, 255, 0.12);
         border-radius: 50%;
         box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.025), 0 0 0 65px rgba(255, 255, 255, 0.02);
+>>>>>>> upstream/main
         content: "";
         pointer-events: none;
     }
@@ -225,6 +308,20 @@
         z-index: 1;
         display: flex;
         align-items: center;
+<<<<<<< HEAD
+        gap: 0.85rem;
+    }
+    .login-brand-mark {
+        display: grid;
+        width: 3rem;
+        height: 3rem;
+        place-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        border-radius: 1rem;
+        color: #f2d58e;
+        background: rgba(255, 255, 255, 0.1);
+        font-size: 1.35rem;
+=======
         gap: 0.75rem;
     }
     .login-brand-mark {
@@ -237,30 +334,59 @@
         color: #f2d58e;
         background: rgba(255, 255, 255, 0.1);
         font-size: 1.15rem;
+>>>>>>> upstream/main
     }
     .login-brand strong,
     .login-brand small {
         display: block;
     }
     .login-brand strong {
+<<<<<<< HEAD
+        font-size: 1.1rem;
+        letter-spacing: 0.09em;
+=======
         font-size: 1rem;
         letter-spacing: 0.08em;
+>>>>>>> upstream/main
     }
     .login-brand small {
         margin-top: 0.1rem;
         color: rgba(255, 255, 255, 0.68);
+<<<<<<< HEAD
+        font-size: 0.72rem;
+    }
+    .login-intro-copy {
+        z-index: 1;
+        max-width: 34rem;
+        padding: 3rem 0;
+=======
         font-size: 0.68rem;
     }
     .login-intro-copy {
         z-index: 1;
         max-width: 32rem;
         padding: 0.75rem 0;
+>>>>>>> upstream/main
     }
     .login-eyebrow,
     .login-form-kicker {
         display: inline-flex;
         align-items: center;
         color: #c8e5d4;
+<<<<<<< HEAD
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+    .login-intro h1 {
+        margin: 1.3rem 0 1rem;
+        color: #fff;
+        font-size: clamp(2.35rem, 4vw, 3.6rem);
+        font-weight: 750;
+        letter-spacing: -0.055em;
+        line-height: 1.08;
+=======
         font-size: 0.7rem;
         font-weight: 700;
         letter-spacing: 0.1em;
@@ -273,11 +399,23 @@
         font-weight: 750;
         letter-spacing: -0.04em;
         line-height: 1.15;
+>>>>>>> upstream/main
     }
     .login-intro h1 span {
         color: #c8e5d4;
     }
     .login-intro-copy > p {
+<<<<<<< HEAD
+        max-width: 28rem;
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 1rem;
+        line-height: 1.7;
+    }
+    .login-benefits {
+        display: grid;
+        gap: 1rem;
+        margin-top: 2rem;
+=======
         max-width: 26rem;
         color: rgba(255, 255, 255, 0.72);
         font-size: 0.86rem;
@@ -288,10 +426,20 @@
         display: grid;
         gap: 0.5rem;
         margin-top: 1rem;
+>>>>>>> upstream/main
     }
     .login-benefits > div {
         display: flex;
         align-items: center;
+<<<<<<< HEAD
+        gap: 0.8rem;
+        color: rgba(255, 255, 255, 0.88);
+        font-size: 0.9rem;
+    }
+    .login-benefits i {
+        color: #c8e5d4;
+        font-size: 1.15rem;
+=======
         gap: 0.65rem;
         color: rgba(255, 255, 255, 0.88);
         font-size: 0.82rem;
@@ -299,21 +447,54 @@
     .login-benefits i {
         color: #c8e5d4;
         font-size: 1rem;
+>>>>>>> upstream/main
     }
     .login-intro-footer {
         z-index: 1;
         color: rgba(255, 255, 255, 0.63);
+<<<<<<< HEAD
+        font-size: 0.78rem;
+=======
         font-size: 0.74rem;
+>>>>>>> upstream/main
     }
     .login-panel {
         display: flex;
         align-items: center;
         justify-content: center;
+<<<<<<< HEAD
+        padding: clamp(2rem, 5vw, 4.5rem);
+=======
         padding: clamp(1.25rem, 2.5vw, 1.85rem) clamp(1.5rem, 3.5vw, 2.5rem);
+>>>>>>> upstream/main
         background: #fff;
     }
     .login-panel-inner {
         width: 100%;
+<<<<<<< HEAD
+        max-width: 390px;
+    }
+    .login-form-kicker {
+        color: #398365;
+        letter-spacing: 0.11em;
+    }
+    .login-panel h2 {
+        margin: 0.7rem 0 0.45rem;
+        color: #19372e;
+        font-size: 1.85rem;
+        font-weight: 750;
+        letter-spacing: -0.04em;
+    }
+    .login-form-description {
+        margin-bottom: 2rem;
+        color: #76837d;
+        font-size: 0.91rem;
+    }
+    .login-panel .form-label {
+        margin-bottom: 0.5rem;
+        color: #344c42;
+        font-size: 0.82rem;
+=======
         max-width: 410px;
     }
     .login-form-kicker {
@@ -336,6 +517,7 @@
         margin-bottom: 0.2rem;
         color: #344c42;
         font-size: 0.78rem;
+>>>>>>> upstream/main
         font-weight: 700;
     }
     .login-input-wrap {
@@ -345,6 +527,22 @@
         position: absolute;
         z-index: 2;
         top: 50%;
+<<<<<<< HEAD
+        left: 0.95rem;
+        color: #8a9b92;
+        transform: translateY(-50%);
+    }
+    .login-input-wrap .form-control {
+        min-height: 50px;
+        padding-left: 2.7rem;
+        border-color: #dfe7e3;
+        border-radius: 0.75rem;
+        background: #fbfcfb;
+        font-size: 0.88rem;
+    }
+    .login-input-wrap .form-control:focus {
+        background: #fff;
+=======
         left: 0.85rem;
         color: #8a9b92;
         transform: translateY(-50%);
@@ -372,6 +570,7 @@
         -webkit-box-shadow: 0 0 0 40px #fbfcfb inset !important;
         -webkit-text-fill-color: #19372e !important;
         transition: background-color 5000s ease-in-out 0s;
+>>>>>>> upstream/main
     }
     .login-help {
         max-width: 12rem;
@@ -380,30 +579,69 @@
         text-align: right;
     }
     .login-password-wrap .form-control {
+<<<<<<< HEAD
+        padding-right: 3rem;
+=======
         padding-right: 2.7rem;
+>>>>>>> upstream/main
     }
     .password-toggle {
         position: absolute;
         z-index: 3;
         top: 50%;
+<<<<<<< HEAD
+        right: 0.8rem;
+        padding: 0.35rem;
+=======
         right: 0.7rem;
         padding: 0.25rem;
+>>>>>>> upstream/main
         border: 0;
         color: #74847c;
         background: transparent;
         transform: translateY(-50%);
+<<<<<<< HEAD
+=======
         font-size: 0.85rem;
+>>>>>>> upstream/main
     }
     .login-remember {
         display: flex;
         align-items: center;
+<<<<<<< HEAD
+        gap: 0.55rem;
+        color: #52635a;
+        font-size: 0.82rem;
+=======
         gap: 0.45rem;
         color: #52635a;
         font-size: 0.78rem;
+>>>>>>> upstream/main
     }
     .login-remember .form-check-input {
         float: none;
         margin: 0;
+<<<<<<< HEAD
+    }
+    .login-secure {
+        color: #75857c;
+        font-size: 0.75rem;
+    }
+    .login-submit {
+        display: flex;
+        min-height: 52px;
+        align-items: center;
+        padding: 0.75rem 1.05rem;
+        border: 0 !important;
+        border-radius: 0.78rem;
+        background: #17624b !important;
+        font-size: 0.92rem;
+        box-shadow: 0 8px 18px rgba(23, 98, 75, 0.2);
+    }
+    .login-submit:hover {
+        background: #104b3a !important;
+        box-shadow: 0 10px 22px rgba(23, 98, 75, 0.27);
+=======
         width: 0.9rem;
         height: 0.9rem;
     }
@@ -425,6 +663,7 @@
     .login-submit:hover {
         background: #104b3a !important;
         box-shadow: 0 8px 18px rgba(23, 98, 75, 0.24);
+>>>>>>> upstream/main
     }
     .login-submit:disabled {
         opacity: 0.75;
@@ -432,6 +671,82 @@
     .login-error {
         display: flex;
         align-items: flex-start;
+<<<<<<< HEAD
+        gap: 0.6rem;
+        font-size: 0.83rem;
+    }
+    .login-demo {
+        margin-top: 1.55rem;
+    }
+    .workflow-account-list {
+        display: grid;
+        gap: 0.35rem;
+        max-height: 190px;
+        overflow-y: auto;
+        padding: 0.65rem;
+        border: 1px solid #e5ebe8;
+        border-radius: 0.75rem;
+        background: #f8faf9;
+    }
+    .workflow-account-list > div {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.5rem;
+        color: #435a4f;
+        font-size: 0.72rem;
+    }
+    .workflow-account-list code {
+        color: #17624b;
+        font-size: 0.7rem;
+        white-space: nowrap;
+    }
+    .login-divider {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        color: #92a098;
+        font-size: 0.7rem;
+    }
+    .login-divider::before,
+    .login-divider::after {
+        height: 1px;
+        flex: 1;
+        background: #e8eeeb;
+        content: "";
+    }
+    .login-legal {
+        margin: 1.6rem 0 0;
+        color: #98a49e;
+        font-size: 0.68rem;
+        line-height: 1.6;
+        text-align: center;
+    }
+    @media (max-width: 767.98px) {
+        .login-frame {
+            grid-template-columns: 1fr;
+            width: min(520px, calc(100% - 1.5rem));
+            min-height: 0;
+            margin: 0.75rem auto;
+            border-radius: 1.2rem;
+        }
+        .login-intro {
+            min-height: 0;
+            padding: 1.5rem;
+        }
+        .login-intro-copy {
+            padding: 2rem 0 0.5rem;
+        }
+        .login-intro h1 {
+            margin: 0.9rem 0 0.6rem;
+            font-size: 2rem;
+        }
+        .login-intro-copy > p {
+            margin-bottom: 0;
+            font-size: 0.87rem;
+        }
+        .login-benefits,
+=======
         gap: 0.5rem;
         font-size: 0.78rem;
         padding: 0.5rem 0.75rem;
@@ -508,10 +823,26 @@
         .login-benefits > div {
             font-size: 0.8rem;
         }
+>>>>>>> upstream/main
         .login-intro-footer {
             display: none;
         }
         .login-panel {
+<<<<<<< HEAD
+            padding: 1.8rem 1.5rem 2rem;
+        }
+        .login-panel h2 {
+            font-size: 1.55rem;
+        }
+        .login-form-description {
+            margin-bottom: 1.5rem;
+        }
+    }
+    @media (max-width: 390px) {
+        .login-help {
+            max-width: 9rem;
+            font-size: 0.63rem;
+=======
             padding: 1.25rem 1.25rem;
         }
     }
@@ -557,6 +888,7 @@
         .login-help {
             max-width: 8.5rem;
             font-size: 0.62rem;
+>>>>>>> upstream/main
         }
     }
 </style>

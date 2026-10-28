@@ -112,6 +112,8 @@ class Handler extends ExceptionHandler
         });
 
         // -------------------------------------------------------------------
+<<<<<<< HEAD
+=======
         // TokenMismatchException (419 Page Expired) → Redirect to login
         // -------------------------------------------------------------------
         $this->renderable(function (\Illuminate\Session\TokenMismatchException $e, $request) {
@@ -128,6 +130,7 @@ class Handler extends ExceptionHandler
         });
 
         // -------------------------------------------------------------------
+>>>>>>> upstream/main
         // Generic HTTP exceptions
         // -------------------------------------------------------------------
         $this->renderable(function (HttpException $e, $request) {

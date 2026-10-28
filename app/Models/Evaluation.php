@@ -14,11 +14,14 @@ class Evaluation extends Model
     protected $fillable = [
         'project_id',
         'examiner_id',
+        'evaluation_type',
         'score',
         'decision',
+        'final_decision',
+        'revision_comments',
         'comments',
         'is_blind_masked',
-        'evaluated_at'
+        'evaluated_at',
     ];
 
     protected $casts = [

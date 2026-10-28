@@ -56,6 +56,23 @@ class GovernanceController extends Controller
 
     public function coordinatorHub()
     {
+        $needs_assessment = Project::where('status', 'DH_Screened')
+            ->whereNull('coordinator_assessment')
+            ->with(['pi', 'department', 'thematicArea'])
+            ->latest()
+            ->get();
+
+        $needs_reviewer = Project::where('status', 'DH_Screened')
+            ->whereNotNull('coordinator_assessment')
+            ->with(['pi', 'department', 'thematicArea', 'evaluations'])
+            ->latest()
+            ->get();
+
+        $under_review = Project::where('status', 'UnderReview')
+            ->with(['pi', 'evaluations', 'irercClearance'])
+            ->latest()
+            ->get();
+
         $projects = Project::whereIn('status', ['DH_Screened', 'UnderReview'])
             ->with(['pi', 'evaluations', 'irercClearance'])
             ->latest()
@@ -80,7 +97,7 @@ class GovernanceController extends Controller
                 ];
             });
 
-        return view('governance.coordinator_hub', compact('projects', 'reviewers'));
+        return view('governance.coordinator_hub', compact('projects', 'reviewers', 'needs_assessment', 'needs_reviewer', 'under_review'));
     }
 
     public function deanApprovals()
@@ -165,7 +182,12 @@ class GovernanceController extends Controller
             ->latest('updated_at')
             ->get();
 
-        return view('governance.rcsc_portal', compact('pending', 'completed'));
+        $proposals = Project::whereIn('status', ['UnderReview', 'RCSC_Review'])
+            ->where('requested_budget', '>=', 500000)
+            ->with(['pi', 'thematicArea', 'members.user'])
+            ->get();
+
+        return view('governance.rcsc_portal', compact('pending', 'completed', 'proposals'));
     }
 
     public function rcscDecision(Request $request, $id)
