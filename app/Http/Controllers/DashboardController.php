@@ -36,6 +36,7 @@ class DashboardController extends Controller
         $disbursedHistory = collect();
         $recentActivity = collect();
         $pendingCancellations = collect();
+<<<<<<< HEAD
 
         if (in_array($role, ['admin', 'coordinator', 'dean', 'rcsc', 'vparttcs'])) {
             $cancellations = Project::where('status', 'PendingCancellation')
@@ -54,8 +55,28 @@ class DashboardController extends Controller
             ->latest()
             ->limit(5)
             ->get();
+=======
+>>>>>>> upstream/main
 
-        if ($role === 'pi') {
+        if (in_array($role, ['admin', 'coordinator', 'dean', 'rcsc', 'vparttcs'])) {
+            $cancellations = Project::where('status', 'PendingCancellation')
+                ->with('pi');
+
+            if (in_array($role, ['coordinator', 'dean'])) {
+                $collegeId = Department::where('id', $user->dept_id)->value('college_id');
+                $collegeDepartmentIds = Department::where('college_id', $collegeId)->pluck('id');
+                $cancellations->whereIn('dept_id', $collegeDepartmentIds);
+            }
+
+            $pendingCancellations = $cancellations->latest()->get();
+        }
+
+        if ($role === 'admin') {
+            $recentActivity = \App\Models\AuditLog::with('user')
+                ->latest()
+                ->limit(6)
+                ->get();
+        } elseif ($role === 'pi') {
             $myProjects = Project::where('pi_id', $user->id)->with(['thematicArea', 'irercClearance'])->get();
         } elseif ($role === 'reviewer') {
             $assignedReviews = Evaluation::where('examiner_id', $user->id)
@@ -103,12 +124,16 @@ class DashboardController extends Controller
 
         $alerts = \App\Services\AlertsService::all();
 
+<<<<<<< HEAD
         return view('dashboard', compact(
             'user', 'role', 'stats', 'myProjects', 'assignedReviews', 
             'pendingApprovals', 'teamProjects', 'pendingDisbursements', 
             'disbursedHistory', 'recentActivity', 'pendingCancellations', 
             'alerts', 'statusDistribution', 'totalProjectsCount', 'recentProjectsList'
         ));
+=======
+        return view('dashboard', compact('user', 'role', 'stats', 'myProjects', 'assignedReviews', 'pendingApprovals', 'teamProjects', 'pendingDisbursements', 'disbursedHistory', 'recentActivity', 'pendingCancellations', 'alerts'));
+>>>>>>> upstream/main
     }
 
     private function getRoleSpecificStats($user, $role)

@@ -174,6 +174,7 @@ class ReportController extends Controller
 
         return $pdf->download('GU_Researcher_Performance_Summary_' . date('Y') . '.pdf');
     }
+<<<<<<< HEAD
 
     /**
      * 5. Coordinator Operational & Periodic Portfolio Report
@@ -262,4 +263,6 @@ class ReportController extends Controller
 
         return $pdf->download("GU_Coordinator_Operational_{$period}_" . date('Y') . ".pdf");
     }
+=======
+>>>>>>> upstream/main
 }

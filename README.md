@@ -8,6 +8,10 @@
 ## Features
 
 ### Core Workflow
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/main
 - **11-Role RBAC:** PI, Team Member, DH, Coordinator, Reviewer, Dean, IRERC, VP ARTTCS, RCSC, Finance, Admin
 - **Project Lifecycle:** Draft → Submitted → DH Screened → Under Review → Approved → Active → Completed
 - **Blind Peer Review:** Anonymous double-blind evaluation with scoring rubrics
@@ -21,6 +25,10 @@
 - **Publication & Award:** Papers, journal indexing, evaluations, awards
 
 ### Pro-Level Upgrades ✨
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/main
 - **API v1 Layer:** RESTful JSON API with Sanctum auth, API Resources, rate limiting
 - **Event Architecture:** 8 domain events + queued listeners, all decoupled from controllers
 - **Queue System:** Database/Redis queue with ProcessBackupJob, ProcessCsvImportJob, ProjectStatusMail
@@ -47,8 +55,8 @@
 
 For local development only, seed the demo data (`php artisan migrate --seed`) and use one of the following accounts. **All demo accounts share the same password:** `UNI@Demo1`. Never use these seeded accounts in a production deployment.
 
-| Role                               | Email Address                   |
-| :--------------------------------- | :------------------------------ |
+| Role                               | Email Address              |
+| :--------------------------------- | :------------------------- |
 | **System Administrator**     | `admin@rpms.local`       |
 | **Principal Investigator**   | `pi@rpms.local`          |
 | **Team Member**              | `tm@rpms.local`          |
@@ -127,6 +135,7 @@ Visit `http://localhost:8000`
 
 Key variables in `.env`:
 
+<<<<<<< HEAD
 | Variable           | Description     | Default                   |
 | ------------------ | --------------- | ------------------------- |
 | `APP_KEY`        | Encryption key  | Pre-configured            |
@@ -141,6 +150,22 @@ Key variables in `.env`:
 | `RPMS_BACKUP_RETENTION_DAYS` | Backup retention window (auto-prune) | `30` |
 | `RPMS_SCHEDULED_BACKUP` | Enable the daily scheduled backup | `true` |
 | `RPMS_SEED_DEMO_DATA` | Seed demo accounts and sample records (local/testing by default; keep `false` in production) | `false` |
+=======
+| Variable                       | Description                                                                                    | Default                   |
+| ------------------------------ | ---------------------------------------------------------------------------------------------- | ------------------------- |
+| `APP_KEY`                    | Encryption key                                                                                 | Pre-configured            |
+| `APP_URL`                    | Application URL                                                                                | Auto-detected             |
+| `APP_DEBUG`                  | Debug mode                                                                                     | `false` in production   |
+| `DB_CONNECTION`              | Database driver                                                                                | `sqlite`                |
+| `DB_DATABASE`                | Database path                                                                                  | `/data/database.sqlite` |
+| `CACHE_DRIVER`               | Cache backend                                                                                  | `file`                  |
+| `SESSION_DRIVER`             | Session storage                                                                                | `file`                  |
+| `RPMS_OVERDUE_MONTHS`        | Months before an active project is flagged overdue                                             | `12`                    |
+| `RPMS_BUDGET_ALERT_PERCENT`  | Released-vs-approved budget alert threshold                                                    | `90`                    |
+| `RPMS_BACKUP_RETENTION_DAYS` | Backup retention window (auto-prune)                                                           | `30`                    |
+| `RPMS_SCHEDULED_BACKUP`      | Enable the daily scheduled backup                                                              | `true`                  |
+| `RPMS_SEED_DEMO_DATA`        | Seed demo accounts and sample records (local/testing by default; keep `false` in production) | `false`                 |
+>>>>>>> upstream/main
 
 ## Docker Deployment
 

@@ -112,6 +112,25 @@ class Handler extends ExceptionHandler
         });
 
         // -------------------------------------------------------------------
+<<<<<<< HEAD
+=======
+        // TokenMismatchException (419 Page Expired) → Redirect to login
+        // -------------------------------------------------------------------
+        $this->renderable(function (\Illuminate\Session\TokenMismatchException $e, $request) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Your session has expired. Please refresh and sign in again.',
+                ], 419);
+            }
+
+            return redirect()->route('login')->withErrors([
+                'email' => 'Your session has expired. Please refresh and sign in again.',
+            ]);
+        });
+
+        // -------------------------------------------------------------------
+>>>>>>> upstream/main
         // Generic HTTP exceptions
         // -------------------------------------------------------------------
         $this->renderable(function (HttpException $e, $request) {
