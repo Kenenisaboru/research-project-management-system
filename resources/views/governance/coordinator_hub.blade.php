@@ -140,75 +140,40 @@
         <div class="card card-custom">
             <div class="card-header bg-white d-flex justify-content-between align-items-center">
                 <h6 class="mb-0 fw-bold"><i class="bi bi-people me-2"></i>Available Reviewers</h6>
-                <span class="badge bg-dark">3 Reviewers</span>
+                <span class="badge bg-dark">{{ $reviewers->count() }} Reviewers</span>
             </div>
             <div class="card-body p-3">
                 <div class="row g-3">
-                    {{-- Reviewer 1: Active --}}
-                    <div class="col-lg-4 col-md-6">
-                        <div class="p-3 border rounded-3 bg-light reviewer-card h-100">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <div>
-                                    <h6 class="mb-0 fw-bold text-dark">Prof. Kebede Tassew (Reviewer 1)</h6>
-                                    <small class="text-muted">Water Resource Engineering</small>
+                    @forelse($reviewers as $reviewerData)
+                        @php
+                            $reviewer = $reviewerData['user'];
+                            $workloadClass = $reviewerData['workload_percent'] >= 80
+                                ? 'workload-high'
+                                : ($reviewerData['workload_percent'] >= 40 ? 'workload-medium' : 'workload-low');
+                        @endphp
+                        <div class="col-lg-4 col-md-6">
+                            <div class="p-3 border rounded-3 bg-light reviewer-card h-100">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <h6 class="mb-0 fw-bold text-dark">{{ $reviewer->name }}</h6>
+                                        <small class="text-muted">{{ $reviewer->department->name ?? 'No department assigned' }}</small>
+                                    </div>
+                                    <span class="badge bg-white text-dark border">{{ $reviewer->staff_id ?: 'Reviewer' }}</span>
                                 </div>
-                                <span class="badge bg-white text-dark border">UNI-EXAM-201</span>
-                            </div>
-                            <div class="d-flex gap-3 mb-2 small">
-                                <span><i class="bi bi-clipboard-check text-dark me-1"></i><strong>1</strong> Active</span>
-                                <span><i class="bi bi-check2-all text-success me-1"></i><strong>2</strong> Done</span>
-                                <span><i class="bi bi-star text-warning me-1"></i><strong>44.3</strong> Avg</span>
-                            </div>
-                            <div class="workload-bar">
-                                <div class="workload-fill workload-low" style="width: 20%"></div>
-                            </div>
-                            <small class="text-muted mt-1 d-block">Workload: 20%</small>
-                        </div>
-                    </div>
-
-                    {{-- Reviewer 2: Inactive (On Leave) --}}
-                    <div class="col-lg-4 col-md-6">
-                        <div class="p-3 border rounded-3 bg-light reviewer-card h-100 opacity-75" style="border-left-color: #6c757d !important; border-style: dashed;">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <div>
-                                    <h6 class="mb-0 fw-bold text-muted">Dr. Berhanu Nega (Reviewer 2)</h6>
-                                    <small class="text-muted">Plant Science &amp; Agronomy</small>
+                                <div class="d-flex gap-3 mb-2 small">
+                                    <span><i class="bi bi-clipboard-check text-dark me-1"></i><strong>{{ $reviewerData['active_reviews'] }}</strong> Active</span>
+                                    <span><i class="bi bi-check2-all text-success me-1"></i><strong>{{ $reviewerData['total_evaluations'] }}</strong> Done</span>
+                                    <span><i class="bi bi-star text-warning me-1"></i><strong>{{ $reviewerData['avg_score'] }}</strong> Avg</span>
                                 </div>
-                                <span class="badge bg-secondary text-white">Inactive / Standby</span>
-                            </div>
-                            <div class="d-flex gap-3 mb-2 small text-muted">
-                                <span><i class="bi bi-pause-circle me-1"></i>0 Active</span>
-                                <span><i class="bi bi-slash-circle me-1"></i>On Sabbatical</span>
-                                <span><i class="bi bi-shield me-1"></i>Faculty Pool</span>
-                            </div>
-                            <div class="workload-bar">
-                                <div class="workload-fill bg-secondary" style="width: 0%"></div>
-                            </div>
-                            <small class="text-muted mt-1 d-block">Status: Inactive / On Sabbatical Leave</small>
-                        </div>
-                    </div>
-
-                    {{-- Reviewer 3: Inactive (External Standby) --}}
-                    <div class="col-lg-4 col-md-6">
-                        <div class="p-3 border rounded-3 bg-light reviewer-card h-100 opacity-75" style="border-left-color: #6c757d !important; border-style: dashed;">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <div>
-                                    <h6 class="mb-0 fw-bold text-muted">Dr. Almaz Tefera (Reviewer 3)</h6>
-                                    <small class="text-muted">Public Health &amp; Epidemiology</small>
+                                <div class="workload-bar">
+                                    <div class="workload-fill {{ $workloadClass }}" style="width: {{ $reviewerData['workload_percent'] }}%"></div>
                                 </div>
-                                <span class="badge bg-secondary text-white">Inactive / Standby</span>
+                                <small class="text-muted mt-1 d-block">Workload: {{ $reviewerData['workload_percent'] }}%</small>
                             </div>
-                            <div class="d-flex gap-3 mb-2 small text-muted">
-                                <span><i class="bi bi-pause-circle me-1"></i>0 Active</span>
-                                <span><i class="bi bi-slash-circle me-1"></i>Unavailable</span>
-                                <span><i class="bi bi-globe me-1"></i>External Pool</span>
-                            </div>
-                            <div class="workload-bar">
-                                <div class="workload-fill bg-secondary" style="width: 0%"></div>
-                            </div>
-                            <small class="text-muted mt-1 d-block">Status: Inactive / External Standby Pool</small>
                         </div>
-                    </div>
+                    @empty
+                        <div class="col-12 text-center py-4 text-muted">No reviewers are registered.</div>
+                    @endforelse
                 </div>
             </div>
         </div>
@@ -228,7 +193,6 @@
             <div class="modal-body">
                 <form id="assignReviewerForm" method="POST">
                     @csrf
-                    <input type="hidden" name="examiner_id" id="modal-reviewer-id">
                     <div class="mb-3">
                         <label class="form-label fw-bold">Project</label>
                         <input type="text" class="form-control" id="modal-project-title" readonly>
@@ -238,15 +202,11 @@
                         <label class="form-label fw-bold">Select Reviewer</label>
                         <select class="form-select" id="modal-reviewer-select" name="examiner_id" required>
                             <option value="">Choose a reviewer...</option>
-                            <option value="4">
-                                Prof. Kebede Tassew (Reviewer 1) - Water Resource Engineering (1 active, Avg: 44.3)
-                            </option>
-                            <option value="" disabled class="text-muted bg-light">
-                                Dr. Berhanu Nega (Reviewer 2) - Plant Science (Inactive / On Leave)
-                            </option>
-                            <option value="" disabled class="text-muted bg-light">
-                                Dr. Almaz Tefera (Reviewer 3) - Public Health (Inactive / Standby)
-                            </option>
+                            @foreach($reviewers as $reviewerData)
+                                <option value="{{ $reviewerData['user']->id }}">
+                                    {{ $reviewerData['user']->name }} - {{ $reviewerData['user']->department->name ?? 'No department' }} ({{ $reviewerData['active_reviews'] }} active, Avg: {{ $reviewerData['avg_score'] }})
+                                </option>
+                            @endforeach
                         </select>
                     </div>
                 <div id="reviewer-workload-info" class="alert alert-secondary d-none">
